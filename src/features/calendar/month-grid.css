@@ -1,0 +1,166 @@
+.mgrid {
+  margin: 0 var(--space-gutter);
+  border: 1px solid var(--rule-strong);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+  overflow: hidden;
+}
+
+.mgrid__weekdays,
+.mgrid__body {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+}
+
+.mgrid__weekdays {
+  border-bottom: 2px solid var(--ink);
+}
+
+.mgrid__weekdays span {
+  padding: var(--space-2);
+  text-align: center;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: var(--muted);
+}
+
+.mgrid__weekdays span[data-weekend='true'] {
+  color: var(--p1);
+}
+
+.mcell {
+  min-height: 6.5rem;
+  padding: var(--space-1);
+  border-right: 1px solid var(--rule);
+  border-bottom: 1px solid var(--rule);
+  cursor: cell;
+  transition: background-color var(--duration-fast) var(--ease-out);
+}
+
+.mcell:nth-child(7n) {
+  border-right: 0;
+}
+
+.mcell:hover {
+  background: color-mix(in oklab, var(--surface-sunk) 50%, transparent);
+}
+
+.mcell[data-out='true'] {
+  background: color-mix(in oklab, var(--surface-sunk) 40%, transparent);
+}
+
+.mcell[data-out='true'] .mcell__num {
+  color: var(--muted);
+}
+
+.mcell[data-over='true'] {
+  background: var(--accent-soft);
+}
+
+.mcell__num {
+  display: inline-grid;
+  place-items: center;
+  min-width: 1.5rem;
+  height: 1.5rem;
+  margin: 2px;
+  border-radius: var(--radius-pill);
+  font-size: var(--text-xs);
+  font-variant-numeric: tabular-nums;
+  color: var(--ink-soft);
+}
+
+.mcell[data-today='true'] .mcell__num {
+  background: var(--accent);
+  color: var(--accent-ink);
+  font-weight: 700;
+}
+
+.mcell__items {
+  display: grid;
+  gap: 2px;
+}
+
+.mchip {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  width: 100%;
+  min-width: 0;
+  padding: 1px var(--space-2);
+  border-left: 3px solid var(--p4);
+  border-radius: var(--radius-sm);
+  background: color-mix(in oklab, var(--p4) 14%, var(--surface));
+  text-align: left;
+  font-size: 0.6875rem;
+  line-height: 1.5;
+  touch-action: manipulation;
+}
+
+.mchip span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.mchip small {
+  flex: none;
+  color: var(--ink-soft);
+  font-variant-numeric: tabular-nums;
+}
+
+.mchip[data-priority='1'] {
+  border-left-color: var(--p1);
+  background: color-mix(in oklab, var(--p1) 14%, var(--surface));
+}
+.mchip[data-priority='2'] {
+  border-left-color: var(--p2);
+  background: color-mix(in oklab, var(--p2) 14%, var(--surface));
+}
+.mchip[data-priority='3'] {
+  border-left-color: var(--p3);
+  background: color-mix(in oklab, var(--p3) 14%, var(--surface));
+}
+
+.mchip[data-virtual='true'] {
+  opacity: 0.55;
+  border-left-style: dashed;
+}
+
+.mchip[data-due='true']::before {
+  content: '⚑';
+  font-size: 0.625rem;
+  color: var(--danger);
+}
+
+.mchip[data-done='true'] span {
+  text-decoration: line-through;
+  color: var(--muted);
+}
+
+.mcell__more {
+  padding: 0 var(--space-2);
+  text-align: left;
+  font-size: 0.6875rem;
+  color: var(--muted);
+}
+
+.mcell__more:hover {
+  color: var(--accent);
+}
+
+@media (max-width: 40rem) {
+  .mgrid {
+    margin: 0;
+    border-radius: 0;
+    border-inline: 0;
+  }
+
+  .mcell {
+    min-height: 4.75rem;
+  }
+
+  .mchip small {
+    display: none;
+  }
+}

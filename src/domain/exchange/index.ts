@@ -1,0 +1,13 @@
+// exchange 모듈 공개 API. 내부 구현(스키마·변환 단계)은 여기서 내보내지 않는다.
+export { BACKUP_VERSION, emptyAppData } from './model'
+export type { AppData, BackupFile, ImportResult, MergeMode } from './model'
+export { createBackup, parseBackup, serializeBackup } from './backup'
+export { migrateBackup } from './migrate'
+export { applyImport } from './merge'
+export { guardFormulaCell, parseCsvRows, toCsvRow, unguardFormulaCell } from './csv-core'
+export { tasksToCsv } from './csv-export'
+export { parseTodoistCsv } from './csv-import'
+export type { CsvImportOptions } from './csv-import'
+export { pickSnapshotsToKeep } from './snapshots'
+export { isSafePayloadShape, TEMPLATE_PAYLOAD_LIMITS } from './payload-guard'
+export type { PayloadLimits } from './payload-guard'

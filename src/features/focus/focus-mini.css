@@ -1,0 +1,128 @@
+/* 어느 화면에서든 떠 있는 작은 타이머. 잉크색 판으로 본문과 확실히 구분한다. */
+.focus-mini {
+  position: fixed;
+  right: var(--space-4);
+  bottom: var(--space-4);
+  z-index: 12;
+  display: flex;
+  align-items: stretch;
+  width: min(22rem, calc(100vw - 2rem));
+  overflow: hidden;
+  background: var(--ink);
+  color: var(--paper);
+  box-shadow: var(--shadow-float);
+  animation: focus-mini-in var(--duration-normal) var(--ease-out);
+}
+
+@keyframes focus-mini-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+
+.focus-mini__progress {
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 3px;
+  background: var(--accent);
+  transform-origin: left center;
+  transition: transform 260ms linear;
+}
+
+.focus-mini[data-kind='shortBreak'] .focus-mini__progress,
+.focus-mini[data-kind='longBreak'] .focus-mini__progress {
+  background: var(--ok);
+}
+
+.focus-mini__body {
+  display: grid;
+  flex: 1;
+  grid-template-columns: auto minmax(0, 1fr);
+  grid-template-areas:
+    'kind kind'
+    'time task';
+  align-items: end;
+  min-width: 0;
+  min-height: 3.75rem;
+  padding: var(--space-3) var(--space-4);
+  row-gap: 2px;
+}
+
+.focus-mini__body:hover .focus-mini__task {
+  text-decoration: underline;
+}
+
+.focus-mini__kind {
+  grid-area: kind;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  opacity: 0.8;
+}
+
+.focus-mini__time {
+  grid-area: time;
+  font-family: var(--font-display);
+  font-size: 1.75rem;
+  line-height: 1;
+  font-variant-numeric: tabular-nums lining-nums;
+  font-feature-settings: 'tnum' 1, 'lnum' 1;
+}
+
+.focus-mini[data-paused='true'] .focus-mini__time {
+  opacity: 0.6;
+}
+
+.focus-mini__task {
+  grid-area: task;
+  min-width: 0;
+  margin-left: var(--space-3);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: var(--text-sm);
+}
+
+.focus-mini__btn {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 2.75rem;
+  border-left: 1px solid color-mix(in oklab, var(--paper) 22%, transparent);
+  color: var(--paper);
+  transition: background var(--duration-fast) var(--ease-out);
+}
+
+.focus-mini__btn:hover {
+  background: color-mix(in oklab, var(--paper) 16%, transparent);
+}
+
+.focus-mini__btn:active {
+  background: color-mix(in oklab, var(--paper) 28%, transparent);
+}
+
+.focus-mini :focus-visible {
+  outline-color: var(--accent);
+  outline-offset: -3px;
+}
+
+/* 모바일: 하단 탭바 위, 가운데 추가 버튼과 겹치지 않게 띄운다 */
+@media (max-width: 56rem) {
+  .focus-mini {
+    right: var(--space-3);
+    bottom: calc(5.5rem + env(safe-area-inset-bottom));
+    left: var(--space-3);
+    width: auto;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .focus-mini {
+    animation: none;
+  }
+
+  .focus-mini__progress {
+    transition: none;
+  }
+}

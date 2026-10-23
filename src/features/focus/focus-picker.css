@@ -1,0 +1,149 @@
+/* 집중에 연결할 할 일 고르기와 오늘의 포모 점 */
+/* 할 일 연결 */
+.focus-picker {
+  display: grid;
+  justify-items: center;
+  gap: var(--space-2);
+  width: min(100%, 24rem);
+  text-align: center;
+}
+
+.focus-picker__linked {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  width: 100%;
+  padding-left: var(--space-3);
+  border-block: 1px solid var(--rule-strong);
+  font-weight: 600;
+}
+
+.focus-picker__title {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.focus-picker__title[data-missing='true'] {
+  color: var(--muted);
+  font-style: italic;
+}
+
+.focus-picker__clear {
+  display: grid;
+  place-items: center;
+  flex: none;
+  min-width: 2.5rem;
+  min-height: 2.5rem;
+  color: var(--muted);
+}
+
+.focus-picker__clear:hover {
+  color: var(--accent);
+}
+
+.focus-picker__open {
+  min-height: 2.5rem;
+  padding: 0 var(--space-2);
+  border-bottom: 1px dashed var(--rule-strong);
+  font-size: var(--text-sm);
+  color: var(--ink-soft);
+}
+
+.focus-picker__open:hover,
+.focus-picker__open[aria-expanded='true'] {
+  border-bottom-style: solid;
+  border-bottom-color: var(--accent);
+  color: var(--ink);
+}
+
+.focus-picker__hint {
+  font-size: var(--text-xs);
+  color: var(--muted);
+}
+
+.focus-picker__pop {
+  display: grid;
+  gap: var(--space-2);
+  min-width: min(20rem, 80vw);
+  padding: var(--space-2);
+}
+
+.focus-picker__pop > input {
+  height: 2.5rem;
+  padding: 0 var(--space-3);
+  border: 1px solid var(--rule-strong);
+  border-radius: var(--radius-sm);
+  background: var(--paper);
+}
+
+.focus-picker__pop ul {
+  max-height: 14rem;
+  overflow: auto;
+}
+
+.focus-picker__option {
+  justify-content: space-between;
+  min-height: 2.5rem;
+  text-align: left;
+}
+
+.focus-picker__option-title {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.focus-picker__option-meta {
+  flex: none;
+  font-size: var(--text-xs);
+  color: var(--muted);
+}
+
+.focus-picker__empty {
+  padding: var(--space-3);
+  font-size: var(--text-sm);
+  color: var(--muted);
+}
+
+/* 오늘 완료한 포모 점 */
+.focus-dots {
+  display: grid;
+  justify-items: center;
+  gap: var(--space-2);
+}
+
+.focus-dots__row {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--space-2);
+}
+
+.focus-dots__dot {
+  width: 0.875rem;
+  height: 0.875rem;
+  border: 2px solid var(--ink);
+  border-radius: 50%;
+}
+
+.focus-dots__dot[data-done='true'] {
+  border-color: var(--accent);
+  background: var(--accent);
+}
+
+.focus-dots__label {
+  font-size: var(--text-sm);
+  color: var(--muted);
+}
+
+.focus-dots__label strong {
+  font-family: var(--font-display);
+  font-size: var(--text-md);
+  font-variant-numeric: tabular-nums lining-nums;
+  color: var(--ink);
+}

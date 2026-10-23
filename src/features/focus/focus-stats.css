@@ -1,0 +1,152 @@
+/* 집중 기록: 합계, 최근 14일 막대, 할 일별 순위 */
+.focus-stats {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-4);
+}
+
+.focus-totals {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin: 0;
+  border-block: 1px solid var(--rule-strong);
+}
+
+.focus-totals__cell {
+  padding: var(--space-4) 0;
+}
+
+.focus-totals__cell + .focus-totals__cell {
+  padding-left: var(--space-4);
+  border-left: 1px solid var(--rule);
+}
+
+.focus-totals dt {
+  font-size: var(--text-xs);
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  color: var(--muted);
+}
+
+.focus-totals dd {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--space-1) var(--space-2);
+  margin: var(--space-1) 0 0;
+}
+
+.focus-totals strong {
+  font-family: var(--font-display);
+  font-size: var(--text-lg);
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums lining-nums;
+}
+
+.focus-totals dd span {
+  font-size: var(--text-sm);
+  color: var(--muted);
+}
+
+.focus-stats__empty,
+.focus-stats__note {
+  font-size: var(--text-sm);
+  color: var(--muted);
+}
+
+.focus-stats__sub {
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--rule);
+  font-size: var(--text-sm);
+  font-weight: 700;
+}
+
+.focus-bars {
+  margin: 0;
+}
+
+.focus-bars svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+
+.focus-bars__base {
+  stroke: var(--rule-strong);
+  stroke-width: 1;
+}
+
+.focus-bars__bar {
+  fill: var(--ink-soft);
+}
+
+.focus-bars__bar[data-empty='true'] {
+  fill: var(--rule-strong);
+}
+
+.focus-bars__bar[data-today='true'] {
+  fill: var(--accent);
+}
+
+.focus-bars__value {
+  fill: var(--ink);
+  font-size: 10px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.focus-bars__label {
+  fill: var(--muted);
+  font-size: 10px;
+  font-variant-numeric: tabular-nums;
+}
+
+.focus-rank__row {
+  display: grid;
+  grid-template-columns: 1.5rem minmax(0, 1fr) auto;
+  grid-template-areas:
+    'no title min'
+    '. bar bar';
+  column-gap: var(--space-3);
+  align-items: baseline;
+  padding: var(--space-2) 0 var(--space-3);
+  border-bottom: 1px solid var(--rule);
+}
+
+.focus-rank__no {
+  grid-area: no;
+  font-family: var(--font-display);
+  font-variant-numeric: lining-nums;
+  color: var(--muted);
+}
+
+.focus-rank__title {
+  grid-area: title;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-weight: 600;
+}
+
+.focus-rank__min {
+  grid-area: min;
+  font-size: var(--text-sm);
+  font-variant-numeric: tabular-nums;
+  color: var(--ink-soft);
+}
+
+.focus-rank__bar {
+  grid-area: bar;
+  height: 3px;
+  margin-top: var(--space-2);
+  background: var(--rule);
+}
+
+.focus-rank__bar > span {
+  display: block;
+  block-size: 100%;
+  background: var(--ink);
+}

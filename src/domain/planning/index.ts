@@ -1,0 +1,12 @@
+// 하루 계획 로직 공개 API
+export { isActionable, isHiddenUntilStart, makeActionableChecker } from './actionable'
+export { buildToday } from './today'
+export type { TodayPlan } from './today'
+export { dayLoad, scheduledOn, suggestOffload, taskMinutes } from './capacity'
+export type { DayLoad } from './capacity'
+export { applyReplanDecision, replanCandidates, shouldSuggestArchive } from './replan'
+export type { ReplanDecision } from './replan'
+export { reviewCandidates } from './review'
+export type { ReviewItem, ReviewOptions, ReviewReason } from './review'
+export { autoPlace } from './autoPlace'
+export type { AutoPlaceOptions, BusyBlock, Placement, PlacementFailure } from './autoPlace'

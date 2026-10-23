@@ -1,0 +1,155 @@
+/* 여러 페이지가 함께 쓰는 작은 스타일 */
+.boot {
+  display: grid;
+  place-items: center;
+  min-height: 100dvh;
+  color: var(--muted);
+  font-family: var(--font-display);
+  font-size: var(--text-lg);
+}
+
+.page-note {
+  padding: 0 var(--space-gutter) var(--space-3);
+  font-size: var(--text-sm);
+  color: var(--muted);
+}
+
+.page-error {
+  margin: 0 var(--space-gutter);
+  padding: var(--space-3) var(--space-4);
+  border-left: 3px solid var(--danger);
+  background: color-mix(in oklab, var(--danger) 10%, transparent);
+  color: var(--danger);
+  font-size: var(--text-sm);
+}
+
+.page-header__desc code {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  padding: 0.1rem 0.4rem;
+  background: var(--surface-sunk);
+  border-radius: var(--radius-sm);
+}
+
+.searchbar {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin: 0 var(--space-gutter) var(--space-4);
+  padding: 0 var(--space-4);
+  border: 1px solid var(--rule-strong);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+  color: var(--muted);
+}
+
+.searchbar > input[type='search'] {
+  flex: 1;
+  height: 3rem;
+  border: 0;
+  background: none;
+  color: var(--ink);
+  font-size: var(--text-md);
+}
+
+.searchbar > input[type='search']:focus {
+  outline: none;
+}
+
+.searchbar label {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--text-xs);
+  white-space: nowrap;
+}
+
+.add-section {
+  padding: var(--space-4) var(--space-gutter);
+}
+
+.add-section button,
+.add-section input {
+  height: 2.25rem;
+  padding: 0 var(--space-3);
+  border: 1px dashed var(--rule-strong);
+  border-radius: var(--radius-md);
+  font-size: var(--text-sm);
+  color: var(--muted);
+}
+
+.add-section button {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.add-section button:hover {
+  color: var(--accent);
+  border-color: var(--accent);
+}
+
+.add-section input {
+  width: min(20rem, 100%);
+  border-style: solid;
+  border-color: var(--accent);
+  color: var(--ink);
+  background: var(--paper);
+}
+
+.overdue-banner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  margin: 0 var(--space-gutter) var(--space-4);
+  padding: var(--space-3) var(--space-4);
+  border-left: 4px solid var(--danger);
+  background: color-mix(in oklab, var(--danger) 8%, var(--surface));
+  font-size: var(--text-sm);
+}
+
+.overdue-banner strong {
+  color: var(--danger);
+}
+
+.overdue-banner > div {
+  display: flex;
+  gap: var(--space-2);
+}
+
+.overdue-banner .btn-ghost {
+  height: 2rem;
+  background: var(--surface);
+}
+
+.boot--error,
+.stale {
+  display: grid;
+  align-content: center;
+  justify-items: start;
+  gap: var(--space-3);
+  max-width: 34rem;
+  margin: 0 auto;
+  padding: var(--space-6) var(--space-gutter);
+  min-height: 100dvh;
+}
+
+.boot--error h1,
+.stale h1 {
+  font-family: var(--font-display);
+  font-size: var(--text-xl);
+  font-weight: 500;
+  line-height: 1.1;
+}
+
+.boot--error > div {
+  display: flex;
+  gap: var(--space-2);
+}
+
+.boot__hint {
+  color: var(--muted);
+  font-size: var(--text-sm);
+}

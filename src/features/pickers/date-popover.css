@@ -1,0 +1,98 @@
+.datepop {
+  display: grid;
+  gap: var(--space-3);
+  padding: var(--space-3);
+}
+
+.datepop__quick {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+  max-width: 15.5rem;
+}
+
+.chip-btn {
+  height: 1.75rem;
+  padding: 0 var(--space-3);
+  border: 1px solid var(--rule-strong);
+  border-radius: var(--radius-pill);
+  font-size: var(--text-xs);
+  color: var(--ink-soft);
+}
+
+.chip-btn:hover {
+  background: var(--surface-sunk);
+}
+
+.chip-btn[data-active='true'] {
+  background: var(--ink);
+  color: var(--paper);
+  border-color: var(--ink);
+}
+
+.datepop__row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--text-sm);
+  color: var(--muted);
+}
+
+.datepop__row label,
+.datepop__row > span {
+  min-width: 3.5rem;
+}
+
+.datepop input[type='time'],
+.datepop select {
+  height: 2rem;
+  padding: 0 var(--space-2);
+  border: 1px solid var(--rule-strong);
+  border-radius: var(--radius-sm);
+  background: var(--paper);
+  color: var(--ink);
+  min-width: 0;
+}
+
+.datepop__summary {
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--accent);
+}
+
+.seg {
+  display: inline-flex;
+  border: 1px solid var(--rule-strong);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+}
+
+.seg button {
+  height: 2rem;
+  padding: 0 var(--space-3);
+  font-size: var(--text-sm);
+  color: var(--ink-soft);
+}
+
+.seg button + button {
+  border-left: 1px solid var(--rule-strong);
+}
+
+.seg button[aria-pressed='true'] {
+  background: var(--ink);
+  color: var(--paper);
+}
+
+.icon-btn {
+  display: inline-grid;
+  place-items: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  border-radius: var(--radius-sm);
+  color: var(--muted);
+}
+
+.icon-btn:hover {
+  background: var(--surface-sunk);
+  color: var(--ink);
+}

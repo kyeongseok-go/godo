@@ -1,0 +1,31 @@
+.drag-grip {
+  position: absolute;
+  top: var(--space-2);
+  right: var(--space-1);
+  display: grid;
+  place-items: center;
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: var(--radius-sm);
+  color: var(--muted);
+  opacity: 0;
+  cursor: grab;
+  touch-action: none;
+  transition: opacity var(--duration-fast) var(--ease-out);
+}
+
+*:hover > .drag-grip,
+.drag-grip:focus-visible {
+  opacity: 1;
+}
+
+.drag-grip:hover {
+  background: var(--surface-sunk);
+  color: var(--ink);
+}
+
+@media (hover: none) {
+  .drag-grip {
+    opacity: 0.55;
+  }
+}

@@ -1,0 +1,33 @@
+.vswitch {
+  display: inline-flex;
+  border: 1px solid var(--rule-strong);
+  border-radius: var(--radius-pill);
+  background: var(--surface);
+  padding: 2px;
+}
+
+.vswitch button {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  height: 1.875rem;
+  padding: 0 var(--space-3);
+  border-radius: var(--radius-pill);
+  font-size: var(--text-xs);
+  color: var(--muted);
+}
+
+.vswitch button:hover {
+  color: var(--ink);
+}
+
+.vswitch button[aria-selected='true'] {
+  background: var(--ink);
+  color: var(--paper);
+}
+
+@media (max-width: 40rem) {
+  .vswitch button span {
+    display: none;
+  }
+}

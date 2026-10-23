@@ -1,0 +1,167 @@
+.qa {
+  display: grid;
+  gap: var(--space-3);
+  padding: var(--space-4);
+}
+
+.qa__field {
+  position: relative;
+  font-size: var(--text-md);
+  line-height: 1.5;
+}
+
+/* 입력창 뒤에 같은 글자를 깔고, 인식된 부분만 배경을 칠한다 */
+.qa__mirror,
+.qa__input {
+  width: 100%;
+  margin: 0;
+  padding: var(--space-2) var(--space-1);
+  font: inherit;
+  letter-spacing: inherit;
+  white-space: pre-wrap;
+  word-break: break-word;
+  border: 0;
+}
+
+.qa__mirror {
+  position: absolute;
+  inset: 0;
+  color: transparent;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.qa__mirror mark {
+  color: transparent;
+  border-radius: 3px;
+  background: var(--accent-soft);
+  box-shadow: 0 0 0 2px var(--accent-soft);
+}
+
+.qa__mirror mark[data-kind='project'],
+.qa__mirror mark[data-kind='section'] {
+  background: color-mix(in oklab, var(--p3) 22%, transparent);
+  box-shadow: 0 0 0 2px color-mix(in oklab, var(--p3) 22%, transparent);
+}
+
+.qa__mirror mark[data-kind='label'] {
+  background: color-mix(in oklab, var(--ok) 22%, transparent);
+  box-shadow: 0 0 0 2px color-mix(in oklab, var(--ok) 22%, transparent);
+}
+
+.qa__mirror mark[data-kind='priority'] {
+  background: color-mix(in oklab, var(--p1) 22%, transparent);
+  box-shadow: 0 0 0 2px color-mix(in oklab, var(--p1) 22%, transparent);
+}
+
+.qa__input {
+  position: relative;
+  display: block;
+  resize: none;
+  background: transparent;
+  color: var(--ink);
+  caret-color: var(--accent);
+  border-bottom: 2px solid var(--ink);
+}
+
+.qa__input:focus {
+  outline: none;
+  border-bottom-color: var(--accent);
+}
+
+.qa__input::placeholder {
+  color: var(--muted);
+}
+
+.qa__tokens {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.qa__tokens li {
+  padding: 0.1rem var(--space-2);
+  border-radius: var(--radius-sm);
+  background: var(--accent-soft);
+  font-size: var(--text-xs);
+  font-weight: 600;
+}
+
+.qa__tokens li[data-kind='project'],
+.qa__tokens li[data-kind='section'] {
+  background: color-mix(in oklab, var(--p3) 18%, transparent);
+}
+.qa__tokens li[data-kind='label'] {
+  background: color-mix(in oklab, var(--ok) 18%, transparent);
+}
+.qa__tokens li[data-kind='priority'] {
+  background: color-mix(in oklab, var(--p1) 18%, transparent);
+}
+
+.qa__note {
+  font-size: var(--text-xs);
+  color: var(--muted);
+}
+
+.qa__bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--rule);
+}
+
+.qa__pickers,
+.qa__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.qa__cancel {
+  height: 2.25rem;
+  padding: 0 var(--space-3);
+  border-radius: var(--radius-md);
+  font-size: var(--text-sm);
+  color: var(--muted);
+}
+
+.qa__cancel:hover {
+  background: var(--surface-sunk);
+}
+
+.qa__submit {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  height: 2.25rem;
+  padding: 0 var(--space-4);
+  border-radius: var(--radius-md);
+  background: var(--accent);
+  color: var(--accent-ink);
+  font-size: var(--text-sm);
+  font-weight: 700;
+}
+
+.qa__submit:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.qa__hint {
+  font-size: 0.6875rem;
+  color: var(--muted);
+}
+
+.qa__hint kbd {
+  margin: 0 0.15rem;
+}
+
+@media (max-width: 40rem) {
+  .qa__hint {
+    display: none;
+  }
+}

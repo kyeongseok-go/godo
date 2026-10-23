@@ -1,0 +1,318 @@
+/* 디데이 화면. 카드 대신 큰 세리프 숫자와 괘선으로 구성한다. */
+.cd {
+  container: cd / inline-size;
+}
+
+.cd__add {
+  flex: none;
+  width: auto;
+  padding: 0 var(--space-4);
+}
+
+.cdlist {
+  margin-inline: var(--space-gutter);
+  border-top: 2px solid var(--ink);
+}
+
+.cdrow {
+  position: relative;
+  display: grid;
+  grid-template-columns: 9.5rem minmax(0, 1fr) auto;
+  align-items: center;
+  column-gap: var(--space-4);
+  padding: var(--space-4) var(--space-2) var(--space-4) var(--space-4);
+  border-bottom: 1px solid var(--rule-strong);
+  transition: background-color var(--duration-fast) var(--ease-out);
+}
+
+/* 항목 색은 왼쪽 가는 막대로만 쓴다. 의미는 숫자와 글자가 전달한다. */
+.cdrow::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: var(--space-3);
+  bottom: var(--space-3);
+  width: 3px;
+  background: var(--cd);
+}
+
+.cdrow:hover {
+  background: color-mix(in oklab, var(--surface-sunk) 55%, transparent);
+}
+
+.cdrow__num {
+  font-family: var(--font-display);
+  font-size: calc(var(--text-xl) * 0.85);
+  font-weight: 400;
+  line-height: 1;
+  letter-spacing: -0.04em;
+  font-variation-settings: 'opsz' 48, 'SOFT' 0;
+  font-variant-numeric: tabular-nums lining-nums;
+  white-space: nowrap;
+  color: var(--ink);
+}
+
+.cdrow[data-tone='soon'] .cdrow__num,
+.cdrow[data-tone='today'] .cdrow__num {
+  color: var(--accent);
+}
+
+.cdrow[data-tone='today'] {
+  background: var(--accent-soft);
+}
+
+.cdrow[data-tone='today']:hover {
+  background: var(--accent-soft);
+}
+
+.cdrow__body {
+  min-width: 0;
+}
+
+.cdrow__name {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--text-md);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  overflow-wrap: anywhere;
+}
+
+.cdrow__swatch {
+  flex: none;
+  width: 0.625rem;
+  height: 0.625rem;
+  background: var(--cd);
+}
+
+.cdrow__date {
+  margin-top: 2px;
+  font-size: var(--text-sm);
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.cdrow__edit {
+  width: 2.5rem;
+  height: 2.5rem;
+  opacity: 0.55;
+  transition: opacity var(--duration-fast) var(--ease-out);
+}
+
+.cdrow:hover .cdrow__edit,
+.cdrow__edit:focus-visible {
+  opacity: 1;
+}
+
+@media (hover: none) {
+  .cdrow__edit {
+    opacity: 1;
+  }
+}
+
+/* 가장 가까운 항목: 숫자를 한 단계 더 키워 위쪽에 놓는다 */
+.cdrow[data-hero='true'] {
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-areas:
+    'num edit'
+    'body body';
+  row-gap: var(--space-3);
+  padding-block: var(--space-5) var(--space-5);
+}
+
+.cdrow[data-hero='true'] .cdrow__num {
+  grid-area: num;
+  font-size: var(--text-hero);
+  font-weight: 300;
+  letter-spacing: -0.05em;
+  font-variation-settings: 'opsz' 144, 'SOFT' 0;
+}
+
+.cdrow[data-hero='true'] .cdrow__body {
+  grid-area: body;
+}
+
+.cdrow[data-hero='true'] .cdrow__edit {
+  grid-area: edit;
+  align-self: start;
+}
+
+.cdrow[data-hero='true'] .cdrow__name {
+  font-family: var(--font-display);
+  font-size: var(--text-lg);
+  font-weight: 500;
+}
+
+/* 지난 항목은 흐리게 */
+.cdrow[data-tone='passed'] .cdrow__num {
+  color: var(--muted);
+  font-weight: 300;
+}
+
+.cdrow[data-tone='passed'] .cdrow__name {
+  color: var(--ink-soft);
+  font-weight: 500;
+}
+
+.cdrow[data-tone='passed']::before {
+  opacity: 0.45;
+}
+
+.cdpassed {
+  margin: var(--space-6) var(--space-gutter) var(--space-6);
+}
+
+.cdpassed summary {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: 2.75rem;
+  cursor: pointer;
+  font-size: var(--text-sm);
+  color: var(--ink-soft);
+}
+
+.cdpassed summary span {
+  color: var(--muted);
+}
+
+.cdpassed .cdlist {
+  margin-inline: 0;
+  border-top-width: 1px;
+}
+
+/* 빈 상태 */
+.cdempty {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: var(--space-6);
+  margin: var(--space-4) var(--space-gutter) var(--space-6);
+  padding: var(--space-6) 0;
+  border-block: 2px solid var(--ink);
+}
+
+.cdempty__big {
+  font-family: var(--font-display);
+  font-size: var(--text-hero);
+  font-weight: 300;
+  line-height: 0.9;
+  letter-spacing: -0.05em;
+  color: var(--accent);
+}
+
+.cdempty__body {
+  display: grid;
+  justify-items: start;
+  gap: var(--space-3);
+}
+
+.cdempty__body h2 {
+  font-family: var(--font-display);
+  font-size: var(--text-lg);
+  font-weight: 500;
+}
+
+.cdempty__body p {
+  max-width: 30rem;
+  font-size: var(--text-sm);
+  color: var(--muted);
+}
+
+.cdempty__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.cdchip {
+  display: inline-flex;
+  align-items: baseline;
+  gap: var(--space-2);
+  min-height: 2.75rem;
+  padding: 0 var(--space-4);
+  border: 1px solid var(--rule-strong);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  font-weight: 600;
+  align-items: center;
+  transition:
+    background-color var(--duration-fast) var(--ease-out),
+    transform var(--duration-fast) var(--ease-out);
+}
+
+.cdchip small {
+  font-size: var(--text-xs);
+  font-weight: 400;
+  color: var(--muted);
+}
+
+.cdchip:hover {
+  background: var(--surface-sunk);
+  border-color: var(--ink);
+}
+
+.cdchip:active {
+  transform: translateY(1px);
+}
+
+/* 좁은 화면 */
+@container cd (max-width: 34rem) {
+  .cdrow {
+    grid-template-columns: 6.5rem minmax(0, 1fr) auto;
+    column-gap: var(--space-3);
+  }
+
+  .cdrow[data-hero='true'] {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+
+  .cdempty {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--space-4);
+  }
+}
+
+/* 대화상자 */
+.cdform__preview {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  padding-bottom: var(--space-3);
+  border-bottom: 2px solid var(--ink);
+}
+
+.cdform__preview span {
+  font-size: var(--text-xs);
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: var(--muted);
+}
+
+.cdform__preview strong {
+  font-family: var(--font-display);
+  font-size: var(--text-xl);
+  font-weight: 400;
+  line-height: 1;
+  letter-spacing: -0.04em;
+  font-variant-numeric: tabular-nums;
+}
+
+.cdform__confirm {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--text-sm);
+  color: var(--danger);
+}
+
+.cdform__save {
+  flex: none;
+  padding: 0 var(--space-5);
+}
+
+.cdform .ed__foot {
+  flex-wrap: wrap;
+}

@@ -1,0 +1,54 @@
+.check {
+  --check-color: var(--p4);
+  position: relative;
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 1.25rem;
+  height: 1.25rem;
+  border: 1.5px solid var(--check-color);
+  border-radius: 50%;
+  color: transparent;
+  transition:
+    background-color var(--duration-fast) var(--ease-out),
+    color var(--duration-fast) var(--ease-out),
+    transform var(--duration-fast) var(--ease-out);
+}
+
+/* 터치 영역은 시각 크기보다 넓게 잡는다 */
+.check::after {
+  content: '';
+  position: absolute;
+  inset: -0.5rem;
+}
+
+.check[data-priority='1'] {
+  --check-color: var(--p1);
+  background: color-mix(in oklab, var(--p1) 14%, transparent);
+}
+.check[data-priority='2'] {
+  --check-color: var(--p2);
+  background: color-mix(in oklab, var(--p2) 12%, transparent);
+}
+.check[data-priority='3'] {
+  --check-color: var(--p3);
+  background: color-mix(in oklab, var(--p3) 10%, transparent);
+}
+
+.check:hover {
+  color: var(--check-color);
+}
+
+.check:active {
+  transform: scale(0.88);
+}
+
+.check[data-checked='true'] {
+  background: var(--check-color);
+  color: var(--paper);
+}
+
+.check[data-canceled='true'] {
+  border-style: dashed;
+  color: var(--muted);
+}

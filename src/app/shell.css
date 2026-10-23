@@ -1,0 +1,120 @@
+.shell {
+  display: grid;
+  grid-template-columns: var(--sidebar-width) minmax(0, 1fr);
+  min-height: 100dvh;
+}
+
+.shell__sidebar {
+  position: sticky;
+  top: 0;
+  height: 100dvh;
+  z-index: 20;
+}
+
+.shell__main {
+  min-width: 0;
+  padding-bottom: 6rem;
+  outline: none;
+}
+
+.shell__scrim {
+  display: none;
+}
+
+.skip-link {
+  position: fixed;
+  left: var(--space-3);
+  top: -4rem;
+  z-index: 100;
+  padding: var(--space-2) var(--space-4);
+  background: var(--ink);
+  color: var(--paper);
+  border-radius: var(--radius-md);
+}
+
+.skip-link:focus {
+  top: var(--space-3);
+}
+
+.tabbar {
+  display: none;
+}
+
+/* 태블릿 이하: 사이드바는 서랍으로, 하단 탭바를 켠다 */
+@media (max-width: 56rem) {
+  .shell {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .shell__sidebar {
+    position: fixed;
+    inset: 0 auto 0 0;
+    width: min(20rem, 86vw);
+    transform: translateX(-100%);
+    transition: transform var(--duration-normal) var(--ease-out);
+    box-shadow: var(--shadow-float);
+  }
+
+  .shell__sidebar[data-open='true'] {
+    transform: none;
+  }
+
+  .shell__scrim {
+    display: block;
+    position: fixed;
+    inset: 0;
+    z-index: 15;
+    background: rgb(23 20 15 / 45%);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity var(--duration-normal) var(--ease-out);
+  }
+
+  .shell__scrim[data-open='true'] {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .shell__main {
+    padding-bottom: 7rem;
+  }
+
+  .tabbar {
+    position: fixed;
+    inset: auto 0 0 0;
+    z-index: 30;
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    align-items: center;
+    padding: var(--space-2) var(--space-2) calc(var(--space-2) + env(safe-area-inset-bottom));
+    background: var(--surface);
+    border-top: 1px solid var(--rule-strong);
+  }
+
+  .tabbar__item {
+    display: grid;
+    justify-items: center;
+    gap: 2px;
+    padding: var(--space-1);
+    font-size: 0.6875rem;
+    color: var(--muted);
+  }
+
+  .tabbar__item.active {
+    color: var(--accent);
+    font-weight: 700;
+  }
+
+  .tabbar__add {
+    justify-self: center;
+    display: grid;
+    place-items: center;
+    width: 3rem;
+    height: 3rem;
+    margin-top: -1.25rem;
+    border-radius: 50%;
+    background: var(--accent);
+    color: var(--accent-ink);
+    box-shadow: var(--shadow-float);
+  }
+}

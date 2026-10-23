@@ -1,0 +1,50 @@
+.tcard {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  padding: var(--space-3);
+  background: var(--surface);
+  border: 1px solid var(--rule);
+  border-left: 3px solid var(--p4);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition:
+    box-shadow var(--duration-fast) var(--ease-out),
+    transform var(--duration-fast) var(--ease-out);
+}
+
+.tcard[data-priority='1'] {
+  border-left-color: var(--p1);
+}
+.tcard[data-priority='2'] {
+  border-left-color: var(--p2);
+}
+.tcard[data-priority='3'] {
+  border-left-color: var(--p3);
+}
+
+.tcard:hover {
+  box-shadow: var(--shadow-float);
+}
+
+.tcard[data-dragging='true'] {
+  box-shadow: var(--shadow-float);
+  transform: rotate(1.2deg);
+  cursor: grabbing;
+}
+
+.tcard__body {
+  flex: 1;
+  min-width: 0;
+}
+
+.tcard__title {
+  font-size: var(--text-sm);
+  line-height: 1.35;
+  word-break: break-word;
+}
+
+.tcard[data-done='true'] .tcard__title {
+  color: var(--muted);
+  text-decoration: line-through;
+}
