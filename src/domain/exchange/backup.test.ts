@@ -111,7 +111,7 @@ function richData(): AppData {
 }
 
 const backupJson = (data: unknown, extra: Record<string, unknown> = {}): string =>
-  JSON.stringify({ app: 'pace', version: BACKUP_VERSION, exportedAt: NOW_ISO, data, ...extra })
+  JSON.stringify({ app: 'godo', version: BACKUP_VERSION, exportedAt: NOW_ISO, data, ...extra })
 
 const expectOk = <T>(r: { ok: boolean } & Record<string, unknown>): T => {
   expect(r.ok).toBe(true)
@@ -134,7 +134,7 @@ describe('emptyAppData', () => {
 describe('createBackup / serializeBackup', () => {
   it('wraps the data with app name, version and export time', () => {
     const file = createBackup(emptyAppData(), NOW_ISO)
-    expect(file).toEqual({ app: 'pace', version: BACKUP_VERSION, exportedAt: NOW_ISO, data: emptyAppData() })
+    expect(file).toEqual({ app: 'godo', version: BACKUP_VERSION, exportedAt: NOW_ISO, data: emptyAppData() })
   })
 
   it('does not share the top-level object with the input', () => {
@@ -144,7 +144,7 @@ describe('createBackup / serializeBackup', () => {
 
   it('writes human readable JSON indented by two spaces', () => {
     const text = serializeBackup(createBackup(emptyAppData(), NOW_ISO))
-    expect(text.startsWith('{\n  "app": "pace",')).toBe(true)
+    expect(text.startsWith('{\n  "app": "godo",')).toBe(true)
   })
 })
 
@@ -155,7 +155,7 @@ describe('parseBackup', () => {
 
     expect(result).toEqual({
       ok: true,
-      value: { app: 'pace', version: BACKUP_VERSION, exportedAt: NOW_ISO, data },
+      value: { app: 'godo', version: BACKUP_VERSION, exportedAt: NOW_ISO, data },
       warnings: [],
     })
   })
@@ -174,7 +174,7 @@ describe('parseBackup', () => {
 
   it('rejects files made by another app', () => {
     const result = parseBackup(JSON.stringify({ app: 'todoist', version: 1, exportedAt: NOW_ISO, data: {} }))
-    expect(result).toEqual({ ok: false, error: 'Pace 백업 파일이 아니에요.' })
+    expect(result).toEqual({ ok: false, error: 'godo 백업 파일이 아니에요.' })
   })
 
   it('rejects a version newer than the app supports', () => {
@@ -191,11 +191,11 @@ describe('parseBackup', () => {
 
   it('rejects a missing or invalid exportedAt', () => {
     expect(parseBackup(backupJson({}, { exportedAt: 'yesterday' })).ok).toBe(false)
-    expect(parseBackup(JSON.stringify({ app: 'pace', version: 1, data: {} })).ok).toBe(false)
+    expect(parseBackup(JSON.stringify({ app: 'godo', version: 1, data: {} })).ok).toBe(false)
   })
 
   it('rejects a missing or non-object data field', () => {
-    expect(parseBackup(JSON.stringify({ app: 'pace', version: 1, exportedAt: NOW_ISO })).ok).toBe(false)
+    expect(parseBackup(JSON.stringify({ app: 'godo', version: 1, exportedAt: NOW_ISO })).ok).toBe(false)
     expect(parseBackup(backupJson([])).ok).toBe(false)
   })
 
@@ -287,7 +287,7 @@ describe('parseBackup', () => {
   it('migrates an older version file up to the current version', () => {
     const v0Task: Record<string, unknown> = { ...makeTask({ id: 'old', dueDate: '2026-10-30' }) }
     delete v0Task.startDate
-    const text = JSON.stringify({ app: 'pace', version: 0, exportedAt: NOW_ISO, data: { tasks: [v0Task] } })
+    const text = JSON.stringify({ app: 'godo', version: 0, exportedAt: NOW_ISO, data: { tasks: [v0Task] } })
 
     const result = expectOk<{ value: { version: number; data: AppData } }>(parseBackup(text))
 

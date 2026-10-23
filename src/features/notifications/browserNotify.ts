@@ -46,11 +46,11 @@ export function notifyDue(due: readonly DueReminder[]): number {
     if (show(item.title, { body: item.body, tag: item.key }, item.taskId)) shown += 1
   }
   const rest = due.length - MAX_INDIVIDUAL
-  if (rest > 0 && show(`알림 ${rest}건 더 있어요`, { body: 'Pace를 열어 확인해 주세요', tag: 'pace-summary' }, null)) shown += 1
+  if (rest > 0 && show(`알림 ${rest}건 더 있어요`, { body: 'godo를 열어 확인해 주세요', tag: 'pace-summary' }, null)) shown += 1
   return shown
 }
 
 export function sendTestNotification(): boolean {
   if (notificationPermission() !== 'granted') return false
-  return show('Pace 테스트 알림', { body: '이렇게 알려 드려요', tag: 'pace-test' }, null)
+  return show('godo 테스트 알림', { body: '이렇게 알려 드려요', tag: 'pace-test' }, null)
 }

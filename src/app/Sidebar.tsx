@@ -33,7 +33,7 @@ import { smartListCounts, projectOpenCount } from '../features/lists/smartLists'
 import { buildProjectTree } from '../features/projects/projectTree'
 import type { ProjectNode } from '../features/projects/projectTree'
 import { useUI } from '../store/ui'
-import { PaceMark } from './PaceMark'
+import { GodoMark } from './GodoMark'
 import { paths } from './nav'
 import './sidebar.css'
 
@@ -151,8 +151,8 @@ export function Sidebar() {
   return (
     <nav className="sidebar" aria-label="주 메뉴">
       <div className="sidebar__brand">
-        <PaceMark />
-        <span className="sidebar__logo">pace</span>
+        <GodoMark />
+        <span className="sidebar__logo">godo</span>
       </div>
 
       <div className="sidebar__actions">

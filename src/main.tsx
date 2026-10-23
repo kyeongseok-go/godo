@@ -10,7 +10,7 @@ import { App } from './app/App'
 if (import.meta.env.DEV) {
   // 개발 중에만 콘솔과 E2E에서 샘플 데이터를 넣을 수 있게 노출한다.
   void Promise.all([import('./dev/seed'), import('./store/app')]).then(([{ seedDemo }, { useApp }]) => {
-    ;(window as unknown as { __pace: unknown }).__pace = { seedDemo, store: useApp }
+    ;(window as unknown as { __godo: unknown }).__godo = { seedDemo, store: useApp }
   })
 }
 

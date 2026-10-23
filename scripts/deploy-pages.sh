@@ -16,7 +16,7 @@ cp -R dist/. "$TMP/"
 cd "$TMP"
 git init -q -b gh-pages
 git add -A
-git -c user.name="${GIT_AUTHOR_NAME:-pace-deploy}" -c user.email="${GIT_AUTHOR_EMAIL:-pace-deploy@users.noreply.github.com}" \
+git -c user.name="${GIT_AUTHOR_NAME:-godo-deploy}" -c user.email="${GIT_AUTHOR_EMAIL:-godo-deploy@users.noreply.github.com}" \
   commit -q -m "deploy: $(date -u +%Y-%m-%dT%H:%M:%SZ)"
 git push -f -q "$REMOTE" gh-pages
 echo "배포 완료: gh-pages 브랜치를 갱신했어요."

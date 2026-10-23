@@ -30,7 +30,7 @@ async function expectPersisted(page: Page, title: string): Promise<void> {
       page.evaluate(
         (wanted) =>
           new Promise<boolean>((resolve) => {
-            const open = indexedDB.open('pace')
+            const open = indexedDB.open('pace') // DB 이름은 바꾸지 않았다
             open.onerror = () => resolve(false)
             open.onsuccess = () => {
               const db = open.result
@@ -64,8 +64,8 @@ test.describe('PWA', () => {
     const manifest = await (await request.get(href ?? '')).json()
 
     expect(manifest).toMatchObject({
-      name: 'Pace',
-      short_name: 'Pace',
+      name: 'godo',
+      short_name: 'godo',
       lang: 'ko',
       display: 'standalone',
       start_url: './',

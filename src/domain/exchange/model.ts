@@ -36,7 +36,7 @@ export interface AppData {
 }
 
 export interface BackupFile {
-  app: 'pace'
+  app: 'godo'
   version: number
   exportedAt: string // ISO 8601
   data: AppData

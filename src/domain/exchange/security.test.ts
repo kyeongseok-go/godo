@@ -5,7 +5,7 @@ import { isSafePayloadShape, parseBackup, parseTodoistCsv, tasksToCsv } from './
 import type { Project } from '../types'
 
 const NOW_ISO = '2026-10-23T12:00:00.000Z'
-const envelope = (dataJson: string): string => `{"app":"pace","version":1,"exportedAt":"${NOW_ISO}","data":${dataJson}}`
+const envelope = (dataJson: string): string => `{"app":"godo","version":1,"exportedAt":"${NOW_ISO}","data":${dataJson}}`
 
 function nested(depth: number): string {
   return '{"children":['.repeat(depth) + ']}'.repeat(depth)

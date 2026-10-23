@@ -80,7 +80,7 @@ describe('NotificationSettings', () => {
 
     await userEvent.click(screen.getByRole('button', { name: /테스트 알림 보내기/ }))
 
-    expect(shown).toEqual(['Pace 테스트 알림'])
+    expect(shown).toEqual(['godo 테스트 알림'])
   })
 
   test('saves the default reminder offset through updateSettings', async () => {

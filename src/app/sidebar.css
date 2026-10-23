@@ -13,14 +13,6 @@
   padding: var(--space-4) var(--space-4) var(--space-3);
 }
 
-.pace-mark rect {
-  fill: var(--rule-strong);
-}
-
-.pace-mark__now {
-  fill: var(--now);
-}
-
 .sidebar__logo {
   font-size: var(--text-md);
   font-weight: 700;

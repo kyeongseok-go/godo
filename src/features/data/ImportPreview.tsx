@@ -93,7 +93,7 @@ export function ImportPreview({ plan, flow }: { plan: ImportPlan; flow: ImportFl
   return (
     <div className="dt-preview" aria-live="polite">
       <p className="dt-preview__file">
-        <span>{plan.kind === 'json' ? 'Pace 백업' : 'Todoist CSV'}</span> {plan.fileName}
+        <span>{plan.kind === 'json' ? 'godo 백업' : 'Todoist CSV'}</span> {plan.fileName}
       </p>
       {plan.kind === 'json' ? <JsonPreview plan={plan} flow={flow} /> : <CsvPreview plan={plan} flow={flow} />}
       <div className="dt-preview__actions">

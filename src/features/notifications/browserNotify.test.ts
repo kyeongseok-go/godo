@@ -140,7 +140,7 @@ describe('sendTestNotification', () => {
 
     expect(sendTestNotification()).toBe(true)
 
-    expect(created[0].title).toBe('Pace 테스트 알림')
+    expect(created[0].title).toBe('godo 테스트 알림')
   })
 
   test('returns false when permission is missing', () => {

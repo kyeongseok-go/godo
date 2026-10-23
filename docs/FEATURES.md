@@ -1,4 +1,4 @@
-# Pace — 개인용 할 일 앱 기능 명세 / 완료 체크리스트
+# godo — 개인용 할 일 앱 기능 명세 / 완료 체크리스트
 
 TickTick + Todoist 실사용 조사(`research/`)에서 뽑은 기능. 나 혼자 쓰는 로컬 앱이라 배포·계정·결제는 없다.
 유료 플랜 한도(프로젝트 5개, 필터 3개, 7일 기록 등)는 전부 제거한다.
@@ -11,7 +11,7 @@ TickTick + Todoist 실사용 조사(`research/`)에서 뽑은 기능. 나 혼자
 ## 구현 현황 (2026-10-23)
 아래 모든 항목을 구현했다(F12 포함). 단위·컴포넌트 테스트 2,795개(구문 96% · 함수 96% 커버리지),
 Playwright E2E 87개(핵심 흐름·접근성 axe 라이트/다크·PWA 오프라인·F12 포함)가 통과한다.
-배포: https://kyeongseok-go.github.io/pace/ (GitHub Pages, 저장소 kyeongseok-go/pace)
+배포: https://kyeongseok-go.github.io/godo/ (GitHub Pages, 저장소 kyeongseok-go/godo)
 
 ## 완료 기준 (루프 종료 조건)
 아래 항목이 전부 `[x]`이고, 단위 테스트 커버리지 80% 이상, Playwright 핵심 흐름 통과, 4개 해상도(320/768/1024/1440) 가로 넘침 없음, 키보드만으로 주요 흐름 가능.

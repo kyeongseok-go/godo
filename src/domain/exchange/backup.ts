@@ -3,7 +3,7 @@ import { BACKUP_VERSION, failure, type AppData, type BackupFile, type ImportResu
 import { migrateBackup } from './migrate'
 
 export function createBackup(data: AppData, nowIso: string): BackupFile {
-  return { app: 'pace', version: BACKUP_VERSION, exportedAt: nowIso, data: { ...data } }
+  return { app: 'godo', version: BACKUP_VERSION, exportedAt: nowIso, data: { ...data } }
 }
 
 /** 사람이 열어 볼 수 있게 들여쓰기 2칸으로 쓴다. */

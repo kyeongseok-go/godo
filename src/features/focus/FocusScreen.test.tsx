@@ -27,7 +27,7 @@ beforeAll(async () => {
 beforeEach(() => {
   useFocus.setState({ timer: createTimer() })
   useApp.setState({ entities: emptyEntityState(), settings: defaultSettings() })
-  document.title = 'Pace'
+  document.title = 'godo'
 })
 
 afterEach(() => {
@@ -87,10 +87,10 @@ describe('FocusScreen: timer', () => {
     const user = userEvent.setup()
     const { unmount } = renderScreen()
     await user.click(screen.getByRole('button', { name: '시작' }))
-    await waitFor(() => expect(document.title).toMatch(/^(25:00|24:5\d) 집중 · Pace$/))
+    await waitFor(() => expect(document.title).toMatch(/^(25:00|24:5\d) 집중 · godo$/))
 
     unmount()
-    expect(document.title).toBe('Pace')
+    expect(document.title).toBe('godo')
   })
 })
 

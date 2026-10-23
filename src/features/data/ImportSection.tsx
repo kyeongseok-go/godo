@@ -10,7 +10,7 @@ export function ImportSection({ onApplied }: { onApplied: () => void }) {
   const inputRef = useRef<HTMLInputElement>(null)
 
   return (
-    <Group title="가져오기" description="Pace에서 내보낸 JSON 백업이나 Todoist CSV 파일을 불러와요. 고른 뒤 내용을 확인하고 적용해요.">
+    <Group title="가져오기" description="godo에서 내보낸 JSON 백업이나 Todoist CSV 파일을 불러와요. 고른 뒤 내용을 확인하고 적용해요.">
       <div className="dt-import">
         <input
           ref={inputRef}

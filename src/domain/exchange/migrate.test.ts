@@ -13,7 +13,7 @@ function v0Task(overrides: Record<string, unknown>): Record<string, unknown> {
 }
 
 const v0File = (tasks: unknown[]): unknown => ({
-  app: 'pace',
+  app: 'godo',
   version: 0,
   exportedAt: NOW_ISO,
   data: { tasks },
@@ -61,13 +61,21 @@ describe('migrateBackup (v0 -> v1)', () => {
 describe('migrateBackup (current version)', () => {
   it('passes a v1 file through unchanged', () => {
     const task = makeTask({ id: 'a', startDate: '2026-10-01' })
+    const result = migrateBackup({ app: 'godo', version: BACKUP_VERSION, exportedAt: NOW_ISO, data: { tasks: [task] } })
+    expect(result.ok && result.value.data.tasks).toEqual([task])
+  })
+
+  it('still reads a backup exported under the old name', () => {
+    const task = makeTask({ id: 'a' })
     const result = migrateBackup({ app: 'pace', version: BACKUP_VERSION, exportedAt: NOW_ISO, data: { tasks: [task] } })
+    expect(result.ok && result.value.app).toBe('godo')
     expect(result.ok && result.value.data.tasks).toEqual([task])
   })
 
   it('rejects input that is not a backup envelope', () => {
     expect(migrateBackup(undefined).ok).toBe(false)
-    expect(migrateBackup({ app: 'pace' }).ok).toBe(false)
+    expect(migrateBackup({ app: 'godo' }).ok).toBe(false)
+    expect(migrateBackup({ app: 'todoist', version: BACKUP_VERSION, exportedAt: NOW_ISO, data: {} }).ok).toBe(false)
   })
 })
 

@@ -10,7 +10,7 @@ const backupText = (tasks = [makeTask({ id: 'a', title: '우유 사기' })]) =>
   serializeBackup(createBackup({ ...emptyAppData(), tasks }, '2026-10-23T00:00:00.000Z'))
 
 describe('analyzeImportText', () => {
-  it('reads a Pace JSON backup', () => {
+  it('reads a godo JSON backup', () => {
     const result = analyzeImportText('pace-backup-2026-10-23.json', backupText(), ctx)
 
     expect(result.ok && result.value.kind === 'json' && result.value.data.tasks.map((t) => t.title)).toEqual(['우유 사기'])
@@ -46,7 +46,7 @@ describe('analyzeImportText', () => {
     expect(result).toEqual({ ok: false, error: expect.stringContaining('JSON 형식이 올바르지 않아요') })
   })
 
-  it('returns an error for a JSON file that is not a Pace backup', () => {
+  it('returns an error for a JSON file that is not a godo backup', () => {
     const result = analyzeImportText('a.json', JSON.stringify({ hello: 'world' }), ctx)
 
     expect(result.ok).toBe(false)

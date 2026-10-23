@@ -6,7 +6,7 @@ import { useToasts } from '../ui/toast'
 
 const RELOAD_RETRY_MS = 250
 const RELOAD_RETRY_LIMIT = 20
-const STORAGE_WARNED_KEY = 'pace.storageWarned'
+const STORAGE_WARNED_KEY = 'godo.storageWarned'
 
 /** 아직 DB에 쓰는 중이거나 저장 실패가 남아 있으면 탭을 닫기 전에 한 번 더 묻는다. */
 export function useBeforeUnloadGuard(): void {

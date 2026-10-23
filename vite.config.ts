@@ -39,7 +39,7 @@ function contentSecurityPolicy(): Plugin {
 }
 
 export default defineConfig({
-  // 상대 경로로 빌드한다. GitHub Pages처럼 하위 경로(/pace/)에 올려도, 루트에 올려도 같은 빌드가 동작한다.
+  // 상대 경로로 빌드한다. GitHub Pages처럼 하위 경로(/godo/)에 올려도, 루트에 올려도 같은 빌드가 동작한다.
   base: './',
   plugins: [
     react(),
@@ -50,8 +50,8 @@ export default defineConfig({
       devOptions: { enabled: false },
       includeAssets: ['favicon.svg', 'icons/apple-touch-icon.png'],
       manifest: {
-        name: 'Pace',
-        short_name: 'Pace',
+        name: 'godo',
+        short_name: 'godo',
         description: '나만 쓰는 할 일 앱',
         lang: 'ko',
         dir: 'ltr',

@@ -57,7 +57,8 @@ export function applyMigrations(
 
 const envelopeSchema = z.object(
   {
-    app: z.literal('pace', { error: 'Pace 백업 파일이 아니에요.' }),
+    // 'pace' 는 이름을 바꾸기 전에 내보낸 백업이다. 계속 읽을 수 있어야 한다.
+    app: z.enum(['pace', 'godo'], { error: 'godo 백업 파일이 아니에요.' }),
     version: z
       .number({ error: '백업 버전 정보가 올바르지 않아요.' })
       .int({ error: '백업 버전 정보가 올바르지 않아요.' })
@@ -67,7 +68,7 @@ const envelopeSchema = z.object(
       .refine((s) => !Number.isNaN(Date.parse(s)), { error: '내보낸 시각(exportedAt)이 올바르지 않아요.' }),
     data: z.record(z.string(), z.unknown(), { error: '백업 데이터(data)가 올바르지 않아요.' }),
   },
-  { error: '백업 파일 형식이 올바르지 않아요. Pace 에서 내보낸 JSON 파일인지 확인해 주세요.' },
+  { error: '백업 파일 형식이 올바르지 않아요. godo 에서 내보낸 JSON 파일인지 확인해 주세요.' },
 )
 
 /** 이미 JSON 으로 읽은 값을 받아 현재 버전으로 올린 뒤 검증한다. 현재 버전이면 변환 없이 검증만 한다. */
@@ -87,7 +88,7 @@ export function migrateBackup(raw: unknown): ImportResult<BackupFile> {
   if (!parsed.ok) return parsed
   return {
     ok: true,
-    value: { app: 'pace', version: BACKUP_VERSION, exportedAt, data: parsed.value },
+    value: { app: 'godo', version: BACKUP_VERSION, exportedAt, data: parsed.value },
     warnings: parsed.warnings,
   }
 }

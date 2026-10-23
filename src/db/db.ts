@@ -41,6 +41,7 @@ export class PaceDB extends Dexie {
   settings!: EntityTable<Settings, 'id'>
   snapshots!: EntityTable<SnapshotRecord, 'id'>
 
+  // 데이터베이스 이름은 'pace' 그대로 둔다. 바꾸면 이미 저장해 둔 데이터를 못 찾는다.
   constructor(name = 'pace') {
     super(name)
     // 다른 탭이 새 버전으로 업그레이드하려고 하면 연결을 닫아 주고, 이 탭에는 새로고침을 안내한다.

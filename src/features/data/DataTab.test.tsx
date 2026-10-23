@@ -59,7 +59,7 @@ describe('ExportSection', () => {
 
     expect(clicked[0].download).toMatch(/^pace-backup-\d{4}-\d{2}-\d{2}\.json$/)
     const parsed = JSON.parse(await blobs[0].text()) as { app: string; data: { tasks: Array<{ title: string }>; settings: unknown } }
-    expect(parsed.app).toBe('pace')
+    expect(parsed.app).toBe('godo')
     expect(parsed.data.tasks.map((t) => t.title)).toEqual(['내보낼 할 일'])
     expect(parsed.data.settings).not.toBeNull()
     expect(useToasts.getState().toasts[0].message).toBe('백업 파일을 내려받았어요')
@@ -170,7 +170,7 @@ describe('ImportSection JSON', () => {
   test('shows warnings for entries that were skipped', async () => {
     const user = userEvent.setup()
     const text = JSON.stringify({
-      app: 'pace',
+      app: 'godo',
       version: 1,
       exportedAt: '2026-10-23T00:00:00.000Z',
       data: { tasks: [{ id: 'broken' }, makeTask({ id: 'ok' })] },
