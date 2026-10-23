@@ -167,5 +167,5 @@ export function isQuickPresetActive(
 /** 내려받는 파일 이름. 기간이 하루면 날짜 하나만 쓴다. */
 export function summaryFileName(options: Pick<SummaryOptions, 'from' | 'to'>): string {
   const period = options.from === options.to ? options.from : `${options.from}_${options.to}`
-  return `pace-summary-${period}.md`
+  return `godo-summary-${period}.md`
 }

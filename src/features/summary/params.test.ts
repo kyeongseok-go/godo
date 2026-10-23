@@ -185,10 +185,10 @@ describe('quick presets', () => {
 
 describe('summaryFileName', () => {
   test('names the file after the period', () => {
-    expect(summaryFileName({ from: '2026-10-19', to: '2026-10-25' })).toBe('pace-summary-2026-10-19_2026-10-25.md')
+    expect(summaryFileName({ from: '2026-10-19', to: '2026-10-25' })).toBe('godo-summary-2026-10-19_2026-10-25.md')
   })
 
   test('uses a single date for one-day reports', () => {
-    expect(summaryFileName({ from: '2026-10-23', to: '2026-10-23' })).toBe('pace-summary-2026-10-23.md')
+    expect(summaryFileName({ from: '2026-10-23', to: '2026-10-23' })).toBe('godo-summary-2026-10-23.md')
   })
 })

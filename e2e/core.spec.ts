@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test'
 import type { Page } from '@playwright/test'
-import { openQuickAdd } from './helpers'
+import { expectPersisted, openQuickAdd } from './helpers'
 
 // 핵심 사용자 흐름. 매 테스트는 새 브라우저 컨텍스트(빈 IndexedDB)에서 시작한다.
 
@@ -22,6 +22,7 @@ test.describe('할 일 기본 흐름', () => {
     await quickAdd(page, '우유 사기')
 
     await expect(page.getByText('우유 사기')).toBeVisible()
+    await expectPersisted(page, '우유 사기')
     await page.reload()
     await expect(page.getByText('우유 사기')).toBeVisible()
   })

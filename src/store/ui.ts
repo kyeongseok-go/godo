@@ -2,7 +2,7 @@
 import { create } from 'zustand'
 import type { ID } from '../domain/types'
 
-const COLLAPSED_KEY = 'pace.collapsed'
+const COLLAPSED_KEY = 'godo.collapsed'
 
 function loadCollapsed(): Record<ID, true> {
   try {

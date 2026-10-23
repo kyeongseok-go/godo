@@ -3,11 +3,11 @@ import { backupFileName, csvFileName, csvProjectName, formatBytes, formatSnapsho
 
 describe('file names', () => {
   it('names the backup after the local date', () => {
-    expect(backupFileName(new Date(2026, 9, 3, 23, 59))).toBe('pace-backup-2026-10-03.json')
+    expect(backupFileName(new Date(2026, 9, 3, 23, 59))).toBe('godo-backup-2026-10-03.json')
   })
 
   it('names the csv export after the local date', () => {
-    expect(csvFileName(new Date(2026, 0, 9))).toBe('pace-tasks-2026-01-09.csv')
+    expect(csvFileName(new Date(2026, 0, 9))).toBe('godo-tasks-2026-01-09.csv')
   })
 })
 

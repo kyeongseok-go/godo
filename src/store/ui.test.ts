@@ -1,6 +1,6 @@
 import { LINGER_MS } from './ui'
 
-const KEY = 'pace.collapsed'
+const KEY = 'godo.collapsed'
 
 /** 모듈이 처음 읽힐 때 localStorage 를 읽으므로, 값을 심은 뒤 새로 불러온다. */
 async function freshUI(stored: string | null) {

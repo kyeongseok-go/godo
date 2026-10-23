@@ -3,7 +3,7 @@
 import { baseKey } from './schedule'
 import type { DueReminder } from './schedule'
 
-export const STORAGE_KEY = 'pace.reminders.v1'
+export const STORAGE_KEY = 'godo.reminders.v1'
 /** 이 시간이 지난 기록은 정리한다. 놓친 알림 복구 한도(24시간)보다 길어야 중복 알림이 생기지 않는다. */
 const RETENTION_MS = 48 * 60 * 60_000
 

@@ -1,4 +1,4 @@
-import { PaceDB } from '../../db/db'
+import { GodoDB } from '../../db/db'
 import { loadAll, persistChanges, persistSettings } from '../../db/persist'
 import { emptyAppData } from '../../domain/exchange'
 import type { AppData } from '../../domain/exchange'
@@ -8,12 +8,12 @@ import { buildCsvImportData, importAppData, readAppData, wipeAllData } from './i
 import { createSnapshot, listSnapshots } from './snapshots'
 
 let seq = 0
-let db: PaceDB
+let db: GodoDB
 let ids = 0
 const ctx = () => ({ nowMs: 1_000, newId: () => `new-${++ids}` })
 
 beforeEach(async () => {
-  db = new PaceDB(`importer-test-${++seq}`)
+  db = new GodoDB(`importer-test-${++seq}`)
   ids = 0
   await persistChanges(db, {
     puts: {
@@ -27,7 +27,7 @@ beforeEach(async () => {
 
 afterEach(async () => {
   db.close()
-  await PaceDB.delete(db.name)
+  await GodoDB.delete(db.name)
 })
 
 const incoming = (patch: Partial<AppData>): AppData => ({ ...emptyAppData(), ...patch })

@@ -57,8 +57,7 @@ export function applyMigrations(
 
 const envelopeSchema = z.object(
   {
-    // 'pace' 는 이름을 바꾸기 전에 내보낸 백업이다. 계속 읽을 수 있어야 한다.
-    app: z.enum(['pace', 'godo'], { error: 'godo 백업 파일이 아니에요.' }),
+    app: z.literal('godo', { error: 'godo 백업 파일이 아니에요.' }),
     version: z
       .number({ error: '백업 버전 정보가 올바르지 않아요.' })
       .int({ error: '백업 버전 정보가 올바르지 않아요.' })

@@ -1,5 +1,5 @@
 // 자동 백업 스냅샷. db.snapshots 테이블에 백업 JSON 문자열을 그대로 보관한다.
-import type { PaceDB, SnapshotRecord } from '../../db/db'
+import type { GodoDB, SnapshotRecord } from '../../db/db'
 import { createBackup, parseBackup, pickSnapshotsToKeep, serializeBackup } from '../../domain/exchange'
 import type { AppData, ImportResult } from '../../domain/exchange'
 
@@ -32,7 +32,7 @@ export function hasChangesSince(data: AppData, sinceMs: number): boolean {
   )
 }
 
-export async function createSnapshot(db: PaceDB, data: AppData, nowMs: number, id: string): Promise<SnapshotRecord> {
+export async function createSnapshot(db: GodoDB, data: AppData, nowMs: number, id: string): Promise<SnapshotRecord> {
   const text = serializeBackup(createBackup(data, new Date(nowMs).toISOString()))
   const record: SnapshotRecord = { id, createdAt: nowMs, data: text }
   await db.snapshots.put(record)
@@ -40,7 +40,7 @@ export async function createSnapshot(db: PaceDB, data: AppData, nowMs: number, i
 }
 
 /** 보관 정책에 걸리지 않는 스냅샷을 지우고 지운 개수를 돌려준다. */
-export async function pruneSnapshots(db: PaceDB, nowMs: number): Promise<number> {
+export async function pruneSnapshots(db: GodoDB, nowMs: number): Promise<number> {
   const records = await db.snapshots.toArray()
   const keep = new Set(pickSnapshotsToKeep(records.map((r) => ({ id: r.id, createdAt: r.createdAt })), nowMs))
   const doomed = records.filter((r) => !keep.has(r.id)).map((r) => r.id)
@@ -49,12 +49,12 @@ export async function pruneSnapshots(db: PaceDB, nowMs: number): Promise<number>
 }
 
 /** 목록용 요약. 크기는 UTF-8 바이트 수다. 최신순. */
-export async function listSnapshots(db: PaceDB): Promise<SnapshotInfo[]> {
+export async function listSnapshots(db: GodoDB): Promise<SnapshotInfo[]> {
   const records = await db.snapshots.orderBy('createdAt').reverse().toArray()
   return records.map((r) => ({ id: r.id, createdAt: r.createdAt, bytes: new Blob([r.data]).size }))
 }
 
-export async function readSnapshotData(db: PaceDB, id: string): Promise<ImportResult<AppData>> {
+export async function readSnapshotData(db: GodoDB, id: string): Promise<ImportResult<AppData>> {
   const record = await db.snapshots.get(id)
   if (!record) return { ok: false, error: '스냅샷을 찾지 못했어요. 이미 정리됐을 수 있어요.' }
   const parsed = parseBackup(record.data)
@@ -71,7 +71,7 @@ export interface AutoSnapshotInput {
 }
 
 /** 6시간이 지났고 바뀐 것이 있으면 스냅샷을 만들고 오래된 것을 정리한다. */
-export async function runAutoSnapshot(db: PaceDB, input: AutoSnapshotInput): Promise<'created' | 'skipped'> {
+export async function runAutoSnapshot(db: GodoDB, input: AutoSnapshotInput): Promise<'created' | 'skipped'> {
   const latest = await db.snapshots.orderBy('createdAt').last()
   const lastAt = latest?.createdAt ?? null
   const hasChanges = input.dirty || lastAt === null || hasChangesSince(input.data, lastAt)

@@ -1,7 +1,7 @@
 import { z } from 'zod'
 import type { TimerState } from './timer'
 
-export const TIMER_STORAGE_KEY = 'pace.focus.timer.v1'
+export const TIMER_STORAGE_KEY = 'godo.focus.timer.v1'
 
 /** localStorage 의 일부. 접근이 막힌 환경에서는 null 로 두고 메모리만 쓴다. */
 export type TimerStorage = Pick<Storage, 'getItem' | 'setItem'>

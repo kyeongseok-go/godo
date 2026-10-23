@@ -26,7 +26,7 @@ const CONTENT_SECURITY_POLICY = [
 // 개발 서버(Vite HMR)는 인라인 스크립트를 주입하므로 빌드 결과물에만 CSP 를 넣는다.
 function contentSecurityPolicy(): Plugin {
   return {
-    name: 'pace:content-security-policy',
+    name: 'godo:content-security-policy',
     apply: 'build',
     transformIndexHtml: () => [
       {

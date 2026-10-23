@@ -20,7 +20,7 @@ const state = () => useApp.getState()
 const seed = (title = '기존 할 일') =>
   state().commit({ puts: { tasks: [makeTask({ id: 'old', title, updatedAt: 10 })] }, deletes: {} }, '준비', { history: false })
 
-const backupFile = (data = emptyAppData(), name = 'pace-backup.json') =>
+const backupFile = (data = emptyAppData(), name = 'godo-backup.json') =>
   new File([serializeBackup(createBackup(data, '2026-10-23T09:00:00.000Z'))], name, { type: 'application/json' })
 
 const fileInput = (container: HTMLElement): HTMLInputElement => {
@@ -57,7 +57,7 @@ describe('ExportSection', () => {
 
     await user.click(screen.getByRole('button', { name: /JSON 백업 내려받기/ }))
 
-    expect(clicked[0].download).toMatch(/^pace-backup-\d{4}-\d{2}-\d{2}\.json$/)
+    expect(clicked[0].download).toMatch(/^godo-backup-\d{4}-\d{2}-\d{2}\.json$/)
     const parsed = JSON.parse(await blobs[0].text()) as { app: string; data: { tasks: Array<{ title: string }>; settings: unknown } }
     expect(parsed.app).toBe('godo')
     expect(parsed.data.tasks.map((t) => t.title)).toEqual(['내보낼 할 일'])
@@ -72,7 +72,7 @@ describe('ExportSection', () => {
 
     await user.click(screen.getByRole('button', { name: /CSV 내려받기/ }))
 
-    expect(clicked[0].download).toMatch(/^pace-tasks-\d{4}-\d{2}-\d{2}\.csv$/)
+    expect(clicked[0].download).toMatch(/^godo-tasks-\d{4}-\d{2}-\d{2}\.csv$/)
     // Blob.text() 는 BOM 을 떼고 읽으므로 바이트로 확인한다.
     const bytes = new Uint8Array(await blobs[0].arrayBuffer())
     expect([...bytes.slice(0, 3)]).toEqual([0xef, 0xbb, 0xbf])
@@ -106,7 +106,7 @@ describe('ImportSection JSON', () => {
     )
 
     // 파일 읽기와 검증은 비동기라 부하가 큰 실행에서는 기본 1초를 넘길 수 있다.
-    const preview = await screen.findByText('pace-backup.json', undefined, { timeout: 15000 })
+    const preview = await screen.findByText('godo-backup.json', undefined, { timeout: 15000 })
     expect(preview).toBeInTheDocument()
     expect(screen.getByText('할 일').nextElementSibling).toHaveTextContent('1')
     expect(screen.getByText('라벨').nextElementSibling).toHaveTextContent('1')
@@ -117,7 +117,7 @@ describe('ImportSection JSON', () => {
     await waitFor(() => expect(Object.keys(state().entities.tasks).sort()).toEqual(['new', 'old']))
     expect(await db.tasks.count()).toBe(2)
     // 가져오기는 비동기라 미리보기가 사라지기까지 한 박자 걸린다
-    await waitFor(() => expect(screen.queryByText('pace-backup.json')).not.toBeInTheDocument())
+    await waitFor(() => expect(screen.queryByText('godo-backup.json')).not.toBeInTheDocument())
     expect(useToasts.getState().toasts.at(-1)?.message).toBe('새 항목 2개를 더하고 0개를 갱신했어요')
   })
 
@@ -221,7 +221,7 @@ describe('ImportSection JSON', () => {
     await user.click(await screen.findByRole('button', { name: '취소' }))
 
     // 가져오기는 비동기라 미리보기가 사라지기까지 한 박자 걸린다
-    await waitFor(() => expect(screen.queryByText('pace-backup.json')).not.toBeInTheDocument())
+    await waitFor(() => expect(screen.queryByText('godo-backup.json')).not.toBeInTheDocument())
   })
 })
 

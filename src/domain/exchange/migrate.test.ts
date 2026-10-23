@@ -65,13 +65,6 @@ describe('migrateBackup (current version)', () => {
     expect(result.ok && result.value.data.tasks).toEqual([task])
   })
 
-  it('still reads a backup exported under the old name', () => {
-    const task = makeTask({ id: 'a' })
-    const result = migrateBackup({ app: 'pace', version: BACKUP_VERSION, exportedAt: NOW_ISO, data: { tasks: [task] } })
-    expect(result.ok && result.value.app).toBe('godo')
-    expect(result.ok && result.value.data.tasks).toEqual([task])
-  })
-
   it('rejects input that is not a backup envelope', () => {
     expect(migrateBackup(undefined).ok).toBe(false)
     expect(migrateBackup({ app: 'godo' }).ok).toBe(false)

@@ -1,11 +1,11 @@
-import { PaceDB } from '../db/db'
+import { GodoDB } from '../db/db'
 import { INBOX_ID } from '../domain/types'
 import { makeTask } from '../test/factories'
 import { createAppStore } from './store'
 import type { AppStore } from './store'
 
 let seq = 0
-let db: PaceDB
+let db: GodoDB
 let store: AppStore
 
 async function flushWrites(): Promise<void> {
@@ -15,14 +15,14 @@ async function flushWrites(): Promise<void> {
 }
 
 beforeEach(async () => {
-  db = new PaceDB(`test-${++seq}`)
+  db = new GodoDB(`test-${++seq}`)
   store = createAppStore(db, () => 1_000)
   await store.getState().load()
 })
 
 afterEach(async () => {
   db.close()
-  await PaceDB.delete(db.name)
+  await GodoDB.delete(db.name)
 })
 
 describe('app store', () => {
@@ -132,7 +132,7 @@ describe('app store', () => {
 
 describe('failure handling', () => {
   test('a failed initial read sets loadError and can be retried', async () => {
-    const broken = new PaceDB(`test-broken-${++seq}`)
+    const broken = new GodoDB(`test-broken-${++seq}`)
     const fresh = createAppStore(broken, () => 4_000)
     const spy = vi.spyOn(broken, 'table').mockImplementation(() => {
       throw new Error('boom')
@@ -148,7 +148,7 @@ describe('failure handling', () => {
     expect(fresh.getState().ready).toBe(true)
     expect(fresh.getState().loadError).toBeNull()
     broken.close()
-    await PaceDB.delete(broken.name)
+    await GodoDB.delete(broken.name)
   })
 
   test('a failed write keeps persistError, even after a later write succeeds', async () => {

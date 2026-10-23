@@ -1,5 +1,5 @@
 import type { Mock } from 'vitest'
-import { PaceDB } from '../../db/db'
+import { GodoDB } from '../../db/db'
 import { createAppStore } from '../../store/store'
 import type { AppStore } from '../../store/store'
 import { makeTask } from '../../test/factories'
@@ -13,7 +13,7 @@ const MIN = 60_000
 const T0 = 1_700_000_000_000
 
 let seq = 0
-let db: PaceDB
+let db: GodoDB
 let app: AppStore
 let clock = T0
 let storage: TimerStorage & { data: Map<string, string> }
@@ -44,14 +44,14 @@ beforeEach(async () => {
   storage = memoryStorage()
   announce = vi.fn<FocusDeps['announce']>()
   prime = vi.fn<FocusDeps['prime']>()
-  db = new PaceDB(`focus-test-${++seq}`)
+  db = new GodoDB(`focus-test-${++seq}`)
   app = createAppStore(db, () => clock)
   await app.getState().load()
 })
 
 afterEach(async () => {
   db.close()
-  await PaceDB.delete(db.name)
+  await GodoDB.delete(db.name)
 })
 
 describe('focus store: lifecycle', () => {

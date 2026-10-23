@@ -1,4 +1,4 @@
-import { PaceDB } from '../../db/db'
+import { GodoDB } from '../../db/db'
 import { emptyAppData } from '../../domain/exchange'
 import { makeProject, makeTask } from '../../test/factories'
 import {
@@ -13,15 +13,15 @@ import {
 } from './snapshots'
 
 let seq = 0
-let db: PaceDB
+let db: GodoDB
 
 beforeEach(() => {
-  db = new PaceDB(`snap-test-${++seq}`)
+  db = new GodoDB(`snap-test-${++seq}`)
 })
 
 afterEach(async () => {
   db.close()
-  await PaceDB.delete(db.name)
+  await GodoDB.delete(db.name)
 })
 
 const HOUR = 3_600_000

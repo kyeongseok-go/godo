@@ -1,5 +1,6 @@
 import { expect, test } from '@playwright/test'
 import type { Page } from '@playwright/test'
+import { expectPersisted } from './helpers'
 
 // PWA(E9): 설치 가능한 매니페스트, 서비스 워커 활성화, 오프라인에서도 앱이 뜨고 할 일을 추가할 수 있어야 한다.
 // 서비스 워커는 프로덕션 빌드에만 있다(playwright.config.ts 의 webServer 가 빌드 후 preview 를 띄운다).
@@ -21,31 +22,6 @@ async function quickAdd(page: Page, text: string): Promise<void> {
   await input.fill(text)
   await page.keyboard.press('Enter')
   await expect(input).toBeHidden()
-}
-
-/** 화면에 보이는 것과 별개로 IndexedDB 에 실제로 저장됐는지 기다린다. 저장이 끝나기 전에 새로고침하면 쓰기가 끊겨 테스트가 흔들린다. */
-async function expectPersisted(page: Page, title: string): Promise<void> {
-  await expect
-    .poll(() =>
-      page.evaluate(
-        (wanted) =>
-          new Promise<boolean>((resolve) => {
-            const open = indexedDB.open('pace') // DB 이름은 바꾸지 않았다
-            open.onerror = () => resolve(false)
-            open.onsuccess = () => {
-              const db = open.result
-              const all = db.transaction('tasks', 'readonly').objectStore('tasks').getAll()
-              all.onerror = () => resolve(false)
-              all.onsuccess = () => {
-                db.close()
-                resolve((all.result as Array<{ title: string }>).some((task) => task.title === wanted))
-              }
-            }
-          }),
-        title,
-      ),
-    )
-    .toBe(true)
 }
 
 test.describe('PWA', () => {

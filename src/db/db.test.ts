@@ -1,4 +1,4 @@
-import { PaceDB } from './db'
+import { GodoDB } from './db'
 import { defaultSettings } from '../store/defaults'
 
 // 이미 쓰고 있던 브라우저의 DB(v1)를 열 때, 새로 생긴 필드가 undefined 로 앱에 흘러들지 않아야 한다.
@@ -6,7 +6,7 @@ describe('스키마 마이그레이션 v1 → v2', () => {
   const name = 'migration-test'
 
   afterEach(async () => {
-    await PaceDB.delete(name)
+    await GodoDB.delete(name)
   })
 
   test('예전 습관에 block, 예전 설정에 frames 를 채운다', async () => {
@@ -47,7 +47,7 @@ describe('스키마 마이그레이션 v1 → v2', () => {
     await old.table('settings').put(settingsWithoutFrames)
     old.close()
 
-    const db = new PaceDB(name)
+    const db = new GodoDB(name)
     await db.open()
     const habit = await db.habits.get('h1')
     const settings = await db.settings.get('settings')

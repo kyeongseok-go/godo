@@ -14,3 +14,28 @@ export async function openQuickAdd(page: Page) {
   await expect(input).toBeFocused()
   return input
 }
+
+/** 화면에 보이는 것과 별개로 IndexedDB 에 실제로 저장됐는지 기다린다. 저장이 끝나기 전에 새로고침하면 쓰기가 끊겨 테스트가 흔들린다. */
+export async function expectPersisted(page: Page, title: string): Promise<void> {
+  await expect
+    .poll(() =>
+      page.evaluate(
+        (wanted) =>
+          new Promise<boolean>((resolve) => {
+            const open = indexedDB.open('godo')
+            open.onerror = () => resolve(false)
+            open.onsuccess = () => {
+              const db = open.result
+              const all = db.transaction('tasks', 'readonly').objectStore('tasks').getAll()
+              all.onerror = () => resolve(false)
+              all.onsuccess = () => {
+                db.close()
+                resolve((all.result as Array<{ title: string }>).some((task) => task.title === wanted))
+              }
+            }
+          }),
+        title,
+      ),
+    )
+    .toBe(true)
+}

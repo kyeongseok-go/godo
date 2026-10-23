@@ -1,5 +1,5 @@
 // 가져오기·복원·전체 삭제처럼 DB 를 직접 건드리는 부분. 순수 계산은 appData.ts 와 domain/exchange 에 있다.
-import type { PaceDB } from '../../db/db'
+import type { GodoDB } from '../../db/db'
 import { clearAll, loadAll, persistChanges, persistSettings } from '../../db/persist'
 import { applyImport, emptyAppData } from '../../domain/exchange'
 import type { AppData, MergeMode } from '../../domain/exchange'
@@ -19,13 +19,13 @@ export interface ImportSummary {
   updated: number
 }
 
-export async function readAppData(db: PaceDB): Promise<AppData> {
+export async function readAppData(db: GodoDB): Promise<AppData> {
   const { entities, settings } = await loadAll(db)
   return collectAppData({ entities, settings })
 }
 
 /** 한 트랜잭션 안에서 비우고 쓴다. 쓰다 실패하면 지운 것도 되돌아가 데이터가 반쯤 남지 않는다. */
-async function replaceAll(db: PaceDB, data: AppData): Promise<void> {
+async function replaceAll(db: GodoDB, data: AppData): Promise<void> {
   await db.transaction('rw', [...TABLE_NAMES.map((t) => db.table(t)), db.settings], async () => {
     await clearAll(db)
     for (const name of TABLE_NAMES) {
@@ -41,7 +41,7 @@ async function replaceAll(db: PaceDB, data: AppData): Promise<void> {
  * 덮어쓰기는 지우기 전에 현재 상태를 스냅샷으로 남겨 두어 되돌릴 길을 만든다.
  */
 export async function importAppData(
-  db: PaceDB,
+  db: GodoDB,
   incoming: AppData,
   mode: MergeMode,
   ctx: ImportContext,
@@ -62,7 +62,7 @@ export async function importAppData(
 
 /** 스냅샷을 덮어쓰기 방식으로 복원한다. 오류는 한국어 문장으로 돌려준다. */
 export async function restoreSnapshot(
-  db: PaceDB,
+  db: GodoDB,
   snapshotId: string,
   ctx: ImportContext,
 ): Promise<{ ok: true; summary: ImportSummary; warnings: string[] } | { ok: false; error: string }> {
@@ -108,7 +108,7 @@ export function buildCsvImportData(
 }
 
 /** 모든 데이터와 자동 백업 스냅샷까지 지운다. 호출 측이 reload() 로 기본 상태를 다시 만든다. */
-export async function wipeAllData(db: PaceDB): Promise<void> {
+export async function wipeAllData(db: GodoDB): Promise<void> {
   await db.transaction('rw', [...TABLE_NAMES.map((t) => db.table(t)), db.settings, db.snapshots], async () => {
     await clearAll(db)
     await db.snapshots.clear()

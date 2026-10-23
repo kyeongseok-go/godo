@@ -14,7 +14,7 @@ const BEEP_PEAK_GAIN = 0.25
 const BEEP_SILENT_GAIN = 0.0001
 const BEEP_ATTACK_SEC = 0.02
 const BEEP_LENGTH_SEC = 0.16
-const NOTIFICATION_TAG = 'pace-focus'
+const NOTIFICATION_TAG = 'godo-focus'
 
 export function alertTextFor(ended: EndedSession, next: SessionKind | null, taskTitle: string | null): SessionAlert {
   const upNext = next ? `다음: ${KIND_LABEL[next]}` : ''

@@ -6,11 +6,11 @@ const KB = 1024
 const MB = KB * 1024
 
 export function backupFileName(now: Date): string {
-  return `pace-backup-${toISODate(now)}.json`
+  return `godo-backup-${toISODate(now)}.json`
 }
 
 export function csvFileName(now: Date): string {
-  return `pace-tasks-${toISODate(now)}.csv`
+  return `godo-tasks-${toISODate(now)}.csv`
 }
 
 /** CSV 파일 이름에서 확장자를 떼어 새 프로젝트 이름의 초깃값으로 쓴다. */

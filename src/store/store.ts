@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 import type { StoreApi, UseBoundStore } from 'zustand'
-import type { PaceDB } from '../db/db'
+import type { GodoDB } from '../db/db'
 import { loadAll, persistChanges, persistSettings } from '../db/persist'
 import { INBOX_ID } from '../domain/types'
 import type { Settings } from '../domain/types'
@@ -73,7 +73,7 @@ export interface StoreOptions {
   onPersisted?: () => void
 }
 
-export function createAppStore(db: PaceDB, now: () => number = Date.now, options: StoreOptions = {}): AppStore {
+export function createAppStore(db: GodoDB, now: () => number = Date.now, options: StoreOptions = {}): AppStore {
   return create<AppState>((set, get) => {
     /** 다른 탭에 "데이터가 바뀌었다"고 알린다. 실패해도 저장 자체는 성공이므로 삼키고 넘어간다. */
     const announce = (): void => {

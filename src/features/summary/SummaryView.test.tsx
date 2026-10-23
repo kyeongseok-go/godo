@@ -177,7 +177,7 @@ describe('SummaryView', () => {
 
     await user.click(screen.getByRole('button', { name: /\.md 파일로 저장/ }))
 
-    expect(names).toEqual([`pace-summary-${today()}.md`])
+    expect(names).toEqual([`godo-summary-${today()}.md`])
     const blob = (createObjectURL.mock.calls[0] as unknown as [Blob])[0]
     expect(await blob.text()).toContain('보고서 작성')
     expect(useToasts.getState().toasts.at(-1)?.message).toBe('.md 파일로 저장했어요')
