@@ -99,7 +99,7 @@ function HabitForm({ habit, today, weekStartsOn, groups, actions, onClose, onSav
       >
         <label className="ed__field">
           <span>이름</span>
-          <input autoFocus value={draft.name} onChange={(e) => set({ name: e.target.value })} placeholder="예) 물 마시기" />
+          <input data-autofocus value={draft.name} onChange={(e) => set({ name: e.target.value })} placeholder="예) 물 마시기" />
         </label>
 
         <div className="ed__field">
@@ -160,6 +160,34 @@ function HabitForm({ habit, today, weekStartsOn, groups, actions, onClose, onSav
             <span>알림 시각</span>
             <input type="time" value={draft.reminderTime} onChange={(e) => set({ reminderTime: e.target.value })} />
           </label>
+        </div>
+
+        <div className="ed__field">
+          <span>시간 비워 두기</span>
+          <label className="ed__check">
+            <input
+              type="checkbox"
+              checked={draft.blockEnabled}
+              onChange={(e) => set({ blockEnabled: e.target.checked })}
+            />
+            이 시간대 안의 빈 자리에 매일 다시 잡기
+          </label>
+          {draft.blockEnabled ? (
+            <div className="hform__inline hform__block">
+              <input type="time" value={draft.blockStart} onChange={(e) => set({ blockStart: e.target.value })} aria-label="블록 시작 시각" />
+              <span aria-hidden="true">–</span>
+              <input type="time" value={draft.blockEnd} onChange={(e) => set({ blockEnd: e.target.value })} aria-label="블록 종료 시각" />
+              <input
+                type="number"
+                min={5}
+                step={5}
+                value={Number.isNaN(draft.blockDuration) ? '' : draft.blockDuration}
+                onChange={(e) => set({ blockDuration: e.target.value === '' ? Number.NaN : Number(e.target.value) })}
+                aria-label="블록 길이(분)"
+              />
+              분
+            </div>
+          ) : null}
         </div>
 
         <label className="ed__field">

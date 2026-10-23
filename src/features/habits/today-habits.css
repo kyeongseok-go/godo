@@ -48,6 +48,21 @@
   scroll-snap-align: start;
 }
 
+/* F12: 오늘 습관에 비워 둔 시간 */
+.today-habits__blocks {
+  flex: none;
+  max-width: 18rem;
+  color: var(--muted);
+  font-size: var(--text-xs);
+  line-height: 1.4;
+}
+
+.today-habits__blocks b {
+  font-family: var(--font-display);
+  color: var(--ink);
+  font-weight: 600;
+}
+
 .today-habits__all {
   flex: none;
   display: grid;

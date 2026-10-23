@@ -34,6 +34,7 @@ const makeHabit = (over: Partial<Habit> = {}): Habit => ({
   startDate: '2026-10-01',
   group: null,
   reminderTime: null,
+  block: null,
   archived: false,
   logs: {},
   order: 1000,

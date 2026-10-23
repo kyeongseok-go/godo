@@ -1,7 +1,7 @@
 // 습관 조작 명령 (순수 함수, ChangeSet 반환). 연속·달성 판정은 domain/stats 를 그대로 쓴다.
 import { isTimeOfDay } from '../../domain/date'
 import { habitValue, setHabitValue } from '../../domain/stats'
-import type { Habit, HabitFrequency, ISODate, TimeOfDay } from '../../domain/types'
+import type { Habit, HabitBlock, HabitFrequency, ISODate, TimeOfDay } from '../../domain/types'
 import { EMPTY_CHANGES } from '../../store/changes'
 import type { ChangeSet, EntityState } from '../../store/changes'
 import { newId } from '../../store/id'
@@ -14,6 +14,7 @@ export interface HabitInput {
   startDate: ISODate
   group: string | null
   reminderTime: TimeOfDay | null
+  block: HabitBlock | null
 }
 
 const ORDER_STEP = 1000
@@ -39,6 +40,15 @@ const normalizeGroup = (group: string | null): string | null => group?.trim() ||
 const normalizeReminder = (time: TimeOfDay | null): TimeOfDay | null =>
   time !== null && isTimeOfDay(time) ? time : null
 
+/** 시각 형식이 틀렸거나 끝이 시작보다 빠르거나 길이가 0 이하면 블록을 두지 않는다. */
+function normalizeBlock(block: HabitBlock | null | undefined): HabitBlock | null {
+  if (!block) return null
+  const { durationMin, start, end } = block
+  if (!isTimeOfDay(start) || !isTimeOfDay(end) || start >= end) return null
+  if (!Number.isFinite(durationMin) || durationMin <= 0) return null
+  return { durationMin: Math.round(durationMin), start, end }
+}
+
 export function createHabit(
   state: EntityState,
   input: HabitInput,
@@ -53,6 +63,7 @@ export function createHabit(
     startDate: input.startDate,
     group: normalizeGroup(input.group),
     reminderTime: normalizeReminder(input.reminderTime),
+    block: normalizeBlock(input.block),
     archived: false,
     logs: {},
     order: nextOrderOf(Object.values(state.habits)),
@@ -71,6 +82,7 @@ export function patchHabit(state: EntityState, id: string, patch: Partial<Habit>
     goal: normalizeGoal(merged.goal),
     group: normalizeGroup(merged.group),
     reminderTime: normalizeReminder(merged.reminderTime),
+    block: normalizeBlock(merged.block),
   }
   return { puts: { habits: [next] }, deletes: {} }
 }

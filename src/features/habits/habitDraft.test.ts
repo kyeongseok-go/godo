@@ -119,6 +119,7 @@ describe('draftFromHabit', () => {
       startDate: '2026-09-01',
       group: '저녁',
       reminderTime: '21:00',
+      block: null,
       archived: false,
       logs: {},
       order: 1000,
@@ -136,7 +137,56 @@ describe('draftFromHabit', () => {
       startDate: '2026-09-01',
       group: '저녁',
       reminderTime: '21:00',
+      block: null,
     })
+  })
+
+  test('블록이 있는 습관도 왕복한다', () => {
+    const habit: Habit = {
+      id: 'h',
+      name: '운동',
+      icon: null,
+      color: '#2f6f5e',
+      frequency: { type: 'daily' },
+      goal: { kind: 'check', target: 1, unit: null },
+      startDate: '2026-09-01',
+      group: null,
+      reminderTime: null,
+      block: { durationMin: 45, start: '06:30', end: '08:30' },
+      archived: false,
+      logs: {},
+      order: 1000,
+    }
+
+    const draft = draftFromHabit(habit)
+
+    expect(draft.blockEnabled).toBe(true)
+    expect(draftToInput(draft).block).toEqual({ durationMin: 45, start: '06:30', end: '08:30' })
+  })
+
+  test('블록을 끄면 입력에서도 빠진다', () => {
+    const draft = { ...emptyDraft(TODAY, '#d9421c'), name: 'a', blockEnabled: false }
+
+    expect(draftToInput(draft).block).toBeNull()
+  })
+
+  test('블록 길이가 시간대보다 길면 저장을 막는다', () => {
+    const draft = {
+      ...emptyDraft(TODAY, '#d9421c'),
+      name: 'a',
+      blockEnabled: true,
+      blockStart: '07:00',
+      blockEnd: '07:30',
+      blockDuration: 60,
+    }
+
+    expect(validateDraft(draft)).toContain('시간대')
+  })
+
+  test('블록 종료가 시작보다 빠르면 저장을 막는다', () => {
+    const draft = { ...emptyDraft(TODAY, '#d9421c'), name: 'a', blockEnabled: true, blockStart: '09:00', blockEnd: '07:00' }
+
+    expect(validateDraft(draft)).toContain('종료 시각')
   })
 })
 

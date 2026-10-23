@@ -2,6 +2,7 @@
 // 각 스키마에 `satisfies z.ZodType<X>` (스키마 -> 타입) 와 Same<> 단언 (타입 -> 스키마) 을 함께 건다.
 import { z } from 'zod'
 import { isISODate, isTimeOfDay } from '../date'
+import { MAX_INTERVAL } from '../recurrence/validate'
 import { isSafePayloadShape, TEMPLATE_PAYLOAD_LIMITS } from './payload-guard'
 import type {
   ActivityLog,
@@ -35,12 +36,14 @@ const timeOfDay = z.string().refine(isTimeOfDay, { error: '올바른 시각(HH:m
 const epochMs = z.number()
 const minutes = z.number().min(0)
 const weekday = z.literal([0, 1, 2, 3, 4, 5, 6])
+const priority = z.literal([1, 2, 3, 4])
 const statusCategory = z.enum(['todo', 'active', 'done', 'canceled'])
 const dateNumberRecord = z.record(isoDate, z.number().min(0))
 
 const recurrenceSchema = z.object({
   freq: z.enum(['daily', 'weekly', 'monthly', 'yearly']),
-  interval: z.number().int().min(1),
+  // 상한이 없으면 1e12 같은 값이 'NaN-NaN-NaN' 날짜를 만든다(MAX_INTERVAL 과 같은 값)
+  interval: z.number().int().min(1).max(MAX_INTERVAL),
   byWeekday: z.array(weekday).optional(),
   byMonthDay: z.union([z.number().int().min(1).max(31), z.literal('last')]).optional(),
   nth: z.object({ n: z.literal([1, 2, 3, 4, -1]), weekday }).optional(),
@@ -67,7 +70,7 @@ export const taskSchema = z.object({
   projectId: id,
   sectionId: id.nullable(),
   parentId: id.nullable(),
-  priority: z.literal([1, 2, 3, 4]),
+  priority,
   labelIds: z.array(id),
   startDate: isoDate.nullable(),
   startTime: timeOfDay.nullable(),
@@ -175,6 +178,9 @@ export const habitSchema = z.object({
   startDate: isoDate,
   group: z.string().nullable(),
   reminderTime: timeOfDay.nullable(),
+  block: z
+    .object({ durationMin: minutes, start: timeOfDay, end: timeOfDay })
+    .nullable(),
   archived: z.boolean(),
   logs: dateNumberRecord,
   order: z.number(),
@@ -230,6 +236,21 @@ export const settingsSchema = z.object({
   bufferMin: minutes,
   dailyCapacityMin: minutes,
   carryOverArchiveDays: z.number().min(0),
+  frames: z.array(
+    z.object({
+      id,
+      name: z.string(),
+      days: z.array(weekday),
+      start: timeOfDay,
+      end: timeOfDay,
+      match: z.object({
+        labelIds: z.array(id),
+        priorities: z.array(priority),
+        minMinutes: minutes.nullable(),
+      }),
+      order: z.number(),
+    }),
+  ),
   modules: z.object({
     calendar: z.boolean(),
     matrix: z.boolean(),

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import type { DayPlan, EngineContext, Task } from '../../domain/types'
+import type { DayPlan, EngineContext, Habit, Task, TimeFrame } from '../../domain/types'
 import { makeTask } from '../../test/factories'
 import {
   MAX_HIGHLIGHTS,
@@ -128,13 +128,13 @@ describe('planPlacements', () => {
     const loose = makeTask({ id: 'loose', startDate: TODAY, estimateMin: 45 })
     const { placements, failures } = planPlacements(ctxOf([timed, loose]), opts)
     expect(failures).toEqual([])
-    expect(placements).toEqual([{ taskId: 'loose', date: TODAY, startTime: '10:15', durationMin: 45 }])
+    expect(placements).toEqual([{ taskId: 'loose', date: TODAY, startTime: '10:15', durationMin: 45, frameName: null }])
   })
 
   it('does not place tasks that are not on today', () => {
     const undated = makeTask({ id: 'undated' })
     const future = makeTask({ id: 'future', startDate: '2026-03-12' })
-    expect(planPlacements(ctxOf([undated, future]), opts)).toEqual({ placements: [], failures: [] })
+    expect(planPlacements(ctxOf([undated, future]), opts)).toEqual({ placements: [], failures: [], habitBlocks: [], habitFailures: [] })
   })
 
   it('does not place a blocked task', () => {
@@ -286,5 +286,68 @@ describe('scheduledTasks', () => {
     const other = makeTask({ id: 'other', startDate: '2026-03-11' })
     const ids = scheduledTasks([plain, later, other, urgent, early], TODAY).map((t) => t.id)
     expect(ids).toEqual(['early', 'later', 'urgent', 'plain'])
+  })
+})
+
+describe('planPlacements - 시간대 템플릿과 습관 블록(F12)', () => {
+  const opts = { capacityMin: 360, workStart: '09:00', workEnd: '18:00', bufferMin: 10, defaultMin: 30 }
+
+  const frame = (over: Partial<TimeFrame> = {}): TimeFrame => ({
+    id: 'f1',
+    name: '잡무',
+    days: [0, 1, 2, 3, 4, 5, 6],
+    start: '14:00',
+    end: '18:00',
+    match: { labelIds: [], priorities: [4], minMinutes: null },
+    order: 0,
+    ...over,
+  })
+
+  const habit = (over: Partial<Habit> = {}): Habit => ({
+    id: 'h1',
+    name: '운동',
+    icon: null,
+    color: '#2f6f5e',
+    frequency: { type: 'daily' },
+    goal: { kind: 'check', target: 1, unit: null },
+    startDate: '2026-01-01',
+    group: null,
+    reminderTime: null,
+    block: { durationMin: 30, start: '09:00', end: '12:00' },
+    archived: false,
+    logs: {},
+    order: 1000,
+    ...over,
+  })
+
+  it('시간대 템플릿에 맞는 일은 그 시간대에 넣고 이름을 붙인다', () => {
+    const chore = makeTask({ id: 'chore', startDate: TODAY, priority: 4 })
+    const { placements } = planPlacements(ctxOf([chore]), { ...opts, frames: [frame()] })
+
+    expect(placements[0]).toMatchObject({ startTime: '14:00', frameName: '잡무' })
+  })
+
+  it('습관 블록이 먼저 자리를 잡고 할 일은 그 자리를 피한다', () => {
+    const task = makeTask({ id: 't', startDate: TODAY })
+    const result = planPlacements(ctxOf([task]), { ...opts, habits: [habit()] })
+
+    expect(result.habitBlocks[0]).toMatchObject({ habitId: 'h1', startTime: '09:00', durationMin: 30 })
+    // 09:00~09:30 + 버퍼 10분 → 15분 격자에 맞춰 09:45
+    expect(result.placements[0]?.startTime).toBe('09:45')
+  })
+
+  it('이미 시각이 정해진 할 일 자리에는 습관 블록을 넣지 않는다', () => {
+    const fixed = makeTask({ id: 'fixed', startDate: TODAY, startTime: '09:00', durationMin: 60 })
+    const result = planPlacements(ctxOf([fixed]), { ...opts, habits: [habit()] })
+
+    expect(result.habitBlocks[0]?.startTime).toBe('10:15')
+  })
+
+  it('습관 블록이 들어갈 자리가 없으면 이유를 돌려준다', () => {
+    const blocking = makeTask({ id: 'all-day', startDate: TODAY, startTime: '09:00', durationMin: 180 })
+    const result = planPlacements(ctxOf([blocking]), { ...opts, habits: [habit()] })
+
+    expect(result.habitBlocks).toEqual([])
+    expect(result.habitFailures[0]?.habitId).toBe('h1')
   })
 })

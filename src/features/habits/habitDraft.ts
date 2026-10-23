@@ -1,5 +1,5 @@
 // 습관 만들기/편집 폼의 입력값(draft)과 검증·변환. 화면 상태가 아니라 순수 데이터만 다룬다.
-import { isISODate, isTimeOfDay } from '../../domain/date'
+import { isISODate, isTimeOfDay, minutesOfDay } from '../../domain/date'
 import type { Habit, ISODate, Weekday } from '../../domain/types'
 import type { HabitInput } from './commands'
 
@@ -17,6 +17,11 @@ export interface HabitDraft {
   startDate: string
   group: string
   reminderTime: string
+  /** F12 유연한 습관 블록 */
+  blockEnabled: boolean
+  blockDuration: number
+  blockStart: string
+  blockEnd: string
 }
 
 const DEFAULT_WEEKDAYS: Weekday[] = [1, 2, 3, 4, 5]
@@ -24,6 +29,8 @@ const MIN_TIMES = 1
 const MAX_TIMES = 7
 const DEFAULT_TIMES = 3
 const DEFAULT_TARGET = 1
+const DEFAULT_BLOCK = { durationMin: 30, start: '07:00', end: '09:00' }
+const MAX_BLOCK_MIN = 480
 
 export function emptyDraft(today: ISODate, color: string): HabitDraft {
   return {
@@ -38,6 +45,10 @@ export function emptyDraft(today: ISODate, color: string): HabitDraft {
     startDate: today,
     group: '',
     reminderTime: '',
+    blockEnabled: false,
+    blockDuration: DEFAULT_BLOCK.durationMin,
+    blockStart: DEFAULT_BLOCK.start,
+    blockEnd: DEFAULT_BLOCK.end,
   }
 }
 
@@ -55,6 +66,10 @@ export function draftFromHabit(habit: Habit): HabitDraft {
     startDate: habit.startDate,
     group: habit.group ?? '',
     reminderTime: habit.reminderTime ?? '',
+    blockEnabled: habit.block !== null,
+    blockDuration: habit.block?.durationMin ?? DEFAULT_BLOCK.durationMin,
+    blockStart: habit.block?.start ?? DEFAULT_BLOCK.start,
+    blockEnd: habit.block?.end ?? DEFAULT_BLOCK.end,
   }
 }
 
@@ -73,6 +88,20 @@ export function validateDraft(draft: HabitDraft): string | null {
   }
   if (!isISODate(draft.startDate)) return '시작일을 정해 주세요'
   if (draft.reminderTime !== '' && !isTimeOfDay(draft.reminderTime)) return '알림 시각 형식이 맞지 않아요'
+  return validateBlock(draft)
+}
+
+/** 블록을 켠 경우만 본다. 시간대가 길이보다 짧으면 어차피 자리를 못 잡으니 여기서 막는다. */
+function validateBlock(draft: HabitDraft): string | null {
+  if (!draft.blockEnabled) return null
+  const { blockStart, blockEnd, blockDuration } = draft
+  if (!isTimeOfDay(blockStart) || !isTimeOfDay(blockEnd)) return '블록 시간대 형식이 맞지 않아요'
+  if (blockStart >= blockEnd) return '블록 종료 시각은 시작 시각보다 늦어야 해요'
+  if (!Number.isFinite(blockDuration) || blockDuration <= 0) return '블록 길이는 0보다 커야 해요'
+  if (blockDuration > MAX_BLOCK_MIN) return `블록 길이는 ${MAX_BLOCK_MIN}분까지만 정할 수 있어요`
+  if (blockDuration > minutesOfDay(blockEnd) - minutesOfDay(blockStart)) {
+    return '블록 길이가 시간대보다 길어요'
+  }
   return null
 }
 
@@ -98,6 +127,9 @@ export function draftToInput(draft: HabitDraft): HabitInput {
     startDate: draft.startDate,
     group: draft.group.trim() || null,
     reminderTime: draft.reminderTime || null,
+    block: draft.blockEnabled
+      ? { durationMin: draft.blockDuration, start: draft.blockStart, end: draft.blockEnd }
+      : null,
   }
 }
 

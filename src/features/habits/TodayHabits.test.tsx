@@ -27,6 +27,7 @@ const makeHabit = (over: Partial<Habit> = {}): Habit => ({
   startDate: '2026-10-01',
   group: null,
   reminderTime: null,
+  block: null,
   archived: false,
   logs: {},
   order: 1000,
@@ -89,5 +90,33 @@ describe('TodayHabits', () => {
     renderApp(<TodayHabits />)
 
     expect(screen.getByRole('link', { name: '습관 전체 보기' })).toHaveAttribute('href', '/habits')
+  })
+})
+
+describe('TodayHabits 습관 블록(F12)', () => {
+  test('블록이 있는 습관에 비워 둔 시각을 보여 준다', () => {
+    seed(makeHabit({ block: { durationMin: 30, start: '13:00', end: '18:00' } }))
+
+    renderApp(<TodayHabits />)
+
+    // 테스트 시각은 12:00, 13:00 시간대의 첫 자리를 제안한다
+    expect(screen.getByText(/비워 둔 시간/)).toBeInTheDocument()
+    expect(screen.getByText('13:00')).toBeInTheDocument()
+  })
+
+  test('블록이 없으면 그 줄을 그리지 않는다', () => {
+    seed(makeHabit())
+
+    renderApp(<TodayHabits />)
+
+    expect(screen.queryByText(/비워 둔 시간/)).not.toBeInTheDocument()
+  })
+
+  test('이미 달성한 습관은 시간을 비우지 않는다', () => {
+    seed(makeHabit({ logs: { '2026-10-23': 1 }, block: { durationMin: 30, start: '13:00', end: '18:00' } }))
+
+    renderApp(<TodayHabits />)
+
+    expect(screen.queryByText(/비워 둔 시간/)).not.toBeInTheDocument()
   })
 })

@@ -86,6 +86,7 @@ export function HabitsScreen() {
         color: example.color,
         frequency: { type: 'daily' },
         goal: example.goal,
+        block: null,
         startDate: today,
         group: null,
         reminderTime: null,

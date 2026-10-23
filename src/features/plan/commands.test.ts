@@ -116,7 +116,7 @@ describe('applyPlacements', () => {
     const state = stateWith([makeTask({ id: 'a', startDate: TODAY, estimateMin: 45 })])
     const cs = applyPlacements(
       state,
-      [{ taskId: 'a', date: TODAY, startTime: '10:15', durationMin: 45 }],
+      [{ taskId: 'a', date: TODAY, startTime: '10:15', durationMin: 45, frameName: null }],
       NOW,
     )
     const next = run(state, cs)
@@ -125,7 +125,7 @@ describe('applyPlacements', () => {
 
   it('can be reverted with the inverse change', () => {
     const state = stateWith([makeTask({ id: 'a', startDate: TODAY })])
-    const cs = applyPlacements(state, [{ taskId: 'a', date: TODAY, startTime: '09:00', durationMin: 30 }], NOW)
+    const cs = applyPlacements(state, [{ taskId: 'a', date: TODAY, startTime: '09:00', durationMin: 30, frameName: null }], NOW)
     const { next, inverse } = applyChangeSet(state, cs)
     expect(applyChangeSet(next, inverse).next.tasks.a.startTime).toBeNull()
   })

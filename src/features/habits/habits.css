@@ -816,6 +816,15 @@
   width: 10rem;
 }
 
+/* 블록은 시각 입력 두 개가 들어가 좁은 화면에서 줄바꿈이 필요하다 */
+.hform__block {
+  flex-wrap: wrap;
+}
+
+.ed__field .hform__block input[type='time'] {
+  width: 7.5rem;
+}
+
 .hform__pair {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));

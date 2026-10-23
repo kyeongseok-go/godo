@@ -22,8 +22,21 @@ const v0ToV1: MigrationStep = (data) => {
   return { ...data, tasks }
 }
 
+/**
+ * v1 -> v2. F12(시간대 템플릿·습관 블록)에서 생긴 필드를 채운다.
+ * 둘 다 "없음"이 기본이라 예전 백업의 뜻이 달라지지 않는다.
+ */
+const v1ToV2: MigrationStep = (data) => {
+  const habits = Array.isArray(data.habits)
+    ? data.habits.map((habit: unknown) => (isRecord(habit) && !('block' in habit) ? { ...habit, block: null } : habit))
+    : data.habits
+  const settings =
+    isRecord(data.settings) && !('frames' in data.settings) ? { ...data.settings, frames: [] } : data.settings
+  return { ...data, habits, settings }
+}
+
 /** 키 N = "vN 을 v(N+1) 로 올리는 단계". 새 버전을 추가할 때 한 줄씩 더한다. */
-const MIGRATIONS: Readonly<Record<number, MigrationStep>> = { 0: v0ToV1 }
+const MIGRATIONS: Readonly<Record<number, MigrationStep>> = { 0: v0ToV1, 1: v1ToV2 }
 
 export type MigrationResult = { ok: true; value: RawData } | { ok: false; error: string }
 

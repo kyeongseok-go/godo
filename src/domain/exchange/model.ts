@@ -16,7 +16,7 @@ import type {
 } from '../types'
 
 /** 백업 파일 형식 버전. 형식이 바뀌면 올리고 migrate.ts 에 변환 단계를 하나 추가한다. */
-export const BACKUP_VERSION = 1
+export const BACKUP_VERSION = 2
 
 /** 앱의 전체 영속 상태 */
 export interface AppData {

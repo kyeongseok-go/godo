@@ -34,6 +34,7 @@ const makeHabit = (over: Partial<Habit> = {}): Habit => ({
   startDate: '2026-10-01',
   group: null,
   reminderTime: null,
+  block: null,
   archived: false,
   logs: {},
   order: 1000,
@@ -291,5 +292,46 @@ describe('dialog', () => {
 
     const dialog = await screen.findByRole('dialog', { name: '습관 편집' })
     expect(within(dialog).getByRole('button', { name: '복원' })).toBeInTheDocument()
+  })
+})
+
+describe('습관 블록(F12)', () => {
+  test('시간 비워 두기를 켜고 시간대와 길이를 정해 저장한다', async () => {
+    const user = userEvent.setup()
+    render()
+    await user.click(screen.getAllByRole('button', { name: /새 습관/ })[0])
+
+    await user.type(await screen.findByLabelText('이름'), '운동')
+    await user.click(screen.getByRole('checkbox', { name: /빈 자리에 매일 다시 잡기/ }))
+    fireEvent.change(screen.getByLabelText('블록 시작 시각'), { target: { value: '06:30' } })
+    fireEvent.change(screen.getByLabelText('블록 종료 시각'), { target: { value: '08:30' } })
+    const length = screen.getByLabelText('블록 길이(분)')
+    await user.clear(length)
+    await user.type(length, '45')
+    await user.click(screen.getByRole('button', { name: '만들기' }))
+
+    await waitFor(() => expect(Object.keys(useApp.getState().entities.habits)).toHaveLength(1))
+    expect(Object.values(useApp.getState().entities.habits)[0].block).toEqual({
+      durationMin: 45,
+      start: '06:30',
+      end: '08:30',
+    })
+  })
+
+  test('블록 길이가 시간대보다 길면 이유를 보여 주고 저장하지 않는다', async () => {
+    const user = userEvent.setup()
+    render()
+    await user.click(screen.getAllByRole('button', { name: /새 습관/ })[0])
+
+    await user.type(await screen.findByLabelText('이름'), '운동')
+    await user.click(screen.getByRole('checkbox', { name: /빈 자리에 매일 다시 잡기/ }))
+    fireEvent.change(screen.getByLabelText('블록 종료 시각'), { target: { value: '07:20' } })
+    const length = screen.getByLabelText('블록 길이(분)')
+    await user.clear(length)
+    await user.type(length, '60')
+    await user.click(screen.getByRole('button', { name: '만들기' }))
+
+    expect(await screen.findByRole('alert')).toHaveTextContent('블록 길이가 시간대보다 길어요')
+    expect(Object.keys(useApp.getState().entities.habits)).toHaveLength(0)
   })
 })

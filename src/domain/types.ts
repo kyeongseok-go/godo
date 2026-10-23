@@ -167,6 +167,16 @@ export type HabitFrequency =
   | { type: 'weekdays'; days: Weekday[] }
   | { type: 'timesPerWeek'; times: number }
 
+/**
+ * F12: 유연한 습관 블록. 정해진 시각에 고정하지 않고, 이 시간대 안의 빈 자리를 날마다 다시 찾는다.
+ * 알림 시각(reminderTime)과 달리 하루 일정에 맞춰 움직인다.
+ */
+export interface HabitBlock {
+  durationMin: number
+  start: TimeOfDay
+  end: TimeOfDay
+}
+
 export interface Habit {
   id: ID
   name: string
@@ -178,6 +188,8 @@ export interface Habit {
   startDate: ISODate
   group: string | null
   reminderTime: TimeOfDay | null
+  /** 시간을 비워 둘 블록. null 이면 시간을 잡지 않는다 */
+  block: HabitBlock | null
   archived: boolean
   /** 날짜별 기록 값. check이면 0 또는 1 */
   logs: Record<ISODate, number>
@@ -215,6 +227,26 @@ export interface DayPlan {
 export type ThemeMode = 'light' | 'dark' | 'auto'
 export type Density = 'comfortable' | 'compact'
 
+/**
+ * F12: 작업 유형별 시간대 템플릿("딥워크는 오전, 잡무는 오후").
+ * 자동 배치는 조건에 맞는 일을 이 시간대 안에만 넣는다. 조건이 모두 비어 있으면 모든 일에 맞는 시간대다.
+ */
+export interface TimeFrame {
+  id: ID
+  name: string
+  /** 이 시간대를 쓰는 요일. 비어 있으면 어느 날에도 쓰지 않는다 */
+  days: Weekday[]
+  start: TimeOfDay
+  end: TimeOfDay
+  match: {
+    labelIds: ID[]
+    priorities: Priority[]
+    /** 예상 시간이 이 값 이상인 일만. null 이면 길이를 따지지 않는다 */
+    minMinutes: number | null
+  }
+  order: number
+}
+
 export interface Settings {
   id: 'settings'
   timeZone: string
@@ -239,6 +271,8 @@ export interface Settings {
   bufferMin: number // 자동 배치 때 블록 사이 여유
   dailyCapacityMin: number // 하루 용량 기본값
   carryOverArchiveDays: number // 연속 N일 이월되면 보관 제안
+  /** F12 시간대 템플릿. 비어 있으면 근무 시간 전체를 쓴다 */
+  frames: TimeFrame[]
   modules: {
     calendar: boolean
     matrix: boolean

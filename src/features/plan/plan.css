@@ -568,6 +568,49 @@
   font-size: var(--text-xs);
 }
 
+/* 어느 시간대 템플릿(F12)에 들어갔는지 */
+.plan-preview__frame {
+  margin-left: var(--space-2);
+  padding: 0.1em 0.45em;
+  border: 1px solid var(--rule-strong);
+  color: var(--muted);
+  font-size: var(--text-xs);
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+/* 습관에 비워 둔 시간(F12) */
+.plan-blocks {
+  display: grid;
+  gap: var(--space-1);
+  margin: 0;
+}
+
+.plan-blocks li {
+  display: grid;
+  grid-template-columns: 5rem minmax(0, 1fr) auto;
+  align-items: baseline;
+  gap: var(--space-3);
+  padding: var(--space-2) var(--space-3);
+  border-left: 3px solid var(--accent);
+  background: color-mix(in oklab, var(--accent) 6%, var(--surface));
+}
+
+.plan-blocks__time {
+  font-family: var(--font-display);
+  white-space: nowrap;
+}
+
+.plan-blocks__name {
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.plan-blocks__len {
+  color: var(--muted);
+  font-size: var(--text-xs);
+}
+
 @media (max-width: 40rem) {
   .plan-preview__item {
     grid-template-columns: minmax(0, 1fr) auto;

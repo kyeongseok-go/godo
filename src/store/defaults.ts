@@ -32,6 +32,7 @@ export function defaultSettings(): Settings {
     bufferMin: 10,
     dailyCapacityMin: 360,
     carryOverArchiveDays: 14,
+    frames: [],
     modules: { calendar: true, matrix: true, habits: true, focus: true, countdown: true, timeline: true },
     sidebar: {
       showToday: true,

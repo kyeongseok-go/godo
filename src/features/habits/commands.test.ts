@@ -26,6 +26,7 @@ const makeHabit = (over: Partial<Habit> = {}): Habit => ({
   startDate: '2026-10-01',
   group: null,
   reminderTime: null,
+  block: null,
   archived: false,
   logs: {},
   order: 1000,
@@ -43,6 +44,7 @@ const baseInput: HabitInput = {
   startDate: TODAY,
   group: '  아침  ',
   reminderTime: '07:30',
+  block: null,
 }
 
 describe('createHabit', () => {

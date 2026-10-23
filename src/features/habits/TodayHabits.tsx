@@ -3,9 +3,13 @@ import { useMemo } from 'react'
 import type { CSSProperties } from 'react'
 import { Link } from 'react-router-dom'
 import { paths } from '../../app/nav'
+import { timeFromMinutes } from '../../domain/date'
+import { formatTime } from '../../domain/format'
+import { planHabitBlocks, scheduledOn } from '../../domain/planning'
 import { habitValue, isHabitDone } from '../../domain/stats'
 import type { Habit, ISODate } from '../../domain/types'
-import { useSettings, useTable, useToday } from '../../hooks/data'
+import { busyFromTimedTasks } from '../plan/logic'
+import { useNow, useSettings, useTable, useToday } from '../../hooks/data'
 import { todayHabits } from './habitView'
 import { useHabitActions } from './useHabitActions'
 import type { HabitActions } from './useHabitActions'
@@ -59,6 +63,42 @@ function CountChip({ habit, today, actions }: ChipProps) {
   )
 }
 
+const SLOT_MIN = 15
+
+/**
+ * F12: 블록이 있는 습관에 오늘 비워 둔 시간. 시각이 정해진 할 일을 피해 1분마다 다시 계산한다.
+ * 분 단위로 바뀌므로 칩 목록과 떨어진 작은 컴포넌트로 두어, 칩이 매분 다시 그려지지 않게 한다.
+ */
+function HabitBlockNote({ due, today }: { due: readonly Habit[]; today: ISODate }) {
+  const tasks = useTable('tasks')
+  const settings = useSettings()
+  const now = useNow()
+  const blocks = useMemo(() => {
+    if (!due.some((h) => h.block !== null)) return []
+    const scheduled = tasks.filter((t) => scheduledOn(t, today))
+    return planHabitBlocks(due, busyFromTimedTasks(scheduled, today, settings.defaultDurationMin), {
+      date: today,
+      nowTime: timeFromMinutes(now.getHours() * 60 + now.getMinutes()),
+      bufferMin: settings.bufferMin,
+      slotMin: SLOT_MIN,
+    }).blocks
+  }, [due, tasks, today, now, settings.bufferMin, settings.defaultDurationMin])
+
+  if (blocks.length === 0) return null
+  const byId = new Map(due.map((h) => [h.id, h]))
+  return (
+    <p className="today-habits__blocks">
+      비워 둔 시간{' '}
+      {blocks.map((block, i) => (
+        <span key={block.habitId}>
+          {i > 0 ? ' · ' : null}
+          <b>{formatTime(block.startTime, settings.timeFormat)}</b> {byId.get(block.habitId)?.name}
+        </span>
+      ))}
+    </p>
+  )
+}
+
 /** 오늘 화면에 끼우는 한 줄. 오늘 해야 하는 습관이 없으면 아무것도 그리지 않는다. */
 export function TodayHabits() {
   const habits = useTable('habits')
@@ -85,6 +125,7 @@ export function TodayHabits() {
           </li>
         ))}
       </ul>
+      <HabitBlockNote due={due} today={today} />
       <Link to={paths.habits} className="today-habits__all" aria-label="습관 전체 보기">
         <ChevronRight size={18} aria-hidden="true" />
       </Link>

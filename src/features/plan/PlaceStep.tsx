@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react'
-import { useNow } from '../../hooks/data'
+import { useNow, useTable } from '../../hooks/data'
 import { Link } from 'react-router-dom'
 import { paths } from '../../app/nav'
 import { formatDuration, formatTime } from '../../domain/format'
@@ -27,6 +27,7 @@ export function PlaceStep({ pc, nav }: StepProps) {
   const [applied, setApplied] = useState(0)
   // 지금 시각이 지나 버린 자리를 제안하지 않도록 1분마다 새로 계산한다
   const now = useNow()
+  const habits = useTable('habits')
   const result = useMemo(
     () =>
       planPlacements(
@@ -37,10 +38,35 @@ export function PlaceStep({ pc, nav }: StepProps) {
           workEnd: settings.workEnd,
           bufferMin: settings.bufferMin,
           defaultMin: settings.defaultDurationMin,
+          frames: settings.frames,
+          habits,
         },
       ),
-    [ctx, now, capacityMin, settings.workStart, settings.workEnd, settings.bufferMin, settings.defaultDurationMin],
+    [
+      ctx,
+      now,
+      capacityMin,
+      settings.workStart,
+      settings.workEnd,
+      settings.bufferMin,
+      settings.defaultDurationMin,
+      settings.frames,
+      habits,
+    ],
   )
+  const { habitBlocks, habitFailures } = useMemo(() => {
+    const byId = new Map(habits.map((h) => [h.id, h]))
+    return {
+      habitBlocks: result.habitBlocks.flatMap((block) => {
+        const habit = byId.get(block.habitId)
+        return habit ? [{ block, habit }] : []
+      }),
+      habitFailures: result.habitFailures.flatMap((failure) => {
+        const habit = byId.get(failure.habitId)
+        return habit ? [{ habit, reason: failure.reason }] : []
+      }),
+    }
+  }, [result.habitBlocks, result.habitFailures, habits])
   const previews = previewPlacements(result.placements, ctx.tasks)
   const byId = new Map(ctx.tasks.map((t) => [t.id, t]))
   const failures = result.failures.flatMap((f) => {
@@ -76,6 +102,22 @@ export function PlaceStep({ pc, nav }: StepProps) {
           아침 계획을 마쳤어요 · {clock(plan.morningDoneAt)}
         </p>
       ) : null}
+      {habitBlocks.length > 0 ? (
+        <>
+          <h3 className="plan-sub">
+            습관에 비워 둔 시간 <span>{habitBlocks.length}</span>
+          </h3>
+          <ul className="plan-blocks" aria-label="습관 블록">
+            {habitBlocks.map(({ block, habit }) => (
+              <li key={habit.id}>
+                <span className="plan-blocks__time">{formatTime(block.startTime, settings.timeFormat)}</span>
+                <span className="plan-blocks__name">{habit.name}</span>
+                <span className="plan-blocks__len">{formatDuration(block.durationMin)}</span>
+              </li>
+            ))}
+          </ul>
+        </>
+      ) : null}
       {previews.length > 0 ? (
         <>
           <h3 className="plan-sub">
@@ -90,7 +132,12 @@ export function PlaceStep({ pc, nav }: StepProps) {
                   <span className="sr-only"> 부터 </span>
                   {formatTime(endTime, settings.timeFormat)}
                 </p>
-                <p className="plan-preview__title">{task.title}</p>
+                <p className="plan-preview__title">
+                  {task.title}
+                  {placement.frameName !== null ? (
+                    <span className="plan-preview__frame">{placement.frameName}</span>
+                  ) : null}
+                </p>
                 <p className="plan-preview__len">{formatDuration(placement.durationMin)}</p>
               </li>
             ))}
@@ -113,6 +160,21 @@ export function PlaceStep({ pc, nav }: StepProps) {
             {failures.map(({ task, reason }) => (
               <li key={task.id}>
                 <p className="plan-failures__title">{task.title}</p>
+                <p className="plan-failures__reason">{reason}</p>
+              </li>
+            ))}
+          </ul>
+        </>
+      ) : null}
+      {habitFailures.length > 0 ? (
+        <>
+          <h3 className="plan-sub">
+            시간을 못 비운 습관 <span>{habitFailures.length}</span>
+          </h3>
+          <ul className="plan-failures">
+            {habitFailures.map(({ habit, reason }) => (
+              <li key={habit.id}>
+                <p className="plan-failures__title">{habit.name}</p>
                 <p className="plan-failures__reason">{reason}</p>
               </li>
             ))}

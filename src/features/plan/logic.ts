@@ -5,12 +5,22 @@ import {
   autoPlace,
   buildToday,
   dayLoad,
+  habitBlocksAsBusy,
   makeActionableChecker,
+  planHabitBlocks,
   scheduledOn,
   suggestOffload,
+  taskMinutes,
 } from '../../domain/planning'
-import type { DayLoad, Placement, PlacementFailure } from '../../domain/planning'
-import type { DayPlan, EngineContext, ID, ISODate, Task } from '../../domain/types'
+import type {
+  BusyBlock,
+  DayLoad,
+  HabitBlockFailure,
+  HabitBlockPlacement,
+  Placement,
+  PlacementFailure,
+} from '../../domain/planning'
+import type { DayPlan, EngineContext, Habit, ID, ISODate, Task, TimeFrame } from '../../domain/types'
 
 export type PlanTab = 'morning' | 'evening'
 
@@ -86,20 +96,36 @@ export interface PlacementInput {
   workEnd: string
   bufferMin: number
   defaultMin: number
+  /** F12 시간대 템플릿 */
+  frames?: readonly TimeFrame[]
+  /** F12 유연한 습관 블록을 먼저 잡아 두려면 습관 목록을 넘긴다 */
+  habits?: readonly Habit[]
+}
+
+export interface PlacementResult {
+  placements: Placement[]
+  failures: PlacementFailure[]
+  /** 작업보다 먼저 자리를 잡은 습관 블록 */
+  habitBlocks: HabitBlockPlacement[]
+  habitFailures: HabitBlockFailure[]
 }
 
 /**
  * 오늘로 잡힌 일 중 시간이 없는 것만 오늘 빈 시간에 맞춘다.
  * 자동 배치 모듈은 날짜 없는 일까지 훑으므로, 오늘 일과 시간 막힘 정보만 골라서 넘긴다.
+ * 습관 블록(F12)은 작업보다 먼저 자리를 잡고, 작업 배치는 그 자리를 피한다.
  */
-export function planPlacements(
-  ctx: EngineContext,
-  input: PlacementInput,
-): { placements: Placement[]; failures: PlacementFailure[] } {
+export function planPlacements(ctx: EngineContext, input: PlacementInput): PlacementResult {
   const nowTime = timeFromMinutes(ctx.now.getHours() * 60 + ctx.now.getMinutes())
   const isReady = makeActionableChecker(ctx)
   const todays = ctx.tasks.filter((t) => scheduledOn(t, ctx.today) && (t.startTime !== null || isReady(t)))
-  const result = autoPlace(todays, [], {
+  const habitPlan = planHabitBlocks(input.habits ?? [], busyFromTimedTasks(todays, ctx.today, input.defaultMin), {
+    date: ctx.today,
+    nowTime,
+    bufferMin: input.bufferMin,
+    slotMin: SLOT_MIN,
+  })
+  const result = autoPlace(todays, habitBlocksAsBusy(habitPlan.blocks), {
     today: ctx.today,
     nowTime,
     horizonDays: 1,
@@ -110,8 +136,23 @@ export function planPlacements(
     slotMin: SLOT_MIN,
     capacityMin: input.capacityMin,
     workDays: [0, 1, 2, 3, 4, 5, 6],
+    frames: input.frames,
   })
-  return { placements: result.placements, failures: result.failures.map(todayWording) }
+  return {
+    placements: result.placements,
+    failures: result.failures.map(todayWording),
+    habitBlocks: habitPlan.blocks,
+    habitFailures: habitPlan.failures,
+  }
+}
+
+/** 이미 시각이 정해진 작업. 습관 블록이 그 자리를 피하도록 넘긴다. */
+export function busyFromTimedTasks(tasks: readonly Task[], date: ISODate, defaultMin: number): BusyBlock[] {
+  return tasks.flatMap((task) => {
+    if (task.startTime === null) return []
+    const start = minutesOfDay(task.startTime)
+    return [{ date, start: task.startTime, end: timeFromMinutes(start + taskMinutes(task, defaultMin)) }]
+  })
 }
 
 /** 계획 기간이 하루뿐이라 "앞으로 1일 안에"는 어색하다. 오늘 화면에 맞게 바꿔 말한다. */

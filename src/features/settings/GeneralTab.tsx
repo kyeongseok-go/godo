@@ -4,6 +4,7 @@ import { useApp } from '../../store/app'
 import type { Settings } from '../../domain/types'
 import { minutesOfDay } from '../../domain/date'
 import { Group, NumberField, Row, Segmented, SelectField, Switch, TimeField } from './fields'
+import { FramesSection } from './FramesSection'
 import {
   dateFormatSample,
   homeOptions,
@@ -171,6 +172,7 @@ export function GeneralTab() {
       <DefaultsSection settings={settings} />
       <InputSection settings={settings} />
       <PlanningSection settings={settings} />
+      <FramesSection />
     </>
   )
 }

@@ -66,5 +66,21 @@ export class PaceDB extends Dexie {
       settings: 'id',
       snapshots: 'id, createdAt',
     })
+    // v2: F12 에서 습관 블록(habits.block)과 시간대 템플릿(settings.frames)이 생겼다.
+    // 인덱스는 그대로지만, 예전에 저장된 행에 필드를 채워 undefined 가 앱으로 퍼지지 않게 한다.
+    this.version(2).upgrade(async (tx) => {
+      await tx
+        .table('habits')
+        .toCollection()
+        .modify((habit: Partial<Habit>) => {
+          if (habit.block === undefined) habit.block = null
+        })
+      await tx
+        .table('settings')
+        .toCollection()
+        .modify((settings: Partial<Settings>) => {
+          if (settings.frames === undefined) settings.frames = []
+        })
+    })
   }
 }

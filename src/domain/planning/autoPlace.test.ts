@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { makeTask } from '../../test/factories'
-import type { Task } from '../types'
+import type { Task, TimeFrame } from '../types'
 import { autoPlace } from './autoPlace'
 import type { AutoPlaceOptions, BusyBlock } from './autoPlace'
 
@@ -28,7 +28,7 @@ const task = (id: string, overrides: Partial<Task> = {}): Task => makeTask({ id,
 describe('autoPlace basics', () => {
   it('places a task at the first slot of the work day', () => {
     const { placements, failures } = run([task('a')])
-    expect(placements).toEqual([{ taskId: 'a', date: TODAY, startTime: '09:00', durationMin: 30 }])
+    expect(placements).toEqual([{ taskId: 'a', date: TODAY, startTime: '09:00', durationMin: 30, frameName: null }])
     expect(failures).toEqual([])
   })
 
@@ -78,7 +78,7 @@ describe('autoPlace busy time', () => {
   it('treats tasks that already have a time as busy', () => {
     const fixed = task('fixed', { startDate: TODAY, startTime: '09:00', durationMin: 60 })
     const { placements } = run([fixed, task('a')])
-    expect(placements).toEqual([{ taskId: 'a', date: TODAY, startTime: '10:15', durationMin: 30 }])
+    expect(placements).toEqual([{ taskId: 'a', date: TODAY, startTime: '10:15', durationMin: 30, frameName: null }])
   })
 
   it('uses the due date for a timed task without a start date', () => {
@@ -232,5 +232,82 @@ describe('autoPlace determinism', () => {
     const backward = autoPlace([...tasks].reverse(), busy, BASE)
     expect(backward).toEqual(forward)
     expect(autoPlace(tasks, busy, BASE)).toEqual(forward)
+  })
+})
+
+describe('autoPlace 시간대 템플릿(F12)', () => {
+  const deep = (patch: Partial<TimeFrame> = {}): TimeFrame => ({
+    id: 'deep',
+    name: '딥워크',
+    days: [1, 2, 3, 4, 5],
+    start: '09:00',
+    end: '11:00',
+    match: { labelIds: ['L-deep'], priorities: [], minMinutes: null },
+    order: 0,
+    ...patch,
+  })
+
+  it('조건에 맞는 일은 그 시간대 안에 넣고 어느 시간대인지 알려준다', () => {
+    const frames = [deep({ start: '13:00', end: '16:00' })]
+    const { placements } = run([task('a', { labelIds: ['L-deep'] })], [], { frames })
+    expect(placements).toEqual([
+      { taskId: 'a', date: TODAY, startTime: '13:00', durationMin: 30, frameName: '딥워크' },
+    ])
+  })
+
+  it('조건에 맞지 않는 일은 근무 시간을 그대로 쓴다', () => {
+    const { placements } = run([task('a', { labelIds: ['L-other'] })], [], { frames: [deep()] })
+    expect(placements[0]).toMatchObject({ startTime: '09:00', frameName: null })
+  })
+
+  it('시간대가 꽉 차면 근무 시간의 빈자리로 흘러가지 않는다', () => {
+    const busy: BusyBlock[] = [{ date: TODAY, start: '09:00', end: '11:00' }]
+    const { placements, failures } = run([task('a', { labelIds: ['L-deep'] })], busy, {
+      frames: [deep()],
+      horizonDays: 1,
+    })
+    expect(placements).toEqual([])
+    expect(failures[0]?.reason).toContain('딥워크')
+  })
+
+  it('그 요일에 열리지 않으면 다음 열리는 날로 넘긴다', () => {
+    // 2026-03-10 은 화요일 → 수요일만 쓰는 시간대는 03-11 로 간다
+    const { placements } = run([task('a', { labelIds: ['L-deep'] })], [], { frames: [deep({ days: [3] })] })
+    expect(placements[0]).toMatchObject({ date: '2026-03-11', startTime: '09:00' })
+  })
+
+  it('시간대보다 긴 일은 이유를 알려주고 근무 시간에 끼워 넣지 않는다', () => {
+    const long = task('a', { labelIds: ['L-deep'], estimateMin: 180 })
+    const { placements, failures } = run([long], [], { frames: [deep()] })
+    expect(placements).toEqual([])
+    expect(failures[0]?.reason).toContain('120분')
+  })
+
+  it('같은 일에 여러 시간대가 맞으면 이른 시각부터 채운다', () => {
+    const frames = [deep({ id: 'pm', name: '오후', start: '14:00', end: '15:00' }), deep({ id: 'am', name: '오전' })]
+    // 긴 일(b)이 먼저 자리를 잡아 오전을 다 쓰고, 짧은 일(a)은 다음 시간대로 간다
+    const tasks = [task('a', { labelIds: ['L-deep'] }), task('b', { labelIds: ['L-deep'], estimateMin: 120 })]
+    const { placements } = run(tasks, [], { frames, horizonDays: 1 })
+    expect(placements.map((p) => [p.taskId, p.startTime, p.frameName])).toEqual([
+      ['b', '09:00', '오전'],
+      ['a', '14:00', '오후'],
+    ])
+  })
+
+  it('우선순위·최소 길이 조건도 본다', () => {
+    const frames = [
+      deep({ id: 'chore', name: '잡무', start: '15:00', end: '18:00', match: { labelIds: [], priorities: [4], minMinutes: null } }),
+    ]
+    const { placements } = run([task('a', { priority: 4 }), task('b', { priority: 1 })], [], { frames, horizonDays: 1 })
+    expect(placements.find((p) => p.taskId === 'a')).toMatchObject({ startTime: '15:00', frameName: '잡무' })
+    expect(placements.find((p) => p.taskId === 'b')).toMatchObject({ startTime: '09:00', frameName: null })
+  })
+
+  it('쓸모 없는 시간대(요일 없음·거꾸로 된 시각)는 무시하고 근무 시간을 쓴다', () => {
+    const broken = [deep({ days: [] }), deep({ id: 'x', start: '16:00', end: '15:00' })]
+    expect(run([task('a', { labelIds: ['L-deep'] })], [], { frames: broken }).placements[0]).toMatchObject({
+      startTime: '09:00',
+      frameName: null,
+    })
   })
 })
