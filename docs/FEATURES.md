@@ -9,7 +9,9 @@ TickTick + Todoist 실사용 조사(`research/`)에서 뽑은 기능. 나 혼자
 - 디자인 방향: Swiss/에디토리얼. 종이색 바탕, 잉크 블랙, 주홍(vermilion) 한 가지 신호색. Pretendard + Fraunces(숫자·제목).
 
 ## 구현 현황 (2026-10-23)
-아래 모든 항목을 구현했다(F12 포함). 배포: https://kyeongseok-go.github.io/pace/ (GitHub Pages, 저장소 kyeongseok-go/pace)
+아래 모든 항목을 구현했다(F12 포함). 단위·컴포넌트 테스트 2,795개(구문 96% · 함수 96% 커버리지),
+Playwright E2E 87개(핵심 흐름·접근성 axe 라이트/다크·PWA 오프라인·F12 포함)가 통과한다.
+배포: https://kyeongseok-go.github.io/pace/ (GitHub Pages, 저장소 kyeongseok-go/pace)
 
 ## 완료 기준 (루프 종료 조건)
 아래 항목이 전부 `[x]`이고, 단위 테스트 커버리지 80% 이상, Playwright 핵심 흐름 통과, 4개 해상도(320/768/1024/1440) 가로 넘침 없음, 키보드만으로 주요 흐름 가능.

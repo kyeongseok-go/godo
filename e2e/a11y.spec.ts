@@ -30,7 +30,8 @@ const ROUTES = [
 
 for (const scheme of ['light', 'dark'] as const) {
   test.describe(`접근성 (${scheme})`, () => {
-    test.use({ colorScheme: scheme })
+    // 모션을 줄이면 앱이 애니메이션을 끈다(base.css). 페이드 중간 상태에서 명암비를 재지 않으려는 것이다.
+    test.use({ colorScheme: scheme, reducedMotion: 'reduce' })
 
     for (const route of ROUTES) {
       test(`${route}`, async ({ page }) => {
