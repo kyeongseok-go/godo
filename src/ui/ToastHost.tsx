@@ -21,7 +21,10 @@ export function ToastHost() {
       ) : null}
       {toasts.map((t) => (
         <div key={t.id} className="toast" data-tone={t.tone}>
-          <span>{t.message}</span>
+          <span>
+            {t.message}
+            {t.count > 1 ? <b className="toast__count">{t.count}</b> : null}
+          </span>
           {t.actionLabel ? (
             <button
               type="button"

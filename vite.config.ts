@@ -4,7 +4,7 @@ import type { Plugin } from 'vite'
 import { defineConfig } from 'vitest/config'
 
 // 종이색. index.html 의 theme-color(라이트), tokens.css 의 --paper 와 같은 값이다.
-const PAPER = '#f4efe4'
+const PAPER = '#f4f6f8'
 const MAX_PRECACHE_BYTES = 5 * 1024 * 1024
 
 // 프로덕션 CSP. 스크립트는 같은 출처 파일만 실행하고, 외부로 나가는 연결·프레임·플러그인은 전부 막는다.

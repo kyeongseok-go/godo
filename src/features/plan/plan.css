@@ -32,8 +32,8 @@
 }
 
 .plan-tabs__tab[aria-selected='true'] {
-  background: var(--ink);
-  color: var(--paper);
+  background: var(--accent);
+  color: var(--accent-ink);
 }
 
 .plan-tabs__tab:focus-visible {
@@ -83,7 +83,6 @@
   font-size: var(--text-lg);
   line-height: 1;
   color: var(--muted);
-  font-variation-settings: 'opsz' 144, 'SOFT' 30;
 }
 
 /* 번호는 괘선 위에 얹힌다. 지난 단계는 먹색, 지금은 굵은 주홍, 앞으로는 가는 회색. */
@@ -152,7 +151,6 @@
   font-weight: 500;
   line-height: 1.15;
   letter-spacing: -0.02em;
-  font-variation-settings: 'opsz' 144, 'SOFT' 30;
   outline: none;
 }
 
@@ -183,7 +181,7 @@
   gap: var(--space-2);
   margin-top: var(--space-3);
   padding-top: var(--space-2);
-  border-top: 2px solid var(--ink);
+  border-top: 1px solid var(--rule-strong);
   font-family: var(--font-display);
   font-size: var(--text-md);
   font-weight: 500;
@@ -244,7 +242,7 @@
   gap: var(--space-5);
   padding: var(--space-5);
   border: 1px solid var(--rule-strong);
-  border-top: 2px solid var(--ink);
+  border-top: 1px solid var(--rule-strong);
   border-radius: var(--radius-sm);
   background: var(--surface);
 }
@@ -255,7 +253,6 @@
   line-height: 0.9;
   letter-spacing: -0.04em;
   color: var(--accent);
-  font-variation-settings: 'opsz' 144, 'SOFT' 30;
 }
 
 .plan-callout__text {
@@ -356,7 +353,7 @@
   width: 1.5rem;
   height: 1.5rem;
   margin-top: 0.1rem;
-  border: 2px solid var(--ink);
+  border: 1px solid var(--rule-strong);
   border-radius: var(--radius-sm);
   background: var(--paper);
   color: transparent;
@@ -407,11 +404,16 @@
 }
 
 /* ── 용량 막대 ── */
+/* ── 하루 리본 ── */
 .capmeter {
   display: grid;
   gap: var(--space-2);
-  padding: var(--space-3) 0;
-  border-top: 2px solid var(--ink);
+  max-width: var(--measure);
+  margin: 0 var(--space-gutter) var(--space-4);
+  padding: var(--space-3) var(--space-4) var(--space-2);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
 }
 
 .capmeter__head {
@@ -425,20 +427,24 @@
 .capmeter__figures {
   display: flex;
   align-items: baseline;
-  gap: var(--space-2);
+  gap: var(--space-1);
+  font-variant-numeric: tabular-nums;
 }
 
 .capmeter__figures strong {
-  font-family: var(--font-display);
-  font-size: var(--text-lg);
-  font-weight: 500;
+  font-size: var(--text-md);
+  font-weight: 700;
   letter-spacing: -0.02em;
 }
 
+.capmeter[data-level='over'] .capmeter__figures strong {
+  color: var(--danger);
+}
+
 .capmeter__cap {
-  min-height: 2rem;
+  min-height: 1.75rem;
   padding: 0 var(--space-1);
-  color: var(--ink-soft);
+  color: var(--muted);
   font-weight: 600;
   text-decoration: underline dotted;
   text-underline-offset: 4px;
@@ -449,45 +455,106 @@
 }
 
 .capmeter__note {
-  font-size: var(--text-sm);
   color: var(--muted);
+  font-size: var(--text-sm);
 }
 
-.capmeter__track {
+.capmeter[data-level='over'] .capmeter__note {
+  color: var(--danger);
+}
+
+/* 리본: 창 전체가 트랙, 시각이 정해진 일이 면으로 앉는다 */
+.capmeter__ribbon {
   position: relative;
-  height: 0.75rem;
-  border: 1px solid var(--rule-strong);
+  height: 1.5rem;
+  border-radius: var(--radius-sm);
   background: var(--surface-sunk);
   overflow: hidden;
 }
 
-.capmeter__fill {
+/* 오늘 지나간 구간. 하루가 어디까지 흘렀는지가 한눈에 보이게 한다. */
+.capmeter__past {
   position: absolute;
-  inset: 0;
-  background: var(--ink);
-  transform-origin: left center;
-  transition: transform var(--duration-normal) var(--ease-out);
+  left: 0;
+  top: 0;
+  bottom: 0;
+  background: color-mix(in oklab, var(--ink) 7%, transparent);
 }
 
-.capmeter__mark {
+.capmeter__tick {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background: var(--rule);
+}
+
+.capmeter__seg {
+  position: absolute;
+  top: 0.25rem;
+  bottom: 0.25rem;
+  min-width: 2px;
+  border-radius: 2px;
+  background: color-mix(in oklab, var(--seg-color, var(--p4)) 58%, var(--surface));
+  box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--seg-color, var(--p4)) 70%, transparent);
+  --seg-color: var(--p4);
+}
+
+.capmeter__seg[data-priority='1'] { --seg-color: var(--p1); }
+.capmeter__seg[data-priority='2'] { --seg-color: var(--p2); }
+.capmeter__seg[data-priority='3'] { --seg-color: var(--p3); }
+
+.capmeter__seg[data-done='true'] {
+  background: repeating-linear-gradient(
+    135deg,
+    color-mix(in oklab, var(--seg-color) 34%, var(--surface)) 0 4px,
+    color-mix(in oklab, var(--seg-color) 16%, var(--surface)) 4px 8px
+  );
+}
+
+/* 지금 시각. 리본에서 유일하게 호박색을 쓰는 자리다. */
+.capmeter__now {
   position: absolute;
   top: 0;
   bottom: 0;
   width: 2px;
-  background: var(--paper);
+  background: var(--now);
 }
 
-.capmeter[data-level='near'] .capmeter__fill {
-  background: var(--warn);
-}
-
-.capmeter[data-level='over'] .capmeter__fill {
-  background: var(--accent);
-}
-
-.capmeter[data-level='over'] .capmeter__note {
-  color: var(--accent);
+.capmeter__now-time {
+  position: absolute;
+  top: 50%;
+  left: 5px;
+  /* 오른쪽 끝에 가까우면 글자를 왼쪽으로 넘긴다(잘리지 않게) */
+  translate: 0 -50%;
+  padding: 0 0.3rem;
+  border-radius: var(--radius-sm);
+  background: var(--now);
+  color: var(--now-ink);
+  font-size: 0.6875rem;
   font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.5;
+  white-space: nowrap;
+}
+
+.capmeter__now[data-flip='true'] .capmeter__now-time {
+  left: auto;
+  right: 5px;
+}
+
+.capmeter__range {
+  display: flex;
+  justify-content: space-between;
+  color: var(--muted);
+  font-size: var(--text-xs);
+  font-variant-numeric: tabular-nums;
+}
+
+@media (max-width: 40rem) {
+  .capmeter__now-time {
+    display: none;
+  }
 }
 
 .capedit {
@@ -652,7 +719,7 @@
 
 .plan-figures > div {
   padding-top: var(--space-2);
-  border-top: 2px solid var(--ink);
+  border-top: 1px solid var(--rule-strong);
 }
 
 .plan-figures dt {

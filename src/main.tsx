@@ -1,5 +1,4 @@
 import 'pretendard/dist/web/variable/pretendardvariable-dynamic-subset.css'
-import '@fontsource-variable/fraunces/opsz.css'
 import './styles/tokens.css'
 import './styles/base.css'
 import './styles/pages.css'

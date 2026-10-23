@@ -7,7 +7,7 @@
 }
 
 .prod__ledger {
-  border-top: 2px solid var(--ink);
+  border-top: 1px solid var(--rule-strong);
   border-bottom: 1px solid var(--rule-strong);
 }
 
@@ -15,7 +15,7 @@
 .prod__section {
   min-width: 0;
   padding-top: var(--space-3);
-  border-top: 2px solid var(--ink);
+  border-top: 1px solid var(--rule-strong);
 }
 
 .prod__section-head {
@@ -149,7 +149,7 @@
   width: 2.75rem;
   height: 1.5rem;
   padding: 2px;
-  border: 2px solid var(--ink);
+  border: 1px solid var(--rule-strong);
   border-radius: var(--radius-sm);
   transition: background-color var(--duration-fast) var(--ease-out);
 }

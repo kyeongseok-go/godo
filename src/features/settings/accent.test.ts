@@ -64,7 +64,7 @@ describe('accentPresets', () => {
 
 describe('accentName', () => {
   it('names known colors and falls back for others', () => {
-    expect(accentName(DEFAULT_ACCENT)).toBe('주홍')
+    expect(accentName(DEFAULT_ACCENT)).toBe('청록')
     expect(accentName('#123456')).toBe('사용자 지정')
   })
 })

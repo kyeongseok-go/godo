@@ -52,7 +52,7 @@ export function TimeGrid({ days, today, occurrences, defaults }: TimeGridProps) 
 
   useEffect(() => {
     // 처음 열 때 업무 시작 시각 근처로 스크롤한다.
-    if (scrollRef.current) scrollRef.current.scrollTop = Math.max(0, px(minutesOfDay(settings.workStart) - 60))
+    if (scrollRef.current) scrollRef.current.scrollTop = Math.max(0, px(minutesOfDay(settings.workStart) - 60) - 10)
   }, [settings.workStart])
 
   const untimed = useMemo(

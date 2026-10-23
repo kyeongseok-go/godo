@@ -12,7 +12,7 @@
   position: sticky;
   top: var(--space-5);
   display: grid;
-  border-top: 2px solid var(--ink);
+  border-top: 1px solid var(--rule-strong);
 }
 
 .st-tab {
@@ -26,12 +26,6 @@
   transition:
     background var(--duration-fast) var(--ease-out),
     color var(--duration-fast) var(--ease-out);
-}
-
-.st-tab__no {
-  font-family: var(--font-mono);
-  font-size: var(--text-xs);
-  color: var(--muted);
 }
 
 .st-tab__short {
@@ -50,10 +44,6 @@
   box-shadow: inset 3px 0 0 var(--accent);
 }
 
-.st-tab[aria-current='page'] .st-tab__no {
-  color: var(--accent);
-}
-
 /* 본문 */
 .st-panel {
   min-width: 0;
@@ -66,7 +56,6 @@
   font-size: var(--text-lg);
   font-weight: 500;
   letter-spacing: -0.02em;
-  font-variation-settings: 'opsz' 72, 'SOFT' 30;
 }
 
 .st-loading {
@@ -80,7 +69,7 @@
 
 .st-group__title {
   padding-bottom: var(--space-2);
-  border-bottom: 2px solid var(--ink);
+  border-bottom: 1px solid var(--rule-strong);
   font-size: var(--text-xs);
   font-weight: 700;
   letter-spacing: 0.12em;
@@ -209,8 +198,8 @@
 }
 
 .st-seg__item[aria-checked='true'] {
-  background: var(--ink);
-  color: var(--paper);
+  background: var(--accent);
+  color: var(--accent-ink);
 }
 
 /* 스위치 */
@@ -237,7 +226,7 @@
   position: relative;
   width: 2.75rem;
   height: 1.5rem;
-  border: 2px solid var(--ink);
+  border: 1px solid var(--rule-strong);
   border-radius: var(--radius-sm);
   background: var(--surface);
 }
@@ -379,7 +368,6 @@
   font-weight: 500;
   line-height: 1;
   letter-spacing: -0.04em;
-  font-variation-settings: 'opsz' 144, 'SOFT' 30;
 }
 
 .st-about__version {
@@ -431,7 +419,7 @@
     position: static;
     grid-template-columns: repeat(4, minmax(0, 1fr));
     gap: 1px;
-    border: 2px solid var(--ink);
+    border: 1px solid var(--rule-strong);
     background: var(--rule-strong);
   }
 
@@ -448,7 +436,6 @@
     text-align: center;
   }
 
-  .st-tab__no,
   .st-tab__long {
     display: none;
   }
@@ -458,9 +445,9 @@
   }
 
   .st-tab[aria-current='page'] {
-    background: var(--ink);
-    color: var(--paper);
-    box-shadow: none;
+    background: var(--accent-soft);
+    color: var(--ink);
+    box-shadow: inset 0 -2px 0 var(--accent);
   }
 }
 

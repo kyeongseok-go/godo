@@ -49,11 +49,8 @@ export function SettingsView() {
       <PageHeader title="설정" description="바꾸는 즉시 저장돼요. 모든 데이터는 이 브라우저 안에만 있어요." />
       <div className="st">
         <nav className="st-tabs" aria-label="설정 구역">
-          {SETTINGS_TABS.map((t, index) => (
+          {SETTINGS_TABS.map((t) => (
             <NavLink key={t.id} to={paths.settings(t.id)} className="st-tab" replace>
-              <span className="st-tab__no" aria-hidden="true">
-                {String(index + 1).padStart(2, '0')}
-              </span>
               <span className="st-tab__long">{t.label}</span>
               <span className="st-tab__short">{t.short}</span>
             </NavLink>

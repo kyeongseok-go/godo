@@ -22,8 +22,8 @@
 }
 
 .vswitch button[aria-selected='true'] {
-  background: var(--ink);
-  color: var(--paper);
+  background: var(--accent);
+  color: var(--accent-ink);
 }
 
 @media (max-width: 40rem) {

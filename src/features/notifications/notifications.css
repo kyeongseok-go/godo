@@ -21,7 +21,7 @@
   background: var(--surface);
   color: var(--ink);
   border: 1px solid var(--rule-strong);
-  border-top: 2px solid var(--ink);
+  border-top: 1px solid var(--rule-strong);
   border-radius: var(--radius-sm);
   box-shadow: var(--shadow-float);
   animation: reminder-in var(--duration-normal) var(--ease-out);
@@ -189,7 +189,7 @@
   display: grid;
   gap: var(--space-3);
   padding-top: var(--space-4);
-  border-top: 2px solid var(--ink);
+  border-top: 1px solid var(--rule-strong);
 }
 
 .notif-block__title {

@@ -1,9 +1,10 @@
 import { INBOX_ID } from '../domain/types'
 import type { Project, Settings } from '../domain/types'
 
-/** 기본 강조색. 테마(라이트/다크)가 각자 맞는 주홍을 정하므로, 이 값일 때는 직접 덮어쓰지 않는다. */
-export const DEFAULT_ACCENT = '#c8360f'
-const LEGACY_DEFAULT_ACCENTS: readonly string[] = ['#d9421c']
+/** 기본 강조색. 테마(라이트/다크)가 각자 맞는 청록을 정하므로, 이 값일 때는 직접 덮어쓰지 않는다. */
+export const DEFAULT_ACCENT = '#0a6a60'
+/** 예전 기본값(주홍 계열). 저장된 값이 이것이면 새 기본값을 따른다. */
+const LEGACY_DEFAULT_ACCENTS: readonly string[] = ['#d9421c', '#c8360f']
 
 export const isDefaultAccent = (accent: string | undefined): boolean =>
   !accent || accent === DEFAULT_ACCENT || LEGACY_DEFAULT_ACCENTS.includes(accent)
@@ -65,16 +66,16 @@ export function inboxProject(nowMs: number): Project {
   }
 }
 
-/** 프로젝트·라벨에 순환해서 쓰는 팔레트. 신호색(주홍)을 앞에 둔다. */
+/** 프로젝트·라벨에 순환해서 쓰는 팔레트. 신호색(청록)을 앞에 둔다. */
 export const PALETTE = [
-  '#c8360f',
-  '#2f6f5e',
+  '#0a6a60',
+  '#2f6fd0',
+  '#6b4ad6',
+  '#b45309',
+  '#be1850',
+  '#15803d',
   '#2b4c7e',
-  '#b8860b',
   '#7a3e8e',
-  '#c2185b',
-  '#00796b',
-  '#5d4037',
   '#455a64',
   '#6b6258',
 ] as const

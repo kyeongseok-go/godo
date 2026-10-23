@@ -61,7 +61,7 @@
   background: transparent;
   color: var(--ink);
   caret-color: var(--accent);
-  border-bottom: 2px solid var(--ink);
+  border-bottom: 1px solid var(--rule-strong);
 }
 
 .qa__input:focus {

@@ -23,15 +23,12 @@ body {
   overflow-x: hidden;
 }
 
-/* 종이 질감. 아주 옅게 깔아서 평평한 단색을 피한다. */
-body::before {
-  content: '';
-  position: fixed;
-  inset: 0;
-  background-image: var(--grain);
-  pointer-events: none;
-  opacity: 0.55;
-  z-index: 0;
+/* 시각·분량처럼 자리를 맞춰 읽는 숫자는 폭을 고정한다(10:00 과 11:30 이 흔들리지 않게). */
+time,
+output,
+kbd,
+.tnum {
+  font-variant-numeric: tabular-nums;
 }
 
 #root {

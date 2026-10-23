@@ -13,7 +13,7 @@
 }
 
 .mgrid__weekdays {
-  border-bottom: 2px solid var(--ink);
+  border-bottom: 1px solid var(--rule-strong);
 }
 
 .mgrid__weekdays span {

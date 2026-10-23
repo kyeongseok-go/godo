@@ -119,7 +119,7 @@ export function HabitsScreen() {
     <div className="habits" ref={rootRef}>
       <PageHeader
         title="습관"
-        eyebrow="Habits"
+        eyebrow="매일 하는 일"
         count={active.length}
         description={dueToday.length > 0 ? `오늘 할 습관 ${dueToday.length}개 중 ${doneToday}개를 마쳤어요.` : '매일 조금씩 쌓는 기록이에요.'}
         actions={

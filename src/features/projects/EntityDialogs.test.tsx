@@ -113,7 +113,7 @@ describe('project dialog', () => {
         projects: [
           makeProject({ id: 'f', name: '회사', isFolder: true }),
           makeProject({ id: 'g', name: '하위 폴더', isFolder: true, parentId: 'f' }),
-          makeProject({ id: 'w', name: '업무', color: '#2f6f5e' }),
+          makeProject({ id: 'w', name: '업무', color: '#15803d' }),
         ],
         tasks: [makeTask({ id: 't1', projectId: 'w', title: '업무 할 일' })],
       })
@@ -125,7 +125,7 @@ describe('project dialog', () => {
 
       const name = await nameField()
       expect(name).toHaveValue('업무')
-      expect(screen.getByRole('radio', { name: '#2f6f5e' })).toHaveAttribute('aria-checked', 'true')
+      expect(screen.getByRole('radio', { name: '#15803d' })).toHaveAttribute('aria-checked', 'true')
 
       await user.clear(name)
       await user.type(name, '프로젝트 A')
@@ -211,15 +211,15 @@ describe('label dialog', () => {
 
   test('editing keeps the own name valid and saves a new color', async () => {
     const user = userEvent.setup()
-    seed({ labels: [makeLabel({ id: 'l1', name: '집중', color: '#2f6f5e' }), makeLabel({ id: 'l2', name: '급함' })] })
+    seed({ labels: [makeLabel({ id: 'l1', name: '집중', color: '#15803d' }), makeLabel({ id: 'l2', name: '급함' })] })
     openDialog({ kind: 'label', id: 'l1' })
 
     expect(await nameField()).toHaveValue('집중')
     expect(screen.queryByText('같은 이름의 라벨이 있어요')).not.toBeInTheDocument()
-    await user.click(screen.getByRole('radio', { name: '#b8860b' }))
+    await user.click(screen.getByRole('radio', { name: '#b45309' }))
     await user.click(submitButton('저장'))
 
-    expect(entities().labels.l1).toMatchObject({ name: '집중', color: '#b8860b' })
+    expect(entities().labels.l1).toMatchObject({ name: '집중', color: '#b45309' })
   })
 
   test('deleting a label also removes it from the tasks that had it', async () => {

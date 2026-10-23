@@ -3,8 +3,8 @@
 export const ACCENT_PRESET_COUNT = 6
 
 const WHITE = '#ffffff'
-const PAPER_LIGHT = '#f4efe4'
-const PAPER_DARK = '#15130f'
+const PAPER_LIGHT = '#f4f6f8'
+const PAPER_DARK = '#0f1318'
 
 // 기준: 강조색 위에 얹는 흰 글자(13px 버튼)는 AA 4.5:1 이상.
 // 종이색 위에서 글자·아이콘으로 쓰일 때는 3.5:1 이상, 다크 종이 위에서는 형체가 읽히는 2:1 이상.
@@ -13,6 +13,12 @@ const MIN_ACCENT_ON_PAPER = 3.5
 const MIN_ACCENT_ON_DARK = 2
 
 const NAMES: Readonly<Record<string, string>> = {
+  '#0a6a60': '청록',
+  '#2f6fd0': '파랑',
+  '#6b4ad6': '보라',
+  '#b45309': '호박',
+  '#be1850': '자홍',
+  '#15803d': '초록',
   '#c8360f': '주홍',
   '#d9421c': '주홍',
   '#2f6f5e': '숲 초록',

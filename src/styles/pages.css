@@ -4,11 +4,11 @@
   place-items: center;
   min-height: 100dvh;
   color: var(--muted);
-  font-family: var(--font-display);
-  font-size: var(--text-lg);
+  font-size: var(--text-md);
 }
 
 .page-note {
+  max-width: var(--measure);
   padding: 0 var(--space-gutter) var(--space-3);
   font-size: var(--text-sm);
   color: var(--muted);
@@ -103,9 +103,11 @@
   align-items: center;
   justify-content: space-between;
   gap: var(--space-3);
+  max-width: var(--measure);
   margin: 0 var(--space-gutter) var(--space-4);
   padding: var(--space-3) var(--space-4);
-  border-left: 4px solid var(--danger);
+  border-radius: var(--radius-md);
+  border-left: 3px solid var(--danger);
   background: color-mix(in oklab, var(--danger) 8%, var(--surface));
   font-size: var(--text-sm);
 }

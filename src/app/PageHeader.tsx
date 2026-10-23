@@ -11,7 +11,7 @@ interface PageHeaderProps {
   actions?: ReactNode
 }
 
-/** 에디토리얼 머리글: 큰 세리프 제목, 오른쪽에 개수, 아래에 굵은 괘선 */
+/** 화면 머리글: 날짜 한 줄 + 제목 + 개수 알약. 제목이 화면을 다 먹지 않도록 작게 둔다. */
 export function PageHeader({ title, eyebrow, count, description, actions }: PageHeaderProps) {
   return (
     <header className="page-header">
@@ -19,7 +19,7 @@ export function PageHeader({ title, eyebrow, count, description, actions }: Page
         {eyebrow ? <p className="page-header__eyebrow">{eyebrow}</p> : null}
         <h1 className="page-header__title">
           {title}
-          {count !== undefined ? <sup className="page-header__count">{count}</sup> : null}
+          {count !== undefined ? <span className="page-header__count">{count}</span> : null}
         </h1>
         {description ? <p className="page-header__desc">{description}</p> : null}
       </div>

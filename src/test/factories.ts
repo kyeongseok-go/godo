@@ -70,5 +70,5 @@ export function makeSection(overrides: Partial<Section> = {}): Section {
 }
 
 export function makeLabel(overrides: Partial<Label> = {}): Label {
-  return { id: nextId('l'), name: '라벨', color: '#2f6f5e', order: 0, ...overrides }
+  return { id: nextId('l'), name: '라벨', color: '#15803d', order: 0, ...overrides }
 }

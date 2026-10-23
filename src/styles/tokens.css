@@ -1,17 +1,19 @@
 /* 디자인 토큰. 색·글꼴·간격·모션은 전부 여기서만 정의하고, 나머지 CSS는 변수만 참조한다.
-   방향: Swiss/에디토리얼. 따뜻한 종이색 바탕, 잉크 블랙 글자, 신호색은 주홍 하나. */
+   방향: 차가운 회색 바탕 위의 조용한 작업 도구. 색은 장식이 아니라 내용(시간 블록·상태·우선순위)에만 쓴다.
+   강조는 짙은 청록 하나, 지금 시각만 호박색으로 짚는다. 글꼴은 Pretendard 한 가족으로 통일한다. */
 :root {
   --font-body: 'Pretendard Variable', Pretendard, system-ui, -apple-system, 'Apple SD Gothic Neo', sans-serif;
-  --font-display: 'Fraunces Variable', 'Pretendard Variable', Georgia, serif;
+  /* 제목도 같은 가족을 쓰되 굵기·자간으로 구분한다(세리프를 섞지 않는다) */
+  --font-display: var(--font-body);
   --font-mono: ui-monospace, 'SF Mono', Menlo, monospace;
 
   --text-xs: 0.75rem;
   --text-sm: 0.8125rem;
-  --text-base: 0.9375rem;
-  --text-md: 1.0625rem;
-  --text-lg: 1.375rem;
-  --text-xl: clamp(2rem, 1.4rem + 2.4vw, 3.25rem);
-  --text-hero: clamp(2.75rem, 1.5rem + 5vw, 5.5rem);
+  --text-base: 0.875rem;
+  --text-md: 1rem;
+  --text-lg: 1.25rem;
+  --text-xl: clamp(1.5rem, 1.2rem + 0.9vw, 1.9rem);
+  --text-hero: clamp(2rem, 1.4rem + 2.6vw, 3rem);
 
   --space-1: 0.25rem;
   --space-2: 0.5rem;
@@ -20,11 +22,13 @@
   --space-5: 1.5rem;
   --space-6: 2.25rem;
   --space-7: 3.5rem;
-  --space-gutter: clamp(1rem, 0.5rem + 2vw, 2.5rem);
+  --space-gutter: clamp(1rem, 0.6rem + 1.6vw, 2rem);
+  /* 목록이 넓은 화면에서 끝까지 늘어나지 않도록 잡는 한 줄 길이 */
+  --measure: 72rem;
 
-  --radius-sm: 3px;
+  --radius-sm: 4px;
   --radius-md: 8px;
-  --radius-lg: 14px;
+  --radius-lg: 12px;
   --radius-pill: 999px;
 
   --duration-fast: 120ms;
@@ -33,99 +37,106 @@
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
   --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
 
-  --sidebar-width: 17rem;
+  --sidebar-width: 16.5rem;
   --detail-width: 28rem;
   --row-height: 2.75rem;
 
-  /* 라이트 */
-  --paper: #f4efe4;
-  --surface: #fbf8f1;
-  --surface-sunk: #ebe5d6;
-  --ink: #17140f;
-  --ink-soft: #3d372e;
-  --muted: #6e665a;
-  --rule: #d6cebc;
-  --rule-strong: #a99f8b;
-  --accent: var(--accent-custom, #c8360f);
+  /* 라이트: 차가운 회색 바탕, 흰 표면 */
+  --paper: #f4f6f8;
+  --surface: #ffffff;
+  --surface-sunk: #e9edf2;
+  --ink: #101720;
+  --ink-soft: #37414e;
+  --muted: #5a6673;
+  --rule: #e1e6ec;
+  --rule-strong: #c4ccd6;
+  --accent: var(--accent-custom, #0a6a60);
   --accent-ink: #ffffff;
-  --accent-soft: color-mix(in oklab, var(--accent) 18%, var(--paper));
-  --focus-ring: #2b4c7e;
+  --accent-soft: color-mix(in oklab, var(--accent) 12%, var(--surface));
+  /* 지금 이 시각을 짚는 색. 글자색으로는 쓰지 않고 면·눈금으로만 쓴다 */
+  --now: #e8a33d;
+  --now-ink: #2a1c04;
+  --focus-ring: #2f6fd0;
 
-  --p1: #c8321a;
-  --p2: #b8730b;
-  --p3: #2b4c7e;
-  --p4: #8c8374;
+  --p1: #c4283a;
+  --p2: #b06a07;
+  --p3: #2f6fd0;
+  --p4: #8b95a3;
 
-  --ok: #2f6f5e;
-  --warn: #b8730b;
-  --danger: #b3261e;
+  --ok: #0a7a5f;
+  --warn: #9c6209;
+  --danger: #c0283a;
 
-  --shadow-float: 0 1px 0 rgb(23 20 15 / 6%), 0 12px 32px -8px rgb(23 20 15 / 22%);
-  --shadow-sheet: -1px 0 0 var(--rule), -24px 0 48px -16px rgb(23 20 15 / 20%);
-  --grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .09 0 0 0 0 .08 0 0 0 0 .06 0 0 0 .07 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  /* 그림자는 진짜로 떠 있는 것(대화상자·팝오버·토스트)에만 쓴다 */
+  --shadow-float: 0 1px 2px rgb(16 23 32 / 6%), 0 12px 32px -10px rgb(16 23 32 / 24%);
+  --shadow-sheet: -1px 0 0 var(--rule), -24px 0 48px -20px rgb(16 23 32 / 18%);
   color-scheme: light;
 }
 
-/* 다크: 순흑이 아니라 잉크색 종이. 신호색은 명도만 올린다. */
+/* 다크: 푸른빛 도는 짙은 회색. 순흑도, 갈색 종이도 아니다. */
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme='light']) {
-    --paper: #15130f;
-    --surface: #1c1915;
-    --surface-sunk: #100e0b;
-    --ink: #f1ebdc;
-    --ink-soft: #d3cab6;
-    --muted: #9a9180;
-    --rule: #332e26;
-    --rule-strong: #5a5244;
-    --accent: var(--accent-custom-dark, #ff6b45);
-    --accent-ink: #1a0d08;
-    --accent-soft: color-mix(in oklab, var(--accent) 22%, var(--paper));
-    --focus-ring: #8fb0e6;
+    --paper: #0f1318;
+    --surface: #161c23;
+    --surface-sunk: #0a0d11;
+    --ink: #e8edf3;
+    --ink-soft: #bac4d0;
+    --muted: #8795a4;
+    --rule: #232b34;
+    --rule-strong: #3a4552;
+    --accent: var(--accent-custom-dark, #3cc9b4);
+    --accent-ink: #05201c;
+    --accent-soft: color-mix(in oklab, var(--accent) 16%, var(--surface));
+    --now: #f0b03f;
+    --now-ink: #271a03;
+    --focus-ring: #7fb0f0;
 
-    --p1: #ff6b45;
-    --p2: #e5a23b;
-    --p3: #8fb0e6;
-    --p4: #7d7566;
+    --p1: #ff7b84;
+    --p2: #e6a63f;
+    --p3: #7fb0f0;
+    --p4: #7f8b99;
 
-    --ok: #6fc2a8;
-    --warn: #e5a23b;
-    --danger: #ff8a80;
+    --ok: #4cc9a4;
+    --warn: #e6a63f;
+    --danger: #ff8a90;
 
-    --shadow-float: 0 1px 0 rgb(0 0 0 / 40%), 0 16px 40px -8px rgb(0 0 0 / 70%);
-    --shadow-sheet: -1px 0 0 var(--rule), -24px 0 48px -16px rgb(0 0 0 / 60%);
+    --shadow-float: 0 1px 0 rgb(0 0 0 / 50%), 0 18px 44px -12px rgb(0 0 0 / 75%);
+    --shadow-sheet: -1px 0 0 var(--rule), -24px 0 48px -16px rgb(0 0 0 / 65%);
     color-scheme: dark;
   }
 }
 
 :root[data-theme='dark'] {
-  --paper: #15130f;
-  --surface: #1c1915;
-  --surface-sunk: #100e0b;
-  --ink: #f1ebdc;
-  --ink-soft: #d3cab6;
-  --muted: #9a9180;
-  --rule: #332e26;
-  --rule-strong: #5a5244;
-  --accent: var(--accent-custom-dark, #ff6b45);
-  --accent-ink: #1a0d08;
-  --accent-soft: color-mix(in oklab, var(--accent) 22%, var(--paper));
-  --focus-ring: #8fb0e6;
+  --paper: #0f1318;
+  --surface: #161c23;
+  --surface-sunk: #0a0d11;
+  --ink: #e8edf3;
+  --ink-soft: #bac4d0;
+  --muted: #8795a4;
+  --rule: #232b34;
+  --rule-strong: #3a4552;
+  --accent: var(--accent-custom-dark, #3cc9b4);
+  --accent-ink: #05201c;
+  --accent-soft: color-mix(in oklab, var(--accent) 16%, var(--surface));
+  --now: #f0b03f;
+  --now-ink: #271a03;
+  --focus-ring: #7fb0f0;
 
-  --p1: #ff6b45;
-  --p2: #e5a23b;
-  --p3: #8fb0e6;
-  --p4: #7d7566;
+  --p1: #ff7b84;
+  --p2: #e6a63f;
+  --p3: #7fb0f0;
+  --p4: #7f8b99;
 
-  --ok: #6fc2a8;
-  --warn: #e5a23b;
-  --danger: #ff8a80;
+  --ok: #4cc9a4;
+  --warn: #e6a63f;
+  --danger: #ff8a90;
 
-  --shadow-float: 0 1px 0 rgb(0 0 0 / 40%), 0 16px 40px -8px rgb(0 0 0 / 70%);
-  --shadow-sheet: -1px 0 0 var(--rule), -24px 0 48px -16px rgb(0 0 0 / 60%);
+  --shadow-float: 0 1px 0 rgb(0 0 0 / 50%), 0 18px 44px -12px rgb(0 0 0 / 75%);
+  --shadow-sheet: -1px 0 0 var(--rule), -24px 0 48px -16px rgb(0 0 0 / 65%);
   color-scheme: dark;
 }
 
 :root[data-density='compact'] {
-  --row-height: 2.125rem;
-  --text-base: 0.875rem;
+  --row-height: 2.25rem;
+  --text-base: 0.8125rem;
 }

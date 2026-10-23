@@ -116,7 +116,8 @@ describe('ImportSection JSON', () => {
 
     await waitFor(() => expect(Object.keys(state().entities.tasks).sort()).toEqual(['new', 'old']))
     expect(await db.tasks.count()).toBe(2)
-    expect(screen.queryByText('pace-backup.json')).not.toBeInTheDocument()
+    // 가져오기는 비동기라 미리보기가 사라지기까지 한 박자 걸린다
+    await waitFor(() => expect(screen.queryByText('pace-backup.json')).not.toBeInTheDocument())
     expect(useToasts.getState().toasts.at(-1)?.message).toBe('새 항목 2개를 더하고 0개를 갱신했어요')
   })
 
@@ -219,7 +220,8 @@ describe('ImportSection JSON', () => {
     await user.upload(fileInput(container), backupFile({ ...emptyAppData(), tasks: [makeTask()] }))
     await user.click(await screen.findByRole('button', { name: '취소' }))
 
-    expect(screen.queryByText('pace-backup.json')).not.toBeInTheDocument()
+    // 가져오기는 비동기라 미리보기가 사라지기까지 한 박자 걸린다
+    await waitFor(() => expect(screen.queryByText('pace-backup.json')).not.toBeInTheDocument())
   })
 })
 

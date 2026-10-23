@@ -40,7 +40,7 @@
 }
 
 .vopts__btn[data-on='true'] {
-  background: var(--ink);
-  color: var(--paper);
-  border-color: var(--ink);
+  background: var(--accent);
+  color: var(--accent-ink);
+  border-color: var(--accent);
 }

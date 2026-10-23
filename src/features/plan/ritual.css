@@ -22,7 +22,7 @@
 }
 
 .ritual-btn:hover:not(:disabled) {
-  border-color: var(--ink);
+  border-color: var(--rule-strong);
   background: var(--surface-sunk);
 }
 
@@ -36,21 +36,17 @@
   cursor: not-allowed;
 }
 
-.ritual-btn--primary {
-  border: 2px solid var(--ink);
-  background: var(--ink);
-  color: var(--paper);
+/* 다음 단계로 가는 버튼. 화면마다 하나만 쓴다. */
+.ritual-btn--primary,
+.ritual-btn--accent {
+  border: 1px solid var(--accent);
+  background: var(--accent);
+  color: var(--accent-ink);
 }
 
 .ritual-btn--primary:hover:not(:disabled) {
-  background: var(--ink-soft);
-  border-color: var(--ink-soft);
-}
-
-.ritual-btn--accent {
-  border: 2px solid var(--accent);
-  background: var(--accent);
-  color: var(--accent-ink);
+  background: color-mix(in oklab, var(--accent) 88%, var(--ink));
+  border-color: color-mix(in oklab, var(--accent) 88%, var(--ink));
 }
 
 .ritual-btn--accent:hover:not(:disabled) {

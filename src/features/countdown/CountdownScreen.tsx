@@ -31,7 +31,7 @@ export function CountdownScreen() {
     <div className="cd">
       <PageHeader
         title="디데이"
-        eyebrow="Countdown"
+        eyebrow="남은 날 세기"
         count={upcoming.length}
         description={description}
         actions={

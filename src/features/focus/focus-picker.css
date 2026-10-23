@@ -127,7 +127,7 @@
 .focus-dots__dot {
   width: 0.875rem;
   height: 0.875rem;
-  border: 2px solid var(--ink);
+  border: 1px solid var(--rule-strong);
   border-radius: 50%;
 }
 

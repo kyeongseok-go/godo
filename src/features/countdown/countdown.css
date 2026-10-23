@@ -11,7 +11,7 @@
 
 .cdlist {
   margin-inline: var(--space-gutter);
-  border-top: 2px solid var(--ink);
+  border-top: 1px solid var(--rule-strong);
 }
 
 .cdrow {
@@ -46,7 +46,6 @@
   font-weight: 400;
   line-height: 1;
   letter-spacing: -0.04em;
-  font-variation-settings: 'opsz' 48, 'SOFT' 0;
   font-variant-numeric: tabular-nums lining-nums;
   white-space: nowrap;
   color: var(--ink);
@@ -126,7 +125,6 @@
   font-size: var(--text-hero);
   font-weight: 300;
   letter-spacing: -0.05em;
-  font-variation-settings: 'opsz' 144, 'SOFT' 0;
 }
 
 .cdrow[data-hero='true'] .cdrow__body {
@@ -190,7 +188,7 @@
   gap: var(--space-6);
   margin: var(--space-4) var(--space-gutter) var(--space-6);
   padding: var(--space-6) 0;
-  border-block: 2px solid var(--ink);
+  border-block: 1px solid var(--rule-strong);
 }
 
 .cdempty__big {
@@ -280,7 +278,7 @@
   align-items: baseline;
   justify-content: space-between;
   padding-bottom: var(--space-3);
-  border-bottom: 2px solid var(--ink);
+  border-bottom: 1px solid var(--rule-strong);
 }
 
 .cdform__preview span {

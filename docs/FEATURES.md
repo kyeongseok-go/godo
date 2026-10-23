@@ -6,7 +6,7 @@ TickTick + Todoist 실사용 조사(`research/`)에서 뽑은 기능. 나 혼자
 ## 기술 결정
 - Vite + React + TypeScript, 상태 Zustand, 저장 IndexedDB(Dexie), 테스트 Vitest + Playwright
 - 서버·계정 없음. 데이터는 브라우저 안에만 있고 JSON 내보내기/가져오기로 백업한다.
-- 디자인 방향: Swiss/에디토리얼. 종이색 바탕, 잉크 블랙, 주홍(vermilion) 한 가지 신호색. Pretendard + Fraunces(숫자·제목).
+- 디자인 방향: 차가운 회색 바탕의 조용한 작업 도구. 강조는 짙은 청록 하나, 호박색은 "지금"에만. Pretendard 한 가족. 기준은 `docs/DESIGN.md`.
 
 ## 구현 현황 (2026-10-23)
 아래 모든 항목을 구현했다(F12 포함). 단위·컴포넌트 테스트 2,795개(구문 96% · 함수 96% 커버리지),

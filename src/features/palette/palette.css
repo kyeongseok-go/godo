@@ -3,7 +3,7 @@
   height: 3.5rem;
   padding: 0 var(--space-5);
   border: 0;
-  border-bottom: 2px solid var(--ink);
+  border-bottom: 1px solid var(--rule-strong);
   background: transparent;
   font-family: var(--font-display);
   font-size: var(--text-lg);

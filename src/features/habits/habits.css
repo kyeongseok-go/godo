@@ -76,7 +76,7 @@
 
 .hlist__head {
   padding-block: var(--space-2);
-  border-bottom: 2px solid var(--ink);
+  border-bottom: 1px solid var(--rule-strong);
 }
 
 .hlist__days {
@@ -118,7 +118,7 @@
   align-items: baseline;
   gap: var(--space-2);
   padding: var(--space-3) var(--space-3) var(--space-2);
-  border-top: 2px solid var(--ink);
+  border-top: 1px solid var(--rule-strong);
   font-family: var(--font-display);
   font-size: var(--text-md);
   font-weight: 600;
@@ -342,7 +342,7 @@
   position: sticky;
   top: var(--space-4);
   padding-top: var(--space-3);
-  border-top: 2px solid var(--ink);
+  border-top: 1px solid var(--rule-strong);
 }
 
 .habits__hint {
@@ -609,7 +609,7 @@
   gap: var(--space-6);
   margin: var(--space-4) var(--space-gutter) var(--space-6);
   padding: var(--space-6) 0;
-  border-block: 2px solid var(--ink);
+  border-block: 1px solid var(--rule-strong);
 }
 
 .hempty__big {
@@ -769,8 +769,8 @@
 }
 
 .hform__seg button[aria-checked='true'] {
-  background: var(--ink);
-  color: var(--paper);
+  background: var(--accent);
+  color: var(--accent-ink);
   font-weight: 600;
 }
 

@@ -193,19 +193,19 @@ describe('AppearanceTab', () => {
     const group = screen.getByRole('radiogroup', { name: '강조색' })
 
     expect(within(group).getAllByRole('radio')).toHaveLength(6)
-    expect(within(group).getByRole('radio', { name: '주홍' })).toBeChecked()
+    expect(within(group).getByRole('radio', { name: '청록' })).toBeChecked()
 
-    await user.click(within(group).getByRole('radio', { name: '남색' }))
+    await user.click(within(group).getByRole('radio', { name: '파랑' }))
 
-    expect(settings().accent).toBe('#2b4c7e')
-    expect(within(group).getByRole('radio', { name: '남색' })).toBeChecked()
+    expect(settings().accent).toBe('#2f6fd0')
+    expect(within(group).getByRole('radio', { name: '파랑' })).toBeChecked()
   })
 
   test('treats the legacy default accent as the default swatch', () => {
     useApp.setState((s) => ({ settings: { ...s.settings, accent: '#d9421c' } }))
     renderSettings('appearance')
 
-    expect(screen.getByRole('radio', { name: '주홍' })).toBeChecked()
+    expect(screen.getByRole('radio', { name: '청록' })).toBeChecked()
   })
 
   test('switches density', async () => {

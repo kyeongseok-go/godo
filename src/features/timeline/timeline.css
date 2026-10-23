@@ -21,7 +21,7 @@
   position: sticky;
   top: 0;
   z-index: 4;
-  border-bottom: 2px solid var(--ink);
+  border-bottom: 1px solid var(--rule-strong);
   background: var(--surface);
 }
 
@@ -72,7 +72,7 @@
 }
 
 .tl__days span[data-first='true'] {
-  border-left: 2px solid var(--ink);
+  border-left: 1px solid var(--rule-strong);
   font-weight: 700;
   color: var(--ink);
 }
@@ -198,7 +198,7 @@
 
 .tl__undated h3 {
   padding-bottom: var(--space-2);
-  border-bottom: 2px solid var(--ink);
+  border-bottom: 1px solid var(--rule-strong);
   font-size: var(--text-xs);
   letter-spacing: 0.1em;
   text-transform: uppercase;

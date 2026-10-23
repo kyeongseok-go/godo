@@ -15,7 +15,7 @@
 .sum-quick {
   height: 2.5rem;
   padding: 0 var(--space-4);
-  border: 2px solid var(--ink);
+  border: 1px solid var(--rule-strong);
   font-weight: 700;
   transition:
     background-color var(--duration-fast) var(--ease-out),
@@ -48,7 +48,7 @@
   display: grid;
   gap: var(--space-5);
   padding-top: var(--space-3);
-  border-top: 2px solid var(--ink);
+  border-top: 1px solid var(--rule-strong);
 }
 
 .sum-field {
@@ -171,7 +171,7 @@
 .sum-output {
   min-width: 0;
   padding-top: var(--space-3);
-  border-top: 2px solid var(--ink);
+  border-top: 1px solid var(--rule-strong);
 }
 
 .sum-output__bar {

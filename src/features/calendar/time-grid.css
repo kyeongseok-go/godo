@@ -16,7 +16,7 @@
 }
 
 .tgrid__head {
-  border-bottom: 2px solid var(--ink);
+  border-bottom: 1px solid var(--rule-strong);
 }
 
 .tgrid__day {

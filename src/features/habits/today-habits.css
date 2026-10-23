@@ -107,14 +107,14 @@ button.thabit:active {
 }
 
 .thabit[data-done='true'] {
-  background: var(--ink);
-  color: var(--paper);
-  border-color: var(--ink);
+  background: color-mix(in oklab, var(--habit) 12%, var(--surface));
+  color: var(--muted);
+  border-color: color-mix(in oklab, var(--habit) 35%, var(--rule));
   border-left-color: var(--habit);
 }
 
 button.thabit[data-done='true']:hover {
-  background: var(--ink-soft);
+  background: color-mix(in oklab, var(--habit) 18%, var(--surface));
 }
 
 .thabit__mark {
@@ -127,9 +127,9 @@ button.thabit[data-done='true']:hover {
 }
 
 .thabit[data-done='true'] .thabit__mark {
-  background: var(--paper);
-  border-color: var(--paper);
-  color: var(--ink);
+  background: var(--habit);
+  border-color: var(--habit);
+  color: var(--surface);
 }
 
 .thabit__name {

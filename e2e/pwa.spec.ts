@@ -70,8 +70,8 @@ test.describe('PWA', () => {
       display: 'standalone',
       start_url: './',
       scope: './',
-      theme_color: '#f4efe4',
-      background_color: '#f4efe4',
+      theme_color: '#f4f6f8',
+      background_color: '#f4f6f8',
     })
     const purposes = manifest.icons.map((icon: { sizes: string; purpose: string }) => `${icon.sizes}:${icon.purpose}`)
     expect(purposes).toEqual(expect.arrayContaining(['192x192:any', '512x512:any', '512x512:maskable']))
