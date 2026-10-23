@@ -4,22 +4,37 @@
   flex: none;
   display: grid;
   place-items: center;
-  width: 1.25rem;
-  height: 1.25rem;
+  width: 1.375rem;
+  height: 1.375rem;
   border: 1.5px solid var(--check-color);
   border-radius: 50%;
   color: transparent;
   transition:
     background-color var(--duration-fast) var(--ease-out),
     color var(--duration-fast) var(--ease-out),
-    transform var(--duration-fast) var(--ease-out);
+    border-color var(--duration-fast) var(--ease-out),
+    transform var(--duration-normal) var(--ease-spring);
 }
 
-/* 터치 영역은 시각 크기보다 넓게 잡는다 */
+/* 보이는 동그라미는 작게 두고, 실제로 눌리는 영역만 44px 로 넓힌다. */
 .check::after {
   content: '';
   position: absolute;
-  inset: -0.5rem;
+  inset: 50% auto auto 50%;
+  width: var(--tap-min);
+  height: var(--tap-min);
+  transform: translate(-50%, -50%);
+}
+
+/* 체크 표시는 눌린 뒤 살짝 튀어나오며 자리를 잡는다.
+   보이고 안 보이고는 color 가 정한다(마우스를 올리면 흐리게 미리 보인다). */
+.check svg {
+  transform: scale(0.7);
+  transition: transform var(--duration-normal) var(--ease-spring);
+}
+
+.check[data-checked='true'] svg {
+  transform: scale(1);
 }
 
 .check[data-priority='1'] {
@@ -35,17 +50,20 @@
   background: color-mix(in oklab, var(--p3) 10%, transparent);
 }
 
-.check:hover {
-  color: var(--check-color);
+@media (hover: hover) {
+  .check:hover {
+    color: var(--check-color);
+    border-color: var(--check-color);
+  }
 }
 
 .check:active {
-  transform: scale(0.88);
+  transform: scale(0.86);
 }
 
 .check[data-checked='true'] {
   background: var(--check-color);
-  color: var(--paper);
+  color: var(--surface);
 }
 
 .check[data-canceled='true'] {

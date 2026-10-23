@@ -27,7 +27,7 @@
 .sechead h2 em {
   font-style: normal;
   font-family: var(--font-body);
-  font-size: 0.6875rem;
+  font-size: var(--text-2xs);
   letter-spacing: 0.06em;
   padding: 0 var(--space-2);
   border: 1px solid var(--rule-strong);

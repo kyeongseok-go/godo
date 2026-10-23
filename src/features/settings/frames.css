@@ -83,7 +83,7 @@
 }
 
 .frame__problem {
-  color: var(--warn-ink, var(--warn));
+  color: var(--warn);
   font-size: var(--text-sm);
 }
 

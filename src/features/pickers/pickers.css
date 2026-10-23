@@ -3,16 +3,22 @@
   align-items: center;
   gap: var(--space-2);
   max-width: 100%;
-  height: 1.875rem;
+  min-height: 2rem;
   padding: 0 var(--space-3);
-  border: 1px solid var(--rule-strong);
+  border: 0;
   border-radius: var(--radius-pill);
-  font-size: var(--text-xs);
+  background: var(--fill-1);
+  font-size: var(--text-sm);
   color: var(--ink-soft);
   white-space: nowrap;
   transition:
-    background-color var(--duration-fast) var(--ease-out),
-    border-color var(--duration-fast) var(--ease-out);
+    background-color var(--duration-fast) var(--ease-ui),
+    color var(--duration-fast) var(--ease-ui),
+    transform var(--duration-fast) var(--ease-spring);
+}
+
+.pick-btn:active {
+  transform: scale(0.95);
 }
 
 .pick-btn > span {
@@ -20,29 +26,41 @@
   text-overflow: ellipsis;
 }
 
-.pick-btn:hover {
-  background: var(--surface-sunk);
+@media (hover: hover) {
+  .pick-btn:hover {
+    background: var(--fill-2);
+  }
 }
 
 .pick-btn[data-set='true'] {
-  border-color: var(--ink);
-  color: var(--ink);
-  font-weight: 600;
+  background: var(--accent-tint);
+  color: var(--accent);
+  font-weight: var(--weight-semibold);
 }
 
 /* 상세 패널의 필드형: 테두리 없이 한 줄을 꽉 채운다 */
 .pick-btn[data-variant='field'] {
   width: 100%;
-  height: 2.25rem;
+  min-height: var(--control-h-sm);
   justify-content: flex-start;
   border: 0;
   border-radius: var(--radius-sm);
-  font-size: var(--text-sm);
+  background: none;
+  font-size: var(--text-base);
   padding: 0 var(--space-2);
 }
 
-.pick-btn[data-variant='field']:hover {
-  background: var(--surface-sunk);
+@media (hover: hover) {
+  .pick-btn[data-variant='field']:hover {
+    background: var(--fill-2);
+  }
+}
+
+/* 손가락으로 누르는 화면에서는 칩도 44px 을 지킨다. */
+@media (max-width: 40rem) {
+  .pick-btn {
+    min-height: var(--control-h);
+  }
 }
 
 .label-pop {

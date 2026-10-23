@@ -345,12 +345,31 @@
   color: var(--muted);
 }
 
-/* 모바일: 아래에서 올라오는 시트 */
+/* 모바일: 아래에서 올라오는 시트. 위쪽 모서리만 둥글고, 잡는 손잡이를 둔다. */
 @media (max-width: 40rem) {
   .detail {
     top: 6dvh;
     width: 100vw;
-    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+    padding-bottom: var(--safe-b);
+    border-radius: var(--radius-xl) var(--radius-xl) 0 0;
     transform: translateY(105%);
+    box-shadow: 0 -1px 0 var(--rule), 0 -12px 40px -12px rgb(0 0 0 / 22%);
+  }
+
+  /* 시트 맨 위의 손잡이. 아래로 끌어 닫을 수 있는 면이라는 신호다. */
+  .detail::before {
+    content: '';
+    position: absolute;
+    top: var(--space-2);
+    left: 50%;
+    width: 2.25rem;
+    height: 5px;
+    translate: -50% 0;
+    border-radius: var(--radius-pill);
+    background: var(--rule-strong);
+  }
+
+  .detail__head {
+    padding-top: var(--space-5);
   }
 }

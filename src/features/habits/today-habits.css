@@ -4,7 +4,6 @@
   align-items: center;
   gap: var(--space-4);
   padding: var(--space-3) var(--space-gutter);
-  border-bottom: 1px solid var(--rule);
 }
 
 .today-habits__head {
@@ -67,15 +66,17 @@
   flex: none;
   display: grid;
   place-items: center;
-  width: 2.5rem;
-  height: 2.5rem;
-  border-radius: var(--radius-sm);
+  width: var(--control-h);
+  height: var(--control-h);
+  border-radius: var(--radius-pill);
   color: var(--muted);
 }
 
-.today-habits__all:hover {
-  background: var(--surface-sunk);
-  color: var(--ink);
+@media (hover: hover) {
+  .today-habits__all:hover {
+    background: var(--fill-1);
+    color: var(--ink);
+  }
 }
 
 .thabit {
@@ -83,19 +84,21 @@
   display: inline-flex;
   align-items: center;
   gap: var(--space-2);
-  height: 2.5rem;
-  padding: 0 var(--space-3);
+  min-height: var(--control-h);
+  padding: 0 var(--space-4);
   overflow: hidden;
-  border: 1px solid var(--rule-strong);
-  border-left: 3px solid var(--habit);
-  border-radius: var(--radius-sm);
-  background: var(--surface);
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: color-mix(in oklab, var(--habit) 10%, var(--surface));
+  color: var(--ink);
   font-size: var(--text-sm);
   white-space: nowrap;
+  scroll-snap-align: start;
+  box-shadow: var(--shadow-1);
   transition:
     background-color var(--duration-fast) var(--ease-out),
     color var(--duration-fast) var(--ease-out),
-    transform var(--duration-fast) var(--ease-out);
+    transform var(--duration-fast) var(--ease-spring);
 }
 
 button.thabit:hover {
@@ -103,14 +106,12 @@ button.thabit:hover {
 }
 
 button.thabit:active {
-  transform: translateY(1px);
+  transform: scale(0.95);
 }
 
 .thabit[data-done='true'] {
-  background: color-mix(in oklab, var(--habit) 12%, var(--surface));
-  color: var(--muted);
-  border-color: color-mix(in oklab, var(--habit) 35%, var(--rule));
-  border-left-color: var(--habit);
+  background: color-mix(in oklab, var(--habit) 22%, var(--surface));
+  color: var(--ink-soft);
 }
 
 button.thabit[data-done='true']:hover {
@@ -122,8 +123,8 @@ button.thabit[data-done='true']:hover {
   place-items: center;
   width: 1.125rem;
   height: 1.125rem;
-  border: 1.5px solid var(--ink-soft);
-  border-radius: 3px;
+  border: 1.5px solid var(--habit);
+  border-radius: 50%;
 }
 
 .thabit[data-done='true'] .thabit__mark {
@@ -197,5 +198,29 @@ button.thabit[data-done='true']:hover {
 
   .today-habits__all {
     margin-left: auto;
+  }
+}
+
+/* 폰: 제목 줄과 칩 줄을 나눈다. 칩은 화면 끝까지 흘러가야 "옆으로 더 있다"가 읽힌다. */
+@media (max-width: 40rem) {
+  .today-habits {
+    flex-wrap: wrap;
+    padding-inline: 0;
+    gap: var(--space-2) var(--space-3);
+  }
+
+  .today-habits__head {
+    flex: 1;
+    padding-inline-start: var(--space-gutter);
+  }
+
+  .today-habits__all {
+    margin-inline-end: var(--space-2);
+  }
+
+  .today-habits__list {
+    flex: 1 0 100%;
+    padding-inline: var(--space-gutter);
+    scroll-padding-inline: var(--space-gutter);
   }
 }

@@ -105,11 +105,10 @@
   gap: var(--space-3);
   max-width: var(--measure);
   margin: 0 var(--space-gutter) var(--space-4);
-  padding: var(--space-3) var(--space-4);
-  border-radius: var(--radius-md);
-  border-left: 3px solid var(--danger);
-  background: color-mix(in oklab, var(--danger) 8%, var(--surface));
-  font-size: var(--text-sm);
+  padding: var(--space-4);
+  border-radius: var(--radius-lg);
+  background: color-mix(in oklab, var(--danger) 9%, var(--surface));
+  font-size: var(--text-base);
 }
 
 .overdue-banner strong {
@@ -121,9 +120,20 @@
   gap: var(--space-2);
 }
 
+/* 배너 안 버튼은 경고색을 옅게 깐다. 흰 상자에 회색 테두리를 두르면 각져 보인다. */
 .overdue-banner .btn-ghost {
-  height: 2rem;
-  background: var(--surface);
+  min-height: var(--control-h-sm);
+  padding: 0 var(--space-3);
+  background: color-mix(in oklab, var(--danger) 14%, transparent);
+  color: var(--danger);
+  font-weight: var(--weight-semibold);
+  font-size: var(--text-sm);
+}
+
+@media (hover: hover) {
+  .overdue-banner .btn-ghost:hover {
+    background: color-mix(in oklab, var(--danger) 22%, transparent);
+  }
 }
 
 .boot--error,
@@ -154,4 +164,11 @@
 .boot__hint {
   color: var(--muted);
   font-size: var(--text-sm);
+}
+
+/* 폰에서는 눌리는 것이 44px 밑으로 내려가지 않게 한다(Apple HIG 최소 터치 영역). */
+@media (max-width: 40rem) {
+  .overdue-banner .btn-ghost {
+    min-height: var(--control-h);
+  }
 }

@@ -91,3 +91,10 @@
   height: 1.125rem;
   accent-color: var(--accent);
 }
+
+/* 폰에서는 눌리는 것이 44px 밑으로 내려가지 않게 한다(Apple HIG 최소 터치 영역). */
+@media (max-width: 40rem) {
+  .focus-field__input {
+    min-height: var(--control-h);
+  }
+}

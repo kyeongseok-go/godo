@@ -1,19 +1,27 @@
-/* 디자인 토큰. 색·글꼴·간격·모션은 전부 여기서만 정의하고, 나머지 CSS는 변수만 참조한다.
-   방향: 차가운 회색 바탕 위의 조용한 작업 도구. 색은 장식이 아니라 내용(시간 블록·상태·우선순위)에만 쓴다.
-   강조는 짙은 청록 하나, 지금 시각만 호박색으로 짚는다. 글꼴은 Pretendard 한 가족으로 통일한다. */
+/* 디자인 토큰. 색·글꼴·간격·모서리·그림자·모션은 전부 여기서만 정의하고, 나머지 CSS 는 변수만 참조한다.
+   방향: iOS 기성 앱의 손맛. 면은 둥글고 넓게 묶고, 테두리 대신 채움색으로 구분하고,
+   누르면 반응하고, 뜨는 것만 그림자를 쓴다. 색은 장식이 아니라 내용(시간·상태·우선순위)에만 쓴다.
+   강조는 청록 하나, 지금 시각만 호박색. 글꼴은 Pretendard 한 가족(SF 와 같은 뼈대). */
 :root {
   --font-body: 'Pretendard Variable', Pretendard, system-ui, -apple-system, 'Apple SD Gothic Neo', sans-serif;
   /* 제목도 같은 가족을 쓰되 굵기·자간으로 구분한다(세리프를 섞지 않는다) */
   --font-display: var(--font-body);
   --font-mono: ui-monospace, 'SF Mono', Menlo, monospace;
 
-  --text-xs: 0.75rem;
-  --text-sm: 0.8125rem;
-  --text-base: 0.875rem;
-  --text-md: 1rem;
-  --text-lg: 1.25rem;
-  --text-xl: clamp(1.5rem, 1.2rem + 0.9vw, 1.9rem);
+  /* 글자 크기. iOS 텍스트 스타일(Caption~Title)에 맞춘 단계. 폰에서는 아래에서 한 단계씩 키운다. */
+  --text-2xs: 0.6875rem; /* 11px */
+  --text-xs: 0.75rem; /* 12px */
+  --text-sm: 0.8125rem; /* 13px */
+  --text-base: 0.9375rem; /* 15px */
+  --text-md: 1.0625rem; /* 17px — iOS Body */
+  --text-lg: 1.375rem; /* 22px — iOS Title 2 */
+  --text-xl: clamp(1.75rem, 1.45rem + 0.9vw, 2.125rem); /* 28~34px */
   --text-hero: clamp(2rem, 1.4rem + 2.6vw, 3rem);
+
+  --weight-regular: 400;
+  --weight-medium: 500;
+  --weight-semibold: 600;
+  --weight-bold: 700;
 
   --space-1: 0.25rem;
   --space-2: 0.5rem;
@@ -26,33 +34,61 @@
   /* 목록이 넓은 화면에서 끝까지 늘어나지 않도록 잡는 한 줄 길이 */
   --measure: 72rem;
 
-  --radius-sm: 4px;
-  --radius-md: 8px;
-  --radius-lg: 12px;
+  /* 모서리. iOS 는 작은 조각도 6~8px 부터 시작하고, 묶는 면은 16px 안팎을 쓴다. */
+  --radius-xs: 6px;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 22px;
   --radius-pill: 999px;
 
-  --duration-fast: 120ms;
-  --duration-normal: 220ms;
+  /* 컨트롤 높이. 손가락이 닿는 것은 44px 밑으로 내려가지 않는다(Apple HIG 최소 터치 영역). */
+  --tap-min: 44px;
+  --control-h: 2.75rem; /* 44px */
+  --control-h-sm: 2.25rem; /* 36px */
+  --control-h-lg: 3.25rem; /* 52px — 화면을 대표하는 버튼 */
+
+  --duration-instant: 80ms;
+  --duration-fast: 160ms;
+  --duration-normal: 320ms;
   --duration-slow: 420ms;
-  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  /* 빠르게 치고 길게 안착하는 감속 곡선. 자리를 옮기는 것(시트·서랍·행)에 쓴다. */
+  --ease-out: cubic-bezier(0.32, 0.72, 0, 1);
+  /* 색·투명도처럼 범위를 벗어나면 안 되는 값에 쓰는 곡선(apple.com 이 실제로 쓰는 값). */
+  --ease-ui: cubic-bezier(0.4, 0, 0.6, 1);
+  /* 살짝 넘겼다 돌아오는 스프링. 끝값이 1 을 넘으므로 transform 에만 쓴다. */
+  --ease-spring: cubic-bezier(0.34, 1.4, 0.64, 1);
   --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
 
   --sidebar-width: 16.5rem;
   --detail-width: 28rem;
   --row-height: 2.75rem;
+  --tabbar-h: 3.25rem;
+  /* 노치·홈 인디케이터 여백. 지원하지 않는 곳에서는 0 이 된다. */
+  --safe-t: env(safe-area-inset-top, 0px);
+  --safe-b: env(safe-area-inset-bottom, 0px);
+  --safe-l: env(safe-area-inset-left, 0px);
+  --safe-r: env(safe-area-inset-right, 0px);
 
-  /* 라이트: 차가운 회색 바탕, 흰 표면 */
-  --paper: #f4f6f8;
+  /* 라이트: 회색 바탕 위에 흰 카드를 얹는 iOS 묶음 목록 구성 */
+  --paper: #f2f2f7;
   --surface: #ffffff;
-  --surface-sunk: #e9edf2;
-  --ink: #101720;
-  --ink-soft: #37414e;
-  --muted: #5a6673;
-  --rule: #e1e6ec;
-  --rule-strong: #c4ccd6;
+  --surface-sunk: #ebebf0;
+  --ink: #1c1c1e;
+  --ink-soft: #4a4a50;
+  --muted: #6c6c70;
+  --rule: #e5e5ea;
+  --rule-strong: #d1d1d6;
+  /* 채움색. 테두리를 그리지 않고 면으로만 구분할 때 쓴다(입력칸·세그먼트 트랙·칩). */
+  --fill-1: rgb(120 120 128 / 12%);
+  --fill-2: rgb(120 120 128 / 8%);
+  --fill-3: rgb(120 120 128 / 5%);
   --accent: var(--accent-custom, #0a6a60);
   --accent-ink: #ffffff;
   --accent-soft: color-mix(in oklab, var(--accent) 12%, var(--surface));
+  /* 강조색을 옅게 깐 바탕. 테두리 없는 보조 버튼에 쓴다. */
+  --accent-tint: color-mix(in oklab, var(--accent) 12%, transparent);
+  --accent-press: color-mix(in oklab, var(--accent) 22%, transparent);
   /* 지금 이 시각을 짚는 색. 글자색으로는 쓰지 않고 면·눈금으로만 쓴다 */
   --now: #e8a33d;
   --now-ink: #2a1c04;
@@ -67,26 +103,62 @@
   --warn: #9c6209;
   --danger: #c0283a;
 
-  /* 그림자는 진짜로 떠 있는 것(대화상자·팝오버·토스트)에만 쓴다 */
-  --shadow-float: 0 1px 2px rgb(16 23 32 / 6%), 0 12px 32px -10px rgb(16 23 32 / 24%);
-  --shadow-sheet: -1px 0 0 var(--rule), -24px 0 48px -20px rgb(16 23 32 / 18%);
+  /* 뒤를 가리는 막. 대화상자·서랍이 열릴 때 깔린다. */
+  --scrim: rgb(0 0 0 / 40%);
+  /* 토스트는 라이트에서 어둡게 뒤집고, 다크에서는 한 단 올린 면을 쓴다. */
+  --toast-bg: rgb(28 28 30 / 92%);
+  --toast-ink: #ffffff;
+  /* 바 뒤가 비쳐 보이게 하는 재질. iOS 의 반투명 바를 흉내 낸다. */
+  --blur-bar: saturate(180%) blur(20px);
+
+  /* 그림자는 진짜로 떠 있는 것에만. 얹힌 면은 그림자 대신 색으로 구분한다. */
+  --shadow-1: 0 0 0 1px rgb(16 23 32 / 5%), 0 1px 1px -0.5px rgb(16 23 32 / 5%);
+  --shadow-2:
+    0 0 0 1px rgb(16 23 32 / 5%),
+    0 1px 1px -0.5px rgb(16 23 32 / 5%),
+    0 3px 3px -1.5px rgb(16 23 32 / 5%);
+  --shadow-float:
+    0 0 0 1px rgb(16 23 32 / 5%),
+    0 1px 1px -0.5px rgb(16 23 32 / 5%),
+    0 3px 3px -1.5px rgb(16 23 32 / 5%),
+    0 6px 6px -3px rgb(16 23 32 / 5%),
+    0 12px 12px -6px rgb(16 23 32 / 4%),
+    0 24px 24px -12px rgb(16 23 32 / 4%);
+  --shadow-sheet: -1px 0 0 var(--rule), -24px 0 48px -20px rgb(16 23 32 / 16%);
   color-scheme: light;
 }
 
-/* 다크: 푸른빛 도는 짙은 회색. 순흑도, 갈색 종이도 아니다. */
+/* 폰에서는 글자를 한 단계 키운다. 손에 들고 보는 거리에서는 13px 이 너무 작다. */
+@media (max-width: 40rem) {
+  :root {
+    --text-2xs: 0.75rem; /* 12px */
+    --text-xs: 0.8125rem; /* 13px */
+    --text-sm: 0.875rem; /* 14px */
+    --text-base: 1rem; /* 16px */
+    --row-height: 3rem; /* 48px */
+  }
+}
+
+/* 다크: 푸른기 없는 짙은 중성 회색. 순흑도, 갈색 종이도 아니다.
+   값을 고칠 때는 아래 [data-theme='dark'] 블록도 같이 고쳐야 한다(tokens.test.ts 가 감시한다). */
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme='light']) {
-    --paper: #0f1318;
-    --surface: #161c23;
-    --surface-sunk: #0a0d11;
-    --ink: #e8edf3;
-    --ink-soft: #bac4d0;
-    --muted: #8795a4;
-    --rule: #232b34;
-    --rule-strong: #3a4552;
+    --paper: #0b0b0e;
+    --surface: #1c1c1f;
+    --surface-sunk: #2c2c30;
+    --ink: #f2f2f7;
+    --ink-soft: #c7c7cc;
+    --muted: #8e8e93;
+    --rule: #2c2c30;
+    --rule-strong: #3a3a3e;
+    --fill-1: rgb(120 120 128 / 24%);
+    --fill-2: rgb(120 120 128 / 16%);
+    --fill-3: rgb(120 120 128 / 10%);
     --accent: var(--accent-custom-dark, #3cc9b4);
     --accent-ink: #05201c;
     --accent-soft: color-mix(in oklab, var(--accent) 16%, var(--surface));
+    --accent-tint: color-mix(in oklab, var(--accent) 18%, transparent);
+    --accent-press: color-mix(in oklab, var(--accent) 30%, transparent);
     --now: #f0b03f;
     --now-ink: #271a03;
     --focus-ring: #7fb0f0;
@@ -100,24 +172,34 @@
     --warn: #e6a63f;
     --danger: #ff8a90;
 
-    --shadow-float: 0 1px 0 rgb(0 0 0 / 50%), 0 18px 44px -12px rgb(0 0 0 / 75%);
+    --scrim: rgb(0 0 0 / 55%);
+    --toast-bg: rgb(58 58 62 / 92%);
+    --toast-ink: var(--ink);
+    --shadow-1: 0 0 0 1px rgb(255 255 255 / 6%);
+    --shadow-2: 0 0 0 1px rgb(255 255 255 / 7%), 0 4px 16px -6px rgb(0 0 0 / 60%);
+    --shadow-float: 0 0 0 1px rgb(255 255 255 / 8%), 0 16px 40px -10px rgb(0 0 0 / 70%);
     --shadow-sheet: -1px 0 0 var(--rule), -24px 0 48px -16px rgb(0 0 0 / 65%);
     color-scheme: dark;
   }
 }
 
 :root[data-theme='dark'] {
-  --paper: #0f1318;
-  --surface: #161c23;
-  --surface-sunk: #0a0d11;
-  --ink: #e8edf3;
-  --ink-soft: #bac4d0;
-  --muted: #8795a4;
-  --rule: #232b34;
-  --rule-strong: #3a4552;
+  --paper: #0b0b0e;
+  --surface: #1c1c1f;
+  --surface-sunk: #2c2c30;
+  --ink: #f2f2f7;
+  --ink-soft: #c7c7cc;
+  --muted: #8e8e93;
+  --rule: #2c2c30;
+  --rule-strong: #3a3a3e;
+  --fill-1: rgb(120 120 128 / 24%);
+  --fill-2: rgb(120 120 128 / 16%);
+  --fill-3: rgb(120 120 128 / 10%);
   --accent: var(--accent-custom-dark, #3cc9b4);
   --accent-ink: #05201c;
   --accent-soft: color-mix(in oklab, var(--accent) 16%, var(--surface));
+  --accent-tint: color-mix(in oklab, var(--accent) 18%, transparent);
+  --accent-press: color-mix(in oklab, var(--accent) 30%, transparent);
   --now: #f0b03f;
   --now-ink: #271a03;
   --focus-ring: #7fb0f0;
@@ -131,12 +213,17 @@
   --warn: #e6a63f;
   --danger: #ff8a90;
 
-  --shadow-float: 0 1px 0 rgb(0 0 0 / 50%), 0 18px 44px -12px rgb(0 0 0 / 75%);
+  --scrim: rgb(0 0 0 / 55%);
+  --toast-bg: rgb(58 58 62 / 92%);
+  --toast-ink: var(--ink);
+  --shadow-1: 0 0 0 1px rgb(255 255 255 / 6%);
+  --shadow-2: 0 0 0 1px rgb(255 255 255 / 7%), 0 4px 16px -6px rgb(0 0 0 / 60%);
+  --shadow-float: 0 0 0 1px rgb(255 255 255 / 8%), 0 16px 40px -10px rgb(0 0 0 / 70%);
   --shadow-sheet: -1px 0 0 var(--rule), -24px 0 48px -16px rgb(0 0 0 / 65%);
   color-scheme: dark;
 }
 
 :root[data-density='compact'] {
-  --row-height: 2.25rem;
-  --text-base: 0.8125rem;
+  --row-height: 2.375rem;
+  --text-base: 0.875rem;
 }

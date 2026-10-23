@@ -1,0 +1,233 @@
+/* 앱 전체가 쓰는 컨트롤. 화면 하나에 묶이지 않는 것만 여기 둔다.
+   원칙: 테두리 대신 채움색, 각진 모서리 대신 둥근 면, 누르면 줄어드는 반응.
+   손가락이 닿는 것은 어떤 경우에도 44px 아래로 내려가지 않는다. */
+
+/* ── 공통 ───────────────────────────────────────────── */
+
+/* 누른 느낌. 손을 떼면 스프링으로 돌아온다.
+   스프링(끝에서 살짝 넘겼다 돌아오는 곡선)은 transform 에만 쓴다.
+   색이나 투명도에 쓰면 중간값이 범위를 벗어나 번쩍인다. */
+.btn-accent,
+.btn-tint,
+.btn-ghost,
+.icon-btn,
+.segmented__option {
+  transition:
+    transform var(--duration-fast) var(--ease-spring),
+    background-color var(--duration-fast) var(--ease-ui),
+    color var(--duration-fast) var(--ease-ui),
+    opacity var(--duration-fast) var(--ease-ui);
+}
+
+.btn-accent:active,
+.btn-tint:active,
+.btn-ghost:active,
+.icon-btn:active {
+  transform: scale(0.96);
+}
+
+.btn-accent:disabled,
+.btn-tint:disabled,
+.btn-ghost:disabled,
+.icon-btn:disabled {
+  opacity: 0.4;
+  transform: none;
+  cursor: default;
+}
+
+/* ── 채운 버튼: 화면에서 가장 중요한 하나 ──────────────── */
+
+.btn-accent {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  min-height: var(--control-h);
+  padding: 0 var(--space-4);
+  border-radius: var(--radius-md);
+  background: var(--accent);
+  color: var(--accent-ink);
+  font-weight: var(--weight-semibold);
+  font-size: var(--text-base);
+}
+
+@media (hover: hover) {
+  .btn-accent:hover {
+    filter: brightness(1.08);
+  }
+}
+
+/* 채운 버튼 위에서는 배지도 그 글자색을 따라야 읽힌다. */
+.btn-accent kbd {
+  margin-left: auto;
+  background: rgb(255 255 255 / 22%);
+  color: var(--accent-ink);
+}
+
+/* ── 옅게 깐 버튼: 보조 동작인데 강조색을 따라야 할 때 ──── */
+
+.btn-tint {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  min-height: var(--control-h);
+  padding: 0 var(--space-4);
+  border-radius: var(--radius-md);
+  background: var(--accent-tint);
+  color: var(--accent);
+  font-weight: var(--weight-semibold);
+  font-size: var(--text-base);
+}
+
+@media (hover: hover) {
+  .btn-tint:hover {
+    background: var(--accent-press);
+  }
+}
+
+/* ── 중립 버튼: 테두리 없이 회색 면으로만 ──────────────── */
+
+.btn-ghost {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  min-height: var(--control-h);
+  padding: 0 var(--space-4);
+  border-radius: var(--radius-md);
+  background: var(--fill-1);
+  color: var(--ink);
+  font-weight: var(--weight-medium);
+  font-size: var(--text-base);
+}
+
+@media (hover: hover) {
+  .btn-ghost:hover {
+    background: var(--fill-2);
+  }
+}
+
+/* ── 아이콘만 있는 버튼 ────────────────────────────────── */
+
+.icon-btn {
+  position: relative;
+  display: inline-grid;
+  place-items: center;
+  width: 2rem;
+  height: 2rem;
+  border-radius: var(--radius-pill);
+  color: var(--muted);
+}
+
+/* 보이는 크기는 작게 두고, 실제로 눌리는 영역만 44px 로 넓힌다. */
+.icon-btn::after {
+  content: '';
+  position: absolute;
+  inset: 50% auto auto 50%;
+  width: var(--tap-min);
+  height: var(--tap-min);
+  transform: translate(-50%, -50%);
+}
+
+@media (hover: hover) {
+  .icon-btn:hover {
+    background: var(--fill-1);
+    color: var(--ink);
+  }
+}
+
+/* ── 세그먼트 컨트롤: 회색 트랙 위를 흰 조각이 미끄러진다 ─ */
+
+.segmented {
+  display: inline-flex;
+  gap: 2px;
+  padding: 2px;
+  border-radius: var(--radius-sm);
+  background: var(--fill-1);
+}
+
+.segmented__option {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-1);
+  min-height: 2rem;
+  padding: 0 var(--space-3);
+  border-radius: calc(var(--radius-sm) - 2px);
+  color: var(--ink-soft);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+  white-space: nowrap;
+}
+
+.segmented__option[aria-pressed='true'],
+.segmented__option[aria-selected='true'] {
+  background: var(--surface);
+  color: var(--ink);
+  font-weight: var(--weight-semibold);
+  box-shadow: var(--shadow-1);
+}
+
+.segmented__option:active {
+  transform: scale(0.94);
+}
+
+@media (hover: hover) {
+  .segmented__option:not([aria-pressed='true']):not([aria-selected='true']):hover {
+    color: var(--ink);
+  }
+}
+
+/* 손가락으로 쓰는 화면에서는 세그먼트도 44px 을 지킨다. */
+@media (max-width: 40rem) {
+  .segmented__option {
+    min-height: 2.5rem;
+    padding: 0 var(--space-4);
+  }
+}
+
+/* ── 단축키 표시 ───────────────────────────────────────── */
+
+/* 배지는 놓인 자리의 글자색을 그대로 쓴다. 회색을 박으면 버튼 위에서 대비가 무너진다. */
+kbd {
+  font-family: var(--font-mono);
+  font-size: var(--text-2xs);
+  padding: 0.1rem 0.4rem;
+  border-radius: var(--radius-xs);
+  background: var(--fill-2);
+  color: var(--ink-soft);
+  line-height: 1.4;
+}
+
+/* ── 터치 최소 크기 보정 ───────────────────────────────
+   손가락으로 쓰는 폭에서는 눌리는 것이 44px 밑으로 내려가지 않게 한다(Apple HIG 최소 터치 영역).
+   화면마다 흩어진 컨트롤을 여기서 한 번에 올린다 — 각 파일에서 따로 챙기면 반드시 빠뜨린다. */
+@media (max-width: 40rem) {
+  .prod-stepper__btn,
+  .prod-daypick__btn {
+    min-height: var(--control-h);
+  }
+
+  .prod-stepper__btn,
+  .prod-daypick__btn {
+    min-width: var(--control-h);
+  }
+
+  /* 눈에 보이는 크기는 그대로 두고 눌리는 영역만 넓힌다(칩이 뚱뚱해지지 않게). */
+  .thabit__step,
+  .task-row__grip {
+    position: relative;
+  }
+
+  .thabit__step::after,
+  .task-row__grip::after {
+    content: '';
+    position: absolute;
+    inset: 50% auto auto 50%;
+    width: var(--tap-min);
+    height: var(--tap-min);
+    transform: translate(-50%, -50%);
+  }
+}

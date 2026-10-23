@@ -3,7 +3,7 @@
   flex-direction: column;
   height: 100dvh;
   background: var(--surface);
-  border-right: 1px solid var(--rule-strong);
+  border-right: 1px solid var(--rule);
 }
 
 .sidebar__brand {
@@ -26,60 +26,6 @@
   padding: 0 var(--space-4) var(--space-3);
 }
 
-.btn-accent {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-  height: 2.5rem;
-  padding: 0 var(--space-3);
-  border-radius: var(--radius-md);
-  background: var(--accent);
-  color: var(--accent-ink);
-  font-weight: 700;
-  font-size: var(--text-sm);
-  transition:
-    transform var(--duration-fast) var(--ease-out),
-    filter var(--duration-fast) var(--ease-out);
-}
-
-.btn-accent:hover {
-  filter: brightness(1.06);
-}
-
-.btn-accent:active {
-  transform: translateY(1px);
-}
-
-.btn-accent kbd {
-  margin-left: auto;
-}
-
-.btn-ghost {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--space-2);
-  height: 2.5rem;
-  padding: 0 var(--space-3);
-  border: 1px solid var(--rule-strong);
-  border-radius: var(--radius-md);
-  color: var(--ink-soft);
-  font-size: var(--text-sm);
-}
-
-.btn-ghost:hover {
-  background: var(--surface-sunk);
-}
-
-kbd {
-  font-family: var(--font-mono);
-  font-size: 0.6875rem;
-  padding: 0.05rem 0.35rem;
-  border: 1px solid color-mix(in oklab, currentColor 45%, transparent);
-  border-radius: var(--radius-sm);
-  line-height: 1.4;
-}
-
 .sidebar__scroll {
   flex: 1;
   overflow-y: auto;
@@ -100,16 +46,27 @@ kbd {
   display: flex;
   align-items: center;
   gap: var(--space-3);
-  min-height: 2.125rem;
+  min-height: 2.25rem;
   padding: 0 var(--space-3);
   border-radius: var(--radius-sm);
   color: var(--ink-soft);
-  font-size: var(--text-sm);
+  font-size: var(--text-base);
   position: relative;
+  transition:
+    background-color var(--duration-fast) var(--ease-ui),
+    color var(--duration-fast) var(--ease-ui),
+    transform var(--duration-fast) var(--ease-spring);
 }
 
-.nav-item:hover {
-  background: var(--surface-sunk);
+@media (hover: hover) {
+  .nav-item:hover {
+    background: var(--fill-3);
+  }
+}
+
+.nav-item:active {
+  background: var(--fill-2);
+  transform: scale(0.98);
 }
 
 .nav-item.active {
@@ -118,14 +75,14 @@ kbd {
   font-weight: 600;
 }
 
-/* 지금 보고 있는 화면을 왼쪽 띠로 한 번 더 알린다 */
+/* 지금 보고 있는 화면을 왼쪽 띠로 한 번 더 알린다(색만으로 알리지 않기 위해). */
 .nav-item.active::after {
   content: '';
   position: absolute;
   left: 0;
-  top: 0.3rem;
-  bottom: 0.3rem;
-  width: 2px;
+  top: 0.35rem;
+  bottom: 0.35rem;
+  width: 3px;
   border-radius: var(--radius-pill);
   background: var(--accent);
 }
@@ -180,7 +137,7 @@ kbd {
   align-items: center;
   gap: var(--space-1);
   padding: var(--space-2) 0;
-  font-size: 0.6875rem;
+  font-size: var(--text-2xs);
   font-weight: 700;
   letter-spacing: 0.12em;
   text-transform: uppercase;
@@ -218,4 +175,12 @@ kbd {
   padding: var(--space-1) var(--space-3);
   font-size: var(--text-xs);
   color: var(--muted);
+}
+
+/* 서랍으로 열릴 때는 손가락으로 누르므로 줄 높이를 키운다. */
+@media (max-width: 56rem) {
+  .nav-item {
+    min-height: var(--control-h);
+    border-radius: var(--radius-md);
+  }
 }

@@ -1,4 +1,4 @@
-import { describeDate, formatDuration, formatTime, dateTone } from './format'
+import { describeDate, formatDayTitle, formatDuration, formatTime, dateTone } from './format'
 
 describe('describeDate', () => {
   const today = '2026-10-23' // 금요일
@@ -55,5 +55,12 @@ describe('formatDuration', () => {
     expect(formatDuration(45)).toBe('45분')
     expect(formatDuration(60)).toBe('1시간')
     expect(formatDuration(95)).toBe('1시간 35분')
+  })
+})
+
+describe('formatDayTitle', () => {
+  test('월·일과 요일을 함께 보여준다', () => {
+    expect(formatDayTitle('2026-10-24')).toBe('10월 24일 (토)')
+    expect(formatDayTitle('2026-01-01')).toBe('1월 1일 (목)')
   })
 })

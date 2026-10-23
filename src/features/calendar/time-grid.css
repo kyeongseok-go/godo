@@ -30,7 +30,7 @@
 }
 
 .tgrid__day small {
-  font-size: 0.6875rem;
+  font-size: var(--text-2xs);
   letter-spacing: 0.1em;
   color: var(--ink-soft);
 }
@@ -65,7 +65,7 @@
   text-overflow: ellipsis;
   white-space: nowrap;
   text-align: left;
-  font-size: 0.6875rem;
+  font-size: var(--text-2xs);
   border-radius: var(--radius-sm);
   background: var(--surface-sunk);
   border-left: 3px solid var(--p4);
@@ -86,7 +86,7 @@
 }
 
 .tgrid__more {
-  font-size: 0.6875rem;
+  font-size: var(--text-2xs);
   color: var(--muted);
   text-align: center;
 }
@@ -109,7 +109,7 @@
   position: absolute;
   right: var(--space-2);
   transform: translateY(-50%);
-  font-size: 0.6875rem;
+  font-size: var(--text-2xs);
   color: var(--muted);
   font-variant-numeric: tabular-nums;
 }

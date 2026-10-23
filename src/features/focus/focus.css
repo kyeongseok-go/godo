@@ -34,29 +34,40 @@
 /* 방식 전환 */
 .focus-mode {
   display: inline-flex;
-  border: 1px solid var(--ink);
+  gap: 2px;
+  padding: 2px;
+  border-radius: var(--radius-sm);
+  background: var(--fill-1);
 }
 
 .focus-mode__button {
-  min-height: 2.5rem;
+  min-height: 2.25rem;
   padding: 0 var(--space-5);
-  font-size: var(--text-sm);
-  font-weight: 600;
-  color: var(--ink);
-  transition: background var(--duration-fast) var(--ease-out);
+  border-radius: calc(var(--radius-sm) - 2px);
+  font-size: var(--text-base);
+  font-weight: var(--weight-medium);
+  color: var(--ink-soft);
+  transition:
+    background-color var(--duration-fast) var(--ease-out),
+    color var(--duration-fast) var(--ease-out),
+    transform var(--duration-fast) var(--ease-spring);
 }
 
-.focus-mode__button + .focus-mode__button {
-  border-left: 1px solid var(--ink);
+.focus-mode__button:active {
+  transform: scale(0.94);
 }
 
-.focus-mode__button:hover:not(:disabled):not([aria-pressed='true']) {
-  background: var(--surface-sunk);
+@media (hover: hover) {
+  .focus-mode__button:hover:not(:disabled):not([aria-pressed='true']) {
+    color: var(--ink);
+  }
 }
 
 .focus-mode__button[aria-pressed='true'] {
-  background: var(--ink);
-  color: var(--paper);
+  background: var(--surface);
+  color: var(--ink);
+  font-weight: var(--weight-semibold);
+  box-shadow: var(--shadow-1);
 }
 
 .focus-mode__button:disabled:not([aria-pressed='true']) {
@@ -83,15 +94,17 @@
 .focus-dial__track,
 .focus-dial__arc {
   fill: none;
-  stroke-width: 6;
+  stroke-width: 10;
 }
 
 .focus-dial__track {
-  stroke: var(--rule);
+  stroke: var(--fill-1);
 }
 
+/* 끝을 둥글게 깎아 남은 시간이 뭉툭하게 끊기지 않게 한다. 진행은 초 단위라 등속으로 움직인다. */
 .focus-dial__arc {
   stroke: var(--accent);
+  stroke-linecap: round;
   transition: stroke-dashoffset 260ms linear;
 }
 
@@ -101,7 +114,7 @@
 }
 
 .focus-dial[data-kind='stopwatch'] .focus-dial__arc {
-  stroke: var(--ink);
+  stroke: var(--p3);
 }
 
 .focus-dial[data-phase='paused'] .focus-dial__arc {
@@ -120,9 +133,8 @@
 }
 
 .focus-dial__kind {
-  font-size: var(--text-xs);
-  font-weight: 700;
-  letter-spacing: 0.14em;
+  font-size: var(--text-sm);
+  font-weight: var(--weight-semibold);
   color: var(--accent);
 }
 
@@ -182,24 +194,26 @@
   align-items: center;
   justify-content: center;
   gap: var(--space-3);
-  min-height: 3.5rem;
-  background: var(--ink);
-  color: var(--paper);
+  min-height: var(--control-h-lg);
+  border-radius: var(--radius-pill);
+  background: var(--accent);
+  color: var(--accent-ink);
   font-size: var(--text-md);
-  font-weight: 700;
+  font-weight: var(--weight-semibold);
+  box-shadow: var(--shadow-2);
   transition:
-    transform var(--duration-fast) var(--ease-out),
-    box-shadow var(--duration-fast) var(--ease-out);
+    transform var(--duration-fast) var(--ease-spring),
+    filter var(--duration-fast) var(--ease-out);
 }
 
-.focus-controls__primary:hover {
-  transform: translate(-2px, -2px);
-  box-shadow: 4px 4px 0 var(--accent);
+@media (hover: hover) {
+  .focus-controls__primary:hover {
+    filter: brightness(1.08);
+  }
 }
 
 .focus-controls__primary:active {
-  transform: none;
-  box-shadow: none;
+  transform: scale(0.97);
 }
 
 .focus-controls__secondary {
@@ -213,24 +227,28 @@
   align-items: center;
   justify-content: center;
   gap: var(--space-2);
-  min-height: 2.5rem;
-  padding: 0 var(--space-4);
-  border: 1px solid var(--rule-strong);
-  font-size: var(--text-sm);
-  font-weight: 600;
-  color: var(--ink-soft);
+  min-height: var(--control-h);
+  padding: 0 var(--space-5);
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: var(--fill-1);
+  font-size: var(--text-base);
+  font-weight: var(--weight-medium);
+  color: var(--ink);
   transition:
-    border-color var(--duration-fast) var(--ease-out),
-    color var(--duration-fast) var(--ease-out);
+    background-color var(--duration-fast) var(--ease-out),
+    transform var(--duration-fast) var(--ease-spring);
 }
 
-.focus-controls__ghost:hover {
-  border-color: var(--ink);
-  color: var(--ink);
+@media (hover: hover) {
+  .focus-controls__ghost:hover {
+    background: var(--fill-2);
+  }
 }
 
 .focus-controls__ghost:active {
-  background: var(--surface-sunk);
+  background: var(--fill-2);
+  transform: scale(0.96);
 }
 
 @media (max-width: 64rem) {
@@ -247,5 +265,12 @@
 
   .focus-controls__primary:hover {
     transform: none;
+  }
+}
+
+/* 폰에서는 눌리는 것이 44px 밑으로 내려가지 않게 한다(Apple HIG 최소 터치 영역). */
+@media (max-width: 40rem) {
+  .focus-mode__button {
+    min-height: var(--control-h);
   }
 }

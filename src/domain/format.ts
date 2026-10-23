@@ -50,3 +50,9 @@ export function formatMonthTitle(date: ISODate): string {
   const d = fromISODate(date)
   return `${d.getFullYear()}년 ${d.getMonth() + 1}월`
 }
+
+/** '10월 24일 (토)' 같은 하루 머리글 */
+export function formatDayTitle(date: ISODate): string {
+  const d = fromISODate(date)
+  return `${d.getMonth() + 1}월 ${d.getDate()}일 (${WEEKDAY_KO[d.getDay()]})`
+}

@@ -132,11 +132,12 @@ export function DatePopover({ open, anchorRef, onClose, value, today, weekStarts
         {!value.startTime ? (
           <div className="datepop__row" role="group" aria-label="하루 중 구간">
             <span>하루 중</span>
-            <div className="seg">
+            <div className="segmented">
               {PARTS.map((p) => (
                 <button
                   key={p.id}
                   type="button"
+                  className="segmented__option"
                   aria-pressed={value.dayPart === p.id}
                   onClick={() => onChange({ dayPart: value.dayPart === p.id ? null : p.id, startDate: value.startDate ?? today })}
                 >

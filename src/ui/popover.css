@@ -6,16 +6,18 @@
   max-height: min(28rem, calc(100dvh - 1rem));
   overflow: auto;
   background: var(--surface);
-  border: 1px solid var(--rule-strong);
-  border-radius: var(--radius-md);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-lg);
   box-shadow: var(--shadow-float);
-  animation: popover-in var(--duration-fast) var(--ease-out);
+  /* 눌린 자리에서 피어나듯 열린다. 위에서 떨어지는 것보다 어디서 왔는지가 분명하다. */
+  transform-origin: top center;
+  animation: popover-in var(--duration-fast) var(--ease-spring);
 }
 
 @keyframes popover-in {
   from {
     opacity: 0;
-    transform: translateY(-4px);
+    transform: scale(0.92);
   }
 }
 
@@ -23,26 +25,38 @@
   padding: var(--space-1);
 }
 
+/* 손가락으로 쓰는 화면에서는 메뉴 한 줄도 44px 을 지킨다. */
+@media (max-width: 40rem) {
+  .menu__item {
+    min-height: var(--control-h);
+  }
+}
+
 .menu__item {
   display: flex;
   align-items: center;
   gap: var(--space-3);
   width: 100%;
-  min-height: 2.25rem;
+  min-height: var(--control-h-sm);
   padding: 0 var(--space-3);
   border-radius: var(--radius-sm);
   text-align: left;
-  font-size: var(--text-sm);
+  font-size: var(--text-base);
   color: var(--ink);
+  transition: background-color var(--duration-instant) var(--ease-out);
 }
 
 .menu__item:hover,
 .menu__item[data-active='true'] {
-  background: var(--surface-sunk);
+  background: var(--fill-2);
+}
+
+.menu__item:active {
+  background: var(--fill-1);
 }
 
 .menu__item[data-selected='true'] {
-  font-weight: 600;
+  font-weight: var(--weight-semibold);
 }
 
 .menu__item[data-danger='true'] {
@@ -75,7 +89,6 @@
 .menu__heading {
   padding: var(--space-2) var(--space-3) var(--space-1);
   font-size: var(--text-xs);
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+  font-weight: var(--weight-semibold);
   color: var(--muted);
 }

@@ -1,7 +1,7 @@
 import { fireEvent, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { useLocation } from 'react-router-dom'
-import { formatMonthTitle } from '../../domain/format'
+import { formatDayTitle, formatMonthTitle } from '../../domain/format'
 import { todayOf } from '../../domain/date'
 import type { QuickAddDefaults } from '../../store/ui'
 import { useUI } from '../../store/ui'
@@ -320,4 +320,58 @@ describe('CalendarView week and day', () => {
       expect(useApp.getState().entities.tasks.z).toMatchObject({ startTime: '11:00', durationMin: null })
     })
   })
+
+describe('폰에서 보는 월간 달력', () => {
+  /** jsdom 에는 matchMedia 가 없다. 좁은 화면인 척한다. */
+  function pretendPhone() {
+    window.matchMedia = ((query: string) => ({
+      media: query,
+      matches: query.includes('40rem'),
+      addEventListener: () => {},
+      removeEventListener: () => {},
+      addListener: () => {},
+      removeListener: () => {},
+      dispatchEvent: () => false,
+      onchange: null,
+    })) as unknown as typeof window.matchMedia
+  }
+
+  afterEach(() => {
+    Reflect.deleteProperty(window, 'matchMedia')
+  })
+
+  test('날짜를 누르면 빠른 추가 대신 그날 목록이 펴진다', async () => {
+    const user = userEvent.setup()
+    useApp.getState().commit(
+      {
+        puts: {
+          tasks: [
+            makeTask({ id: 'a', title: '치과 예약', startDate: '2026-03-18', startTime: '14:00' }),
+            makeTask({ id: 'b', title: '장보기', startDate: '2026-03-20' }),
+          ],
+        },
+        deletes: {},
+      },
+      'seed',
+      { history: false },
+    )
+    pretendPhone()
+    renderApp(<Calendar />, '/calendar?date=2026-03-15')
+
+    await user.click(within(month()).getByRole('button', { name: /^18/ }))
+
+    const agenda = screen.getByRole('region', { name: '3월 18일 (수) 일정' })
+    expect(within(agenda).getByText('치과 예약')).toBeInTheDocument()
+    expect(within(agenda).queryByText('장보기')).not.toBeInTheDocument()
+    // 폰에서는 칸을 눌러도 빠른 추가가 열리지 않는다
+    expect(useUI.getState().quickAdd.open).toBe(false)
+  })
+
+  test('아무 날도 고르지 않았으면 오늘 목록을 보여 준다', () => {
+    pretendPhone()
+    renderApp(<Calendar />, '/calendar?date=2026-03-15')
+
+    expect(screen.getByRole('region', { name: `${formatDayTitle(todayOf(new Date()))} 일정` })).toBeInTheDocument()
+  })
+})
 })

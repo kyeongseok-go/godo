@@ -1,7 +1,8 @@
 import { CalendarDays, Inbox, Menu as MenuIcon, Plus, Sun } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import { NavLink, Outlet, useLocation } from 'react-router-dom'
 import { useUI } from '../store/ui'
+import { DRAWER_QUERY, useMediaQuery } from '../hooks/media'
 import { DetailPanel } from '../features/detail/DetailPanel'
 import { QuickAdd } from '../features/quickadd/QuickAdd'
 import { CommandPalette } from '../features/palette/CommandPalette'
@@ -14,23 +15,6 @@ import { ToastHost } from '../ui/ToastHost'
 import { paths } from './nav'
 import { Sidebar } from './Sidebar'
 import './shell.css'
-
-// shell.css 의 서랍 전환 지점과 같은 값이어야 한다.
-const DRAWER_QUERY = '(max-width: 56rem)'
-
-/** 사이드바가 서랍으로 뜨는 좁은 화면인지. matchMedia 가 없는 환경(테스트)에서는 넓은 화면으로 본다. */
-function useDrawerLayout(): boolean {
-  const [drawer, setDrawer] = useState(false)
-  useEffect(() => {
-    if (typeof window.matchMedia !== 'function') return
-    const query = window.matchMedia(DRAWER_QUERY)
-    setDrawer(query.matches)
-    const onChange = (e: MediaQueryListEvent) => setDrawer(e.matches)
-    query.addEventListener('change', onChange)
-    return () => query.removeEventListener('change', onChange)
-  }, [])
-  return drawer
-}
 
 export function Shell() {
   const sidebarOpen = useUI((s) => s.sidebarOpen)
@@ -45,7 +29,7 @@ export function Shell() {
   useGlobalShortcuts()
   useReminders()
 
-  const drawerLayout = useDrawerLayout()
+  const drawerLayout = useMediaQuery(DRAWER_QUERY)
   // 서랍이 화면 밖에 있을 때는 탭 순서에서도 빠져야 한다(transform 으로만 숨기면 포커스가 거기로 간다).
   const drawerHidden = drawerLayout && !sidebarOpen
 

@@ -26,7 +26,10 @@
   left: var(--space-3);
   top: -4rem;
   z-index: 100;
-  padding: var(--space-2) var(--space-4);
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--control-h);
+  padding: 0 var(--space-4);
   background: var(--ink);
   color: var(--paper);
   border-radius: var(--radius-md);
@@ -52,6 +55,9 @@
     position: fixed;
     inset: 0 auto 0 0;
     width: min(20rem, 86vw);
+    /* 상태 표시줄(노치) 아래부터 내용이 시작하게 한다. 홈 화면에 추가해 전체 화면으로 열 때 필요하다. */
+    padding-top: var(--safe-t);
+    padding-bottom: var(--safe-b);
     transform: translateX(-100%);
     visibility: hidden;
     transition: transform var(--duration-normal) var(--ease-out), visibility var(--duration-normal);
@@ -68,7 +74,7 @@
     position: fixed;
     inset: 0;
     z-index: 15;
-    background: rgb(23 20 15 / 45%);
+    background: var(--scrim);
     opacity: 0;
     pointer-events: none;
     transition: opacity var(--duration-normal) var(--ease-out);
@@ -79,46 +85,76 @@
     pointer-events: auto;
   }
 
+  /* 탭바와 그 위에 뜬 추가 버튼에 가리지 않을 만큼 아래를 비우고, 위는 노치를 피한다. */
   .shell__main {
-    padding-bottom: 7rem;
+    padding-top: var(--safe-t);
+    padding-bottom: calc(var(--tabbar-h) + var(--safe-b) + 5rem);
   }
 
+  /* 바 뒤로 내용이 비쳐 보인다. 스크롤 중에도 바가 화면에서 분리돼 보이게 하는 장치다. */
   .tabbar {
     position: fixed;
     inset: auto 0 0 0;
     z-index: 30;
     display: grid;
-    grid-template-columns: repeat(5, 1fr);
-    align-items: center;
-    padding: var(--space-2) var(--space-2) calc(var(--space-2) + env(safe-area-inset-bottom));
-    background: var(--surface);
-    border-top: 1px solid var(--rule-strong);
+    grid-template-columns: repeat(4, 1fr);
+    align-items: stretch;
+    padding: 0 var(--space-2) var(--safe-b);
+    padding-inline-start: calc(var(--space-2) + var(--safe-l));
+    padding-inline-end: calc(var(--space-2) + var(--safe-r));
+    background: color-mix(in srgb, var(--surface) 80%, transparent);
+    -webkit-backdrop-filter: var(--blur-bar);
+    backdrop-filter: var(--blur-bar);
+    border-top: 1px solid var(--rule);
+  }
+
+  /* 뒤를 흐릴 수 없는 브라우저에서는 그냥 불투명하게 둔다(글자가 겹쳐 읽히는 것보다 낫다). */
+  @supports not (backdrop-filter: blur(1px)) {
+    .tabbar {
+      background: var(--surface);
+    }
   }
 
   .tabbar__item {
     display: grid;
     justify-items: center;
-    gap: 2px;
+    align-content: center;
+    gap: 3px;
+    min-height: var(--tabbar-h);
     padding: var(--space-1);
-    font-size: 0.6875rem;
+    font-size: var(--text-2xs);
     color: var(--muted);
+    transition:
+      color var(--duration-fast) var(--ease-out),
+      transform var(--duration-fast) var(--ease-spring);
+  }
+
+  .tabbar__item:active {
+    transform: scale(0.9);
   }
 
   .tabbar__item.active {
     color: var(--accent);
-    font-weight: 700;
+    font-weight: var(--weight-semibold);
   }
 
+  /* 추가 버튼은 탭 사이에 끼우지 않고 바 위에 띄운다. 엄지가 닿는 자리이면서 탭의 리듬을 깨지 않는다. */
   .tabbar__add {
-    justify-self: center;
+    position: absolute;
+    right: calc(var(--space-4) + var(--safe-r));
+    bottom: calc(100% + var(--space-3));
     display: grid;
     place-items: center;
-    width: 3rem;
-    height: 3rem;
-    margin-top: -1.25rem;
-    border-radius: 50%;
+    width: 3.5rem;
+    height: 3.5rem;
+    border-radius: var(--radius-pill);
     background: var(--accent);
     color: var(--accent-ink);
     box-shadow: var(--shadow-float);
+    transition: transform var(--duration-fast) var(--ease-spring);
+  }
+
+  .tabbar__add:active {
+    transform: scale(0.9);
   }
 }

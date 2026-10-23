@@ -23,7 +23,7 @@
 
 .palette__group {
   padding: var(--space-3) var(--space-3) var(--space-1);
-  font-size: 0.6875rem;
+  font-size: var(--text-2xs);
   font-weight: 700;
   letter-spacing: 0.12em;
   text-transform: uppercase;
@@ -42,9 +42,11 @@
   font-size: var(--text-sm);
 }
 
+/* 고른 줄은 검정으로 반전하지 않고 강조색을 옅게 깐다. 반전하면 안의 배지까지 색을 다시 맞춰야 한다. */
 .palette__item[data-active='true'] {
-  background: var(--ink);
-  color: var(--paper);
+  background: var(--accent-tint);
+  color: var(--ink);
+  font-weight: var(--weight-medium);
 }
 
 .palette__icon {

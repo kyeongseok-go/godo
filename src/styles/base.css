@@ -17,10 +17,31 @@ body {
   font-family: var(--font-body);
   font-size: var(--text-base);
   line-height: 1.55;
-  letter-spacing: -0.005em;
+  letter-spacing: -0.016em;
   font-feature-settings: 'tnum' 1;
   -webkit-font-smoothing: antialiased;
   overflow-x: hidden;
+  /* 누를 때 뜨는 회색 사각형을 없앤다. 눌린 느낌은 각 컨트롤이 직접 만든다. */
+  -webkit-tap-highlight-color: transparent;
+  /* 안쪽 목록을 끝까지 당겼을 때 페이지 전체가 따라 늘어나지 않게 한다. */
+  overscroll-behavior-y: contain;
+}
+
+/* 자간은 크기에 따라 부호가 두 번 바뀐다(Apple 의 SF Pro 트래킹 표).
+   12px 에서 0 → 17px 에서 가장 좁고(-0.022em) → 24px 을 넘으면 다시 벌어진다.
+   본문은 조이고 큰 제목은 살짝 벌리는 것이 규칙이다. Pretendard 는 시스템 글꼴이 아니라
+   브라우저가 이 보정을 대신 해 주지 않으므로 여기서 직접 넣는다. */
+h1 {
+  letter-spacing: 0.008em;
+}
+
+h2 {
+  letter-spacing: -0.012em;
+}
+
+h3,
+h4 {
+  letter-spacing: -0.02em;
 }
 
 /* 시각·분량처럼 자리를 맞춰 읽는 숫자는 폭을 고정한다(10:00 과 11:30 이 흔들리지 않게). */
@@ -59,6 +80,17 @@ button {
   background: none;
   border: 0;
   padding: 0;
+  /* 두 번 두드렸을 때 확대되거나 300ms 늦게 반응하는 것을 막는다. */
+  touch-action: manipulation;
+  /* 버튼 글자는 드래그로 잡히지 않는다. 네이티브 버튼과 같은 감각. */
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+/* 네이티브 체크박스·라디오·진행바도 앱 강조색을 따른다. */
+input,
+progress {
+  accent-color: var(--accent);
 }
 
 a {
@@ -108,18 +140,21 @@ ol {
   }
 }
 
-::-webkit-scrollbar {
-  width: 10px;
-  height: 10px;
-}
-::-webkit-scrollbar-thumb {
-  background: var(--rule);
-  border-radius: var(--radius-pill);
-  border: 3px solid transparent;
-  background-clip: content-box;
-}
-::-webkit-scrollbar-thumb:hover {
-  background: var(--rule-strong);
-  background-clip: content-box;
-  border: 3px solid transparent;
+/* 스크롤 막대는 마우스를 쓰는 화면에서만 자리를 차지한다. 터치 기기는 운영체제가 알아서 띄운다. */
+@media (hover: hover) {
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: var(--rule-strong);
+    border-radius: var(--radius-pill);
+    border: 3px solid transparent;
+    background-clip: content-box;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--muted);
+    background-clip: content-box;
+    border: 3px solid transparent;
+  }
 }

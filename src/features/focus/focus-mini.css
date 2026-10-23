@@ -55,7 +55,7 @@
 
 .focus-mini__kind {
   grid-area: kind;
-  font-size: 0.6875rem;
+  font-size: var(--text-2xs);
   font-weight: 700;
   letter-spacing: 0.1em;
   opacity: 0.8;

@@ -531,7 +531,7 @@
   border-radius: var(--radius-sm);
   background: var(--now);
   color: var(--now-ink);
-  font-size: 0.6875rem;
+  font-size: var(--text-2xs);
   font-weight: 700;
   font-variant-numeric: tabular-nums;
   line-height: 1.5;
@@ -823,5 +823,26 @@
 
   .plan-figures > div:first-child {
     grid-column: 1 / -1;
+  }
+}
+
+/* 폰에서는 눌리는 것이 44px 밑으로 내려가지 않게 한다(Apple HIG 최소 터치 영역). */
+@media (max-width: 40rem) {
+  .plan-tabs__tab {
+    min-height: var(--control-h);
+  }
+
+  /* 용량 링크는 글 안에 있어 키우면 줄이 흔들린다. 눌리는 영역만 넓힌다. */
+  .capmeter__cap {
+    position: relative;
+  }
+
+  .capmeter__cap::after {
+    content: '';
+    position: absolute;
+    inset: 50% auto auto 50%;
+    width: var(--tap-min);
+    height: var(--tap-min);
+    transform: translate(-50%, -50%);
   }
 }

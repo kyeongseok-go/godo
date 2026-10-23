@@ -11,9 +11,9 @@
   align-items: baseline;
   gap: var(--space-2);
   max-width: var(--measure);
-  padding: var(--space-4) var(--space-gutter) var(--space-2);
+  padding: var(--space-5) calc(var(--space-gutter) + var(--space-3)) var(--space-2);
   font-size: var(--text-sm);
-  font-weight: 600;
+  font-weight: var(--weight-semibold);
   color: var(--muted);
   position: sticky;
   top: 0;
@@ -36,17 +36,24 @@
   display: flex;
   align-items: center;
   gap: var(--space-2);
-  width: 100%;
+  width: auto;
+  min-height: var(--control-h);
   max-width: var(--measure);
-  padding: var(--space-3) var(--space-gutter);
+  margin: var(--space-3) var(--space-gutter) 0;
+  padding: 0 var(--space-4);
+  border-radius: var(--radius-md);
   color: var(--muted);
-  font-size: var(--text-sm);
-  border-bottom: 1px dashed var(--rule);
-  transition: color var(--duration-fast) var(--ease-out);
+  font-size: var(--text-base);
+  transition:
+    color var(--duration-fast) var(--ease-out),
+    background-color var(--duration-fast) var(--ease-out);
 }
 
-.task-list__add:hover {
-  color: var(--accent);
+@media (hover: hover) {
+  .task-list__add:hover {
+    background: var(--fill-3);
+    color: var(--accent);
+  }
 }
 
 /* 넓은 화면에서 줄이 끝까지 늘어나지 않게 한 줄 길이를 잡는다 */
@@ -55,8 +62,29 @@
   max-width: var(--measure);
 }
 
+/* 목록은 하나의 둥근 면으로 묶는다. 줄마다 선을 긋는 표가 아니라 한 덩어리로 읽히게. */
 .task-ul {
-  margin: 0;
+  margin: 0 var(--space-gutter);
   padding: 0;
   list-style: none;
+  background: var(--surface);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-1);
+}
+
+.task-ul > li:first-child > .task-row {
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+}
+
+.task-ul > li:last-child > .task-row {
+  border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+}
+
+.task-ul > li:only-child > .task-row {
+  border-radius: var(--radius-lg);
+}
+
+/* 맨 아래 줄에는 구분선을 긋지 않는다. */
+.task-ul > li:last-child > .task-row::after {
+  display: none;
 }
