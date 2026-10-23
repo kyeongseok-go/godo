@@ -24,7 +24,7 @@ async function audit(page: Page) {
 
 const ROUTES = [
   '/inbox', '/today', '/upcoming', '/now', '/calendar', '/calendar?cal=week', '/matrix', '/timeline', '/search?q=회의',
-  '/habits', '/focus', '/countdown', '/productivity', '/summary', '/review', '/replan', '/plan',
+  '/help', '/habits', '/focus', '/countdown', '/productivity', '/summary', '/review', '/replan', '/plan',
   '/settings/general', '/settings/appearance', '/settings/modules', '/settings/notifications', '/settings/shortcuts', '/settings/data', '/settings/templates', '/settings/about',
 ]
 

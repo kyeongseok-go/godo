@@ -11,7 +11,7 @@ export interface GuideSection {
 
 /**
  * 첫 `## ` 앞은 "시작" 머리말, 이후는 `## ` 마다 한 장. 코드 블록 안의 `## `는 장 구분으로 보지 않는다.
- * `---` 구분선은 화면에서 의미가 없으므로 뺀다.
+ * `---` 구분선과 문서 제목(`# `)은 화면에서 쓰지 않으므로 뺀다.
  */
 export function splitGuide(markdown: string): GuideSection[] {
   const lines = markdown.replace(/\r\n/g, '\n').split('\n')
@@ -29,7 +29,8 @@ export function splitGuide(markdown: string): GuideSection[] {
     .map((s, i) => ({
       id: String(i),
       title: s.title,
-      body: s.lines.filter((l) => l.trim() !== '---').join('\n').trim(),
+      // `---` 구분선과 문서 맨 위 `# 제목`은 뺀다(페이지 머리글이 같은 제목을 이미 보여준다. h1이 둘이 되지 않게).
+      body: s.lines.filter((l) => l.trim() !== '---' && !(i === 0 && /^# /.test(l))).join('\n').trim(),
     }))
     .filter((s) => s.body.length > 0 || s.id === '0')
 }

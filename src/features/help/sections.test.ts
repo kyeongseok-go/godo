@@ -9,6 +9,12 @@ describe('splitGuide', () => {
     expect(first).toMatchObject({ id: '1', title: '1. 시작', body: '내용' })
   })
 
+  test('drops the document title so the page does not end up with two h1 headings', () => {
+    const [intro] = splitGuide('# 문서 제목\n\n소개 문장\n\n## 1. 장')
+
+    expect(intro.body).toBe('소개 문장')
+  })
+
   test('does not split on ## inside a code fence', () => {
     const sections = splitGuide('## 장\n```\n## 코드 안\n```\n뒤')
 
