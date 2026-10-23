@@ -152,11 +152,11 @@ describe('failure handling', () => {
   })
 
   test('a failed write keeps persistError, even after a later write succeeds', async () => {
-    const spy = vi.spyOn(db, 'transaction').mockRejectedValueOnce(new Error('quota'))
+    // 쓰기는 몇 번 다시 시도하므로, 끝까지 실패하는 상황을 만든다
+    const spy = vi.spyOn(db, 'transaction').mockRejectedValue(new Error('quota'))
 
     store.getState().commit({ puts: { tasks: [makeTask({ id: 'lost' })] }, deletes: {} }, '추가 실패')
-    await flushWrites()
-    expect(store.getState().persistError).toContain('저장하지 못했어요')
+    await vi.waitFor(() => expect(store.getState().persistError).toContain('저장하지 못했어요'))
 
     spy.mockRestore()
     store.getState().commit({ puts: { tasks: [makeTask({ id: 'ok' })] }, deletes: {} }, '추가 성공')
@@ -167,17 +167,28 @@ describe('failure handling', () => {
     expect(store.getState().persistError).toBeNull()
   })
 
-  test('keeps the first error instead of overwriting it', async () => {
-    vi.spyOn(db, 'transaction')
-      .mockRejectedValueOnce(new Error('first'))
-      .mockRejectedValueOnce(new Error('second'))
+  test('잠깐 실패한 쓰기는 다시 시도해 저장한다', async () => {
+    const spy = vi.spyOn(db, 'transaction').mockRejectedValueOnce(new Error('잠깐 잠김'))
 
+    store.getState().commit({ puts: { tasks: [makeTask({ id: 'retried' })] }, deletes: {} }, '추가')
+    await vi.waitFor(async () => expect(await db.tasks.get('retried')).toBeDefined())
+
+    expect(store.getState().persistError).toBeNull()
+    spy.mockRestore()
+  })
+
+  test('keeps the first error instead of overwriting it', async () => {
+    const spy = vi.spyOn(db, 'transaction').mockRejectedValue(new Error('first'))
     store.getState().commit({ puts: { tasks: [makeTask({ id: 'a' })] }, deletes: {} }, 'a')
+    await vi.waitFor(() => expect(store.getState().persistError).toContain('first'))
+
+    spy.mockRejectedValue(new Error('second'))
     store.getState().commit({ puts: { tasks: [makeTask({ id: 'b' })] }, deletes: {} }, 'b')
-    await flushWrites()
+    await vi.waitFor(() => expect(store.getState().pendingWrites).toBe(0))
 
     expect(store.getState().persistError).toContain('first')
     expect(store.getState().persistError).not.toContain('second')
+    spy.mockRestore()
   })
 
   test('pendingWrites counts in-flight writes and returns to zero', async () => {
@@ -207,5 +218,86 @@ describe('failure handling', () => {
     expect(pomodoro.focusMin).toBe(50)
     expect(pomodoro.shortBreakMin).toBe(5)
     expect(store.getState().settings.modules.habits).toBe(true)
+  })
+})
+
+describe('실행 취소가 건드리지 않은 필드', () => {
+  test('되돌릴 때 그 사이에 다른 경로가 바꾼 값은 지키고 되돌릴 필드만 돌려놓는다', async () => {
+    const task = makeTask({ id: 't1', title: '원래 제목', actualMin: {} })
+    store.getState().commit({ puts: { tasks: [task] }, deletes: {} }, '추가', { history: false })
+
+    // 제목 수정(실행 취소 대상)
+    const renamed = { ...store.getState().entities.tasks.t1, title: '바뀐 제목' }
+    store.getState().commit({ puts: { tasks: [renamed] }, deletes: {} }, '제목 수정')
+
+    // 집중 세션 기록처럼 실행 취소에 남기지 않는 쓰기
+    const tracked = { ...store.getState().entities.tasks.t1, actualMin: { '2026-10-23': 25 } }
+    store.getState().commit({ puts: { tasks: [tracked] }, deletes: {} }, '집중 기록', { history: false })
+
+    store.getState().undo()
+
+    const after = store.getState().entities.tasks.t1
+    expect(after.title).toBe('원래 제목')
+    expect(after.actualMin).toEqual({ '2026-10-23': 25 })
+    await flushWrites()
+    expect((await db.tasks.get('t1'))?.actualMin).toEqual({ '2026-10-23': 25 })
+  })
+
+  test('다시 실행도 같은 규칙을 따른다', () => {
+    const task = makeTask({ id: 't1', title: '원래 제목' })
+    store.getState().commit({ puts: { tasks: [task] }, deletes: {} }, '추가', { history: false })
+    const renamed = { ...task, title: '바뀐 제목' }
+    store.getState().commit({ puts: { tasks: [renamed] }, deletes: {} }, '제목 수정')
+    store.getState().undo()
+
+    const tracked = { ...store.getState().entities.tasks.t1, actualMin: { '2026-10-23': 10 } }
+    store.getState().commit({ puts: { tasks: [tracked] }, deletes: {} }, '집중 기록', { history: false })
+    store.getState().redo()
+
+    const after = store.getState().entities.tasks.t1
+    expect(after.title).toBe('바뀐 제목')
+    expect(after.actualMin).toEqual({ '2026-10-23': 10 })
+  })
+
+  test('만들기를 되돌리면 행이 사라진다(좁히기와 무관)', () => {
+    const task = makeTask({ id: 't1' })
+    store.getState().commit({ puts: { tasks: [task] }, deletes: {} }, '추가')
+
+    store.getState().undo()
+
+    expect(store.getState().entities.tasks.t1).toBeUndefined()
+  })
+
+  test('지우기를 되돌리면 행 전체가 돌아온다', () => {
+    const task = makeTask({ id: 't1', title: '지울 일' })
+    store.getState().commit({ puts: { tasks: [task] }, deletes: {} }, '추가', { history: false })
+    store.getState().commit({ puts: {}, deletes: { tasks: ['t1'] } }, '삭제')
+
+    store.getState().undo()
+
+    expect(store.getState().entities.tasks.t1.title).toBe('지울 일')
+  })
+})
+
+describe('다시 읽기와 쓰기가 겹칠 때', () => {
+  test('다시 읽는 동안 들어온 변경이 화면에서 사라지지 않는다', async () => {
+    const first = makeTask({ id: 't1', title: '먼저' })
+    store.getState().commit({ puts: { tasks: [first] }, deletes: {} }, '추가')
+
+    const reloading = store.getState().reload()
+    const second = makeTask({ id: 't2', title: '읽는 중에 추가' })
+    store.getState().commit({ puts: { tasks: [second] }, deletes: {} }, '추가')
+    await reloading
+    await flushWrites()
+
+    expect(Object.keys(store.getState().entities.tasks).sort()).toEqual(['t1', 't2'])
+  })
+
+  test('다시 읽기는 다른 탭이 쓴 데이터를 가져온다', async () => {
+    await db.tasks.put(makeTask({ id: 'other', title: '다른 탭이 쓴 일' }))
+
+    await store.getState().reload()
+
+    expect(store.getState().entities.tasks.other?.title).toBe('다른 탭이 쓴 일')
   })
 })

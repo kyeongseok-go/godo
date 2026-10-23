@@ -53,6 +53,8 @@ export function DatePopover({ open, anchorRef, onClose, value, today, weekStarts
   ]
 
   const pickDate = (date: ISODate | null) => {
+    // 날짜를 지우면 반복도 사라지므로 사용자 지정 편집기도 닫는다.
+    if (date === null) setCustom(false)
     onChange({ startDate: date, someday: false, ...(date === null ? { startTime: null, dayPart: null, recurrence: null } : {}) })
   }
 
@@ -60,7 +62,8 @@ export function DatePopover({ open, anchorRef, onClose, value, today, weekStarts
     ? isSameAsPreset(value.recurrence, base)
     : 'none'
   // 프리셋에 없는 규칙(예: 2주마다 화·목)은 select 에서 '사용자 지정'을 다시 고를 수 없으니 처음부터 편집기를 보여 준다.
-  const isCustom = custom || presetId === 'custom'
+  // 반복이 사라지면(예: '날짜 없음') 사용자 지정도 함께 꺼진다. 안 그러면 select 만 '사용자 지정…'인 채 편집기가 없다.
+  const isCustom = Boolean(value.recurrence) && (custom || presetId === 'custom')
 
   const choosePreset = (id: string) => {
     if (id === 'none') {

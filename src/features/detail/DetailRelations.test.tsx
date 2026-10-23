@@ -2,8 +2,11 @@ import { screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { useApp } from '../../store/app'
 import { makeTask } from '../../test/factories'
+import { installHiddenPanelFocusShim } from '../../test/focusShim'
 import { renderApp, resetApp } from '../../test/render'
 import { DetailPanel } from './DetailPanel'
+
+installHiddenPanelFocusShim()
 
 // 상세 패널의 알림과 시작 조건(의존 관계·보류) 블록
 
@@ -134,6 +137,15 @@ describe('start conditions', () => {
     expect(stored().blockedBy).toEqual(['b'])
     expect(screen.queryByRole('dialog', { name: '먼저 끝나야 할 일 선택' })).not.toBeInTheDocument()
     expect(within(dependencies()).getByText('자료 조사')).toBeInTheDocument()
+  })
+
+  test('the search box takes focus as soon as the picker is up', async () => {
+    const user = userEvent.setup()
+    openPanel({}, ...others())
+
+    await user.click(within(dependencies()).getByRole('button', { name: '+ 먼저 끝나야 할 일' }))
+
+    expect(await screen.findByPlaceholderText('할 일 검색')).toHaveFocus()
   })
 
   test('typing narrows the candidates and says so when nothing matches', async () => {

@@ -79,10 +79,13 @@ describe('importAppData replace', () => {
     expect(settings?.theme).toBe('light')
   })
 
-  it('clears settings when the backup has none so defaults return on reload', async () => {
+  // 백업에 설정이 없다고 지금 설정까지 버리면 테마·시간대·단축키가 조용히 초기화된다
+  it('백업에 설정이 없으면 지금 설정을 그대로 남긴다', async () => {
+    await db.settings.put({ ...defaultSettings(), theme: 'dark' })
+
     await importAppData(db, incoming({}), 'replace', ctx())
 
-    expect((await loadAll(db)).settings).toBeNull()
+    expect((await loadAll(db)).settings?.theme).toBe('dark')
   })
 
   it('keeps the current data as a safety snapshot first', async () => {

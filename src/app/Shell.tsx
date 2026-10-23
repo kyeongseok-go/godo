@@ -1,5 +1,5 @@
 import { CalendarDays, Inbox, Menu as MenuIcon, Plus, Sun } from 'lucide-react'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { NavLink, Outlet, useLocation } from 'react-router-dom'
 import { useUI } from '../store/ui'
 import { DetailPanel } from '../features/detail/DetailPanel'
@@ -15,6 +15,23 @@ import { paths } from './nav'
 import { Sidebar } from './Sidebar'
 import './shell.css'
 
+// shell.css 의 서랍 전환 지점과 같은 값이어야 한다.
+const DRAWER_QUERY = '(max-width: 56rem)'
+
+/** 사이드바가 서랍으로 뜨는 좁은 화면인지. matchMedia 가 없는 환경(테스트)에서는 넓은 화면으로 본다. */
+function useDrawerLayout(): boolean {
+  const [drawer, setDrawer] = useState(false)
+  useEffect(() => {
+    if (typeof window.matchMedia !== 'function') return
+    const query = window.matchMedia(DRAWER_QUERY)
+    setDrawer(query.matches)
+    const onChange = (e: MediaQueryListEvent) => setDrawer(e.matches)
+    query.addEventListener('change', onChange)
+    return () => query.removeEventListener('change', onChange)
+  }, [])
+  return drawer
+}
+
 export function Shell() {
   const sidebarOpen = useUI((s) => s.sidebarOpen)
   const setSidebarOpen = useUI((s) => s.setSidebarOpen)
@@ -28,13 +45,26 @@ export function Shell() {
   useGlobalShortcuts()
   useReminders()
 
+  const drawerLayout = useDrawerLayout()
+  // 서랍이 화면 밖에 있을 때는 탭 순서에서도 빠져야 한다(transform 으로만 숨기면 포커스가 거기로 간다).
+  const drawerHidden = drawerLayout && !sidebarOpen
+
+  useEffect(() => {
+    if (!drawerLayout || !sidebarOpen) return
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && !document.querySelector('dialog[open], .popover')) setSidebarOpen(false)
+    }
+    document.addEventListener('keydown', onKey)
+    return () => document.removeEventListener('keydown', onKey)
+  }, [drawerLayout, sidebarOpen, setSidebarOpen])
+
   return (
     <div className="shell">
       {/* href="#main"은 해시 라우터와 충돌하므로 버튼으로 포커스만 옮긴다. */}
       <button type="button" className="skip-link" onClick={() => document.getElementById('main')?.focus()}>
         본문으로 건너뛰기
       </button>
-      <aside className="shell__sidebar" data-open={sidebarOpen}>
+      <aside className="shell__sidebar" data-open={sidebarOpen} {...(drawerHidden ? { inert: true } : {})}>
         <Sidebar />
       </aside>
       <button

@@ -198,3 +198,36 @@ describe('skipOccurrence', () => {
     expect(t.recurrence?.skipDates).toEqual(['2026-09-01'])
   })
 })
+
+describe('advanceRecurringTask - 기준 일 고정', () => {
+  test('매월 반복을 여러 번 완료해도 31일이 28일로 굳지 않는다', () => {
+    let task = makeTask({
+      startDate: '2026-01-31',
+      recurrence: { freq: 'monthly', interval: 1, anchor: 'due', end: { type: 'never' }, resetSubtasks: false },
+    })
+    const dates: string[] = []
+    for (let i = 0; i < 4; i++) {
+      const next = advanceRecurringTask(task, task.startDate as string, NOW)
+      expect(next).not.toBeNull()
+      task = next as typeof task
+      dates.push(task.startDate as string)
+    }
+
+    expect(dates).toEqual(['2026-02-28', '2026-03-31', '2026-04-30', '2026-05-31'])
+  })
+
+  test('매년 반복을 여러 번 완료해도 2월 29일로 돌아온다', () => {
+    let task = makeTask({
+      startDate: '2024-02-29',
+      recurrence: { freq: 'yearly', interval: 1, anchor: 'due', end: { type: 'never' }, resetSubtasks: false },
+    })
+    const dates: string[] = []
+    for (let i = 0; i < 4; i++) {
+      const next = advanceRecurringTask(task, task.startDate as string, NOW)
+      task = next as typeof task
+      dates.push(task.startDate as string)
+    }
+
+    expect(dates).toEqual(['2025-02-28', '2026-02-28', '2027-02-28', '2028-02-29'])
+  })
+})

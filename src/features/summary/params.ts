@@ -104,8 +104,18 @@ function rangeDates(params: SummaryParams, today: ISODate, weekStartsOn: 0 | 1):
 }
 
 /** 화면 옵션을 buildSummaryMarkdown 이 받는 옵션으로 바꾼다. */
-export function resolveSummaryOptions(params: SummaryParams, today: ISODate, weekStartsOn: 0 | 1): SummaryOptions {
-  return { ...rangeDates(params, today, weekStartsOn), projectIds: params.projectIds, status: params.status }
+export function resolveSummaryOptions(
+  params: SummaryParams,
+  today: ISODate,
+  weekStartsOn: 0 | 1,
+  dayStartHour = 0,
+): SummaryOptions {
+  return {
+    ...rangeDates(params, today, weekStartsOn),
+    projectIds: params.projectIds,
+    status: params.status,
+    dayStartHour,
+  }
 }
 
 /**

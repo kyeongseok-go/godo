@@ -2,7 +2,7 @@
 import { addDays, daysBetween, toISODate } from '../date'
 import type { EpochMs, ISODate, RecurrenceRule, Task } from '../types'
 import { findNextAfter, nextOccurrence } from './next'
-import { stepDue } from './steps'
+import { stepDue, withMonthDayAnchor } from './steps'
 
 function moveToOccurrence(task: Task, base: ISODate, next: ISODate, rule: RecurrenceRule, nowMs: EpochMs): Task {
   const shiftDays = daysBetween(base, next)
@@ -25,7 +25,9 @@ export function advanceRecurringTask(task: Task, completedOn: ISODate, nowMs: Ep
   const base = task.startDate ?? task.dueDate ?? completedOn
   const next = nextOccurrence(rule, base, completedOn)
   if (next === null) return null
-  return moveToOccurrence(task, base, next, { ...rule, doneCount: (rule.doneCount ?? 0) + 1 }, nowMs)
+  // 기준 일을 규칙에 남겨 둔다. 다음 완료 때도 원래 일(31일, 2월 29일)을 기억한다.
+  const anchored = withMonthDayAnchor(rule, base)
+  return moveToOccurrence(task, base, next, { ...anchored, doneCount: (anchored.doneCount ?? 0) + 1 }, nowMs)
 }
 
 /**
@@ -33,9 +35,10 @@ export function advanceRecurringTask(task: Task, completedOn: ISODate, nowMs: Ep
  * 완료한 날이 없으므로 anchor와 관계없이 현재 회차에서 규칙대로 한 걸음 나아간다.
  */
 export function skipOccurrence(task: Task, nowMs: EpochMs): Task | null {
-  const rule = task.recurrence
-  if (rule === null) return null
+  const stored = task.recurrence
+  if (stored === null) return null
   const base = task.startDate ?? task.dueDate ?? toISODate(new Date(nowMs))
+  const rule = withMonthDayAnchor(stored, base)
   const next = findNextAfter(rule, stepDue(rule, base), base)
   if (next === null) return null
   const skipDates = rule.skipDates ?? []

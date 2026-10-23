@@ -4,9 +4,17 @@ import type { ISODate, Weekday } from '../types'
 
 const MAX_YEAR_SCAN = 9
 
+/** ISODate는 네 자리 연도만 담는다. 그 밖의 연도는 날짜로 보지 않는다. */
+const MIN_YEAR = 1000
+const MAX_YEAR = 9999
+
 export function buildDate(year: number, month: number, day: number): ISODate | null {
+  if (year < MIN_YEAR || year > MAX_YEAR) return null
   if (month < 1 || month > 12 || day < 1 || day > lastDayOfMonth(year, month)) return null
-  return toISODate(new Date(year, month - 1, day))
+  // new Date(year, ...)는 연도 0~99를 1900년대로 바꾸므로 setFullYear로 연도를 그대로 넣는다.
+  const date = new Date(2000, 0, 1)
+  date.setFullYear(year, month - 1, day)
+  return toISODate(date)
 }
 
 /** 주 시작 요일 기준으로 weekOffset주 뒤(음수면 앞) 그 주의 weekday */
@@ -42,11 +50,11 @@ function monthStart(today: ISODate, monthOffset: number): ISODate {
   return addMonths(first, monthOffset)
 }
 
-/** monthOffset달 뒤 달의 day일. 그 달에 없는 일이면 말일로 맞춘다. */
+/** monthOffset달 뒤 달의 day일. 그 달에 없는 일이면 말일로 맞춘다. 1일 이전으로는 넘어가지 않는다. */
 export function dayOfMonth(today: ISODate, monthOffset: number, day: number): ISODate {
   const first = fromISODate(monthStart(today, monthOffset))
   const last = lastDayOfMonth(first.getFullYear(), first.getMonth() + 1)
-  return addDays(toISODate(first), Math.min(day, last) - 1)
+  return addDays(toISODate(first), Math.min(Math.max(day, 1), last) - 1)
 }
 
 export function endOfMonth(today: ISODate, monthOffset: number): ISODate {

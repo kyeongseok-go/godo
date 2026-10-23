@@ -43,14 +43,19 @@ describe('SettingsView routing', () => {
     expect(await screen.findByRole('heading', { level: 2, name: '모양' })).toBeInTheDocument()
   })
 
+  // 이 두 탭은 lazy 로 불러온다. 전체 스위트를 병렬로 돌리면 기본 1초를 넘길 수 있다.
+  const LAZY_TIMEOUT = { timeout: 15000 }
+
   test('loads the data and templates tabs on demand', async () => {
     const user = userEvent.setup()
     renderSettings('data')
-    expect(await screen.findByRole('button', { name: /JSON 백업 내려받기/ })).toBeInTheDocument()
+    expect(
+      await screen.findByRole('button', { name: /JSON 백업 내려받기/ }, LAZY_TIMEOUT),
+    ).toBeInTheDocument()
 
     await user.click(screen.getByRole('link', { name: /템플릿/ }))
 
-    expect(await screen.findByText('저장한 템플릿')).toBeInTheDocument()
+    expect(await screen.findByText('저장한 템플릿', undefined, LAZY_TIMEOUT)).toBeInTheDocument()
   })
 
   test('renders the notifications body from the notifications module', () => {

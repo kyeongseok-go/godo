@@ -41,14 +41,41 @@ describe('RepeatEditor', () => {
       expect(summary()).toHaveTextContent('3일마다')
     })
 
-    test('never lets the interval drop below one', () => {
+    test('can be emptied to retype, and is corrected to one only when leaving the field', () => {
+      const { onRule, last } = setup({ ...presetRule('daily', START), interval: 4 })
+      const field = screen.getByLabelText('매')
+
+      // 지운 순간 1 로 바뀌어 버리면 이어서 3 을 눌렀을 때 "13" 이 된다.
+      fireEvent.change(field, { target: { value: '' } })
+      expect(field).toHaveValue(null)
+      expect(onRule).not.toHaveBeenCalled()
+
+      fireEvent.change(field, { target: { value: '3' } })
+      expect(last().interval).toBe(3)
+      expect(field).toHaveValue(3)
+    })
+
+    test('never commits an interval below one', () => {
+      const { onRule, last } = setup({ ...presetRule('daily', START), interval: 4 })
+      const field = screen.getByLabelText('매')
+
+      fireEvent.change(field, { target: { value: '0' } })
+      expect(onRule).not.toHaveBeenCalled()
+
+      fireEvent.blur(field)
+      expect(last().interval).toBe(1)
+      expect(field).toHaveValue(1)
+    })
+
+    test('leaving an emptied interval field puts one back', () => {
       const { last } = setup({ ...presetRule('daily', START), interval: 4 })
+      const field = screen.getByLabelText('매')
 
-      fireEvent.change(screen.getByLabelText('매'), { target: { value: '0' } })
-      expect(last().interval).toBe(1)
+      fireEvent.change(field, { target: { value: '' } })
+      fireEvent.blur(field)
 
-      fireEvent.change(screen.getByLabelText('매'), { target: { value: '' } })
       expect(last().interval).toBe(1)
+      expect(field).toHaveValue(1)
     })
 
     test('switching the unit keeps interval, anchor, end and subtask reset but rebuilds the pattern', async () => {
@@ -196,6 +223,26 @@ describe('RepeatEditor', () => {
       expect(summary()).toHaveTextContent('3회')
 
       fireEvent.change(screen.getByLabelText('반복 횟수'), { target: { value: '0' } })
+      fireEvent.blur(screen.getByLabelText('반복 횟수'))
+      expect(last().end).toEqual({ type: 'count', count: 1 })
+    })
+
+    test('the number of times can be emptied to retype and is corrected when leaving the field', async () => {
+      const user = userEvent.setup()
+      const { onRule, last } = setup(presetRule('daily', START))
+      await user.selectOptions(screen.getByLabelText('종료'), '횟수만큼')
+      const field = screen.getByLabelText('반복 횟수')
+      onRule.mockClear()
+
+      fireEvent.change(field, { target: { value: '' } })
+      expect(field).toHaveValue(null)
+      expect(onRule).not.toHaveBeenCalled()
+
+      fireEvent.change(field, { target: { value: '4' } })
+      expect(last().end).toEqual({ type: 'count', count: 4 })
+
+      fireEvent.change(field, { target: { value: '' } })
+      fireEvent.blur(field)
       expect(last().end).toEqual({ type: 'count', count: 1 })
     })
 

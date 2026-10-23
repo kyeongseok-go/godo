@@ -28,10 +28,25 @@ export function DetailPanel() {
   const task = useMemo(() => tasks.find((t) => t.id === openId) ?? null, [tasks, openId])
   const open = Boolean(openId && task)
   const panelRef = useRef<HTMLElement>(null)
+  // 패널을 열기 전에 포커스가 있던 곳(보통 목록 행). 닫으면 여기로 돌려준다.
+  const returnFocusRef = useRef<HTMLElement | null>(null)
+
+  useEffect(() => {
+    if (!open) {
+      // 닫혔으니 왔던 자리로 포커스를 돌려준다. 그냥 두면 포커스가 body 로 빠져 J/K 가 먹지 않는다.
+      const back = returnFocusRef.current
+      returnFocusRef.current = null
+      if (back?.isConnected) back.focus()
+      return
+    }
+    const before = document.activeElement as HTMLElement | null
+    // 패널 안에서 다른 할 일을 열 때(하위 작업)는 돌아갈 자리를 그대로 둔다.
+    if (before && before !== document.body && !panelRef.current?.contains(before)) returnFocusRef.current = before
+    panelRef.current?.focus()
+  }, [open])
 
   useEffect(() => {
     if (!open) return
-    panelRef.current?.focus()
     const onKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape' && !document.querySelector('dialog[open], .popover')) close()
     }

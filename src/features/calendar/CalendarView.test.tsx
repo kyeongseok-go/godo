@@ -263,4 +263,61 @@ describe('CalendarView week and day', () => {
     expect(address()).toContain('task=a')
     expect(useApp.getState().entities.tasks.a).toMatchObject({ startDate: '2026-03-10', startTime: '14:00' })
   })
+
+  describe('a drag that barely moves', () => {
+    const drag = (block: HTMLElement, clientY: number) => {
+      fireEvent.pointerDown(block, { button: 0, pointerId: 1, clientX: 0, clientY: 0 })
+      fireEvent.pointerMove(block, { pointerId: 1, clientX: 0, clientY })
+      fireEvent.pointerUp(block, { pointerId: 1 })
+    }
+
+    test('still counts as a click: it opens the task and records no change', () => {
+      seed()
+      renderApp(<Calendar />, '/calendar?cal=week&date=2026-03-10')
+
+      drag(screen.getByRole('button', { name: '발표 준비 14:00' }), 1)
+
+      expect(address()).toContain('task=a')
+      expect(useApp.getState().entities.tasks.a).toMatchObject({ startDate: '2026-03-10', startTime: '14:00' })
+      expect(useApp.getState().undoStack).toHaveLength(0)
+    })
+
+    test('a real drag past the threshold does reschedule the task', () => {
+      seed()
+      renderApp(<Calendar />, '/calendar?cal=week&date=2026-03-10')
+
+      // 56px 이 한 시간이다. 112px 아래로 끌면 두 시간 뒤가 된다.
+      drag(screen.getByRole('button', { name: '발표 준비 14:00' }), 112)
+
+      expect(useApp.getState().entities.tasks.a).toMatchObject({ startDate: '2026-03-10', startTime: '16:00' })
+      expect(useApp.getState().undoStack.at(-1)?.label).toBe('일정 이동')
+    })
+
+    test('dragging back to the very same slot records nothing', () => {
+      seed()
+      renderApp(<Calendar />, '/calendar?cal=week&date=2026-03-10')
+      const block = screen.getByRole('button', { name: '발표 준비 14:00' })
+
+      fireEvent.pointerDown(block, { button: 0, pointerId: 1, clientX: 0, clientY: 0 })
+      fireEvent.pointerMove(block, { pointerId: 1, clientX: 0, clientY: 112 })
+      fireEvent.pointerMove(block, { pointerId: 1, clientX: 0, clientY: 0 })
+      fireEvent.pointerUp(block, { pointerId: 1 })
+
+      expect(useApp.getState().entities.tasks.a).toMatchObject({ startTime: '14:00' })
+      expect(useApp.getState().undoStack).toHaveLength(0)
+    })
+
+    test('never writes a default duration onto a task that had none', () => {
+      useApp.getState().commit(
+        { puts: { tasks: [makeTask({ id: 'z', title: '통화', startDate: '2026-03-10', startTime: '09:00', durationMin: null })] }, deletes: {} },
+        'seed',
+        { history: false },
+      )
+      renderApp(<Calendar />, '/calendar?cal=week&date=2026-03-10')
+
+      drag(screen.getByRole('button', { name: '통화 09:00' }), 112)
+
+      expect(useApp.getState().entities.tasks.z).toMatchObject({ startTime: '11:00', durationMin: null })
+    })
+  })
 })

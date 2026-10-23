@@ -97,7 +97,7 @@ function CountdownForm({ countdown, preset, today, onClose }: CountdownDialogPro
         </p>
         <label className="ed__field">
           <span>이름</span>
-          <input autoFocus value={draft.name} onChange={(e) => set({ name: e.target.value })} placeholder="예) 엄마 생일" />
+          <input autoFocus data-autofocus value={draft.name} onChange={(e) => set({ name: e.target.value })} placeholder="예) 엄마 생일" />
         </label>
         <label className="ed__field">
           <span>날짜</span>

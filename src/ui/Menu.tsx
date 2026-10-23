@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 import type { ReactNode, RefObject } from 'react'
 import { Popover } from './Popover'
 
@@ -20,15 +20,9 @@ interface MenuProps {
 export function Menu({ open, anchorRef, onClose, entries, label, align }: MenuProps) {
   const items = entries.filter((e) => e.kind === 'item' && !e.disabled)
   const [active, setActive] = useState(0)
-  const listRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     if (open) setActive(0)
-  }, [open])
-
-  useEffect(() => {
-    if (!open) return
-    listRef.current?.focus()
   }, [open])
 
   const choose = (index: number) => {
@@ -54,7 +48,8 @@ export function Menu({ open, anchorRef, onClose, entries, label, align }: MenuPr
   let itemIndex = -1
   return (
     <Popover open={open} anchorRef={anchorRef} onClose={onClose} label={label} align={align}>
-      <div className="menu" role="menu" tabIndex={-1} ref={listRef} onKeyDown={onKeyDown}>
+      {/* 팝오버가 보이게 된 뒤 이 목록으로 포커스를 옮겨 준다(data-autofocus). 그래야 방향키·Enter 가 먹는다. */}
+      <div className="menu" role="menu" tabIndex={-1} data-autofocus onKeyDown={onKeyDown}>
         {entries.map((entry) => {
           if (entry.kind === 'separator') return <div key={entry.id} className="menu__sep" role="separator" />
           if (entry.kind === 'heading') return <div key={entry.id} className="menu__heading">{entry.label}</div>

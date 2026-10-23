@@ -20,6 +20,7 @@ beforeAll(() => {
 beforeEach(async () => {
   await resetApp()
   useToasts.setState({ toasts: [] })
+  useUI.setState({ sidebarOpen: false })
 })
 
 function Page() {
@@ -39,6 +40,25 @@ function renderShell(route = '/inbox') {
 }
 
 const sidebar = () => screen.getByRole('navigation', { name: '주 메뉴' })
+const drawer = () => document.querySelector('.shell__sidebar') as HTMLElement
+
+/** 좁은 화면(사이드바가 서랍으로 뜨는 폭)인 척한다. jsdom 에는 matchMedia 가 없다. */
+function fakeViewport(narrow: boolean): void {
+  window.matchMedia = ((query: string) => ({
+    media: query,
+    matches: narrow,
+    onchange: null,
+    addEventListener: () => {},
+    removeEventListener: () => {},
+    addListener: () => {},
+    removeListener: () => {},
+    dispatchEvent: () => false,
+  })) as unknown as typeof window.matchMedia
+}
+
+afterEach(() => {
+  Reflect.deleteProperty(window, 'matchMedia')
+})
 
 describe('Shell', () => {
   test('renders the current page inside the main landmark', () => {
@@ -83,6 +103,45 @@ describe('Shell', () => {
     expect(useUI.getState().sidebarOpen).toBe(true)
     await user.click(screen.getByRole('button', { name: '메뉴 닫기', hidden: true }))
     expect(useUI.getState().sidebarOpen).toBe(false)
+  })
+
+  describe('the sidebar drawer on a narrow screen', () => {
+    test('is kept out of the tab order while it sits off screen', () => {
+      fakeViewport(true)
+      renderShell('/inbox')
+
+      expect(drawer()).toHaveAttribute('inert')
+    })
+
+    test('joins the tab order again once it is open', async () => {
+      const user = userEvent.setup()
+      fakeViewport(true)
+      renderShell('/inbox')
+
+      await user.click(within(screen.getByRole('navigation', { name: '빠른 이동' })).getByRole('button', { name: '메뉴' }))
+
+      expect(drawer()).not.toHaveAttribute('inert')
+    })
+
+    test('closes with Escape', async () => {
+      const user = userEvent.setup()
+      fakeViewport(true)
+      renderShell('/inbox')
+      await user.click(within(screen.getByRole('navigation', { name: '빠른 이동' })).getByRole('button', { name: '메뉴' }))
+      expect(useUI.getState().sidebarOpen).toBe(true)
+
+      await user.keyboard('{Escape}')
+
+      await waitFor(() => expect(useUI.getState().sidebarOpen).toBe(false))
+    })
+  })
+
+  test('the always-visible sidebar on a wide screen stays reachable', () => {
+    fakeViewport(false)
+    renderShell('/inbox')
+
+    expect(useUI.getState().sidebarOpen).toBe(false)
+    expect(drawer()).not.toHaveAttribute('inert')
   })
 
   test('the skip link moves focus to the main content', async () => {

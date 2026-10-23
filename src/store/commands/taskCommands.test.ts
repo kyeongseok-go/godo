@@ -210,14 +210,45 @@ describe('delete, restore, purge', () => {
   })
 
   test('purgeTasks removes tasks, descendants and their comments for good', () => {
-    const state = stateWith([makeTask({ id: 'p' }), makeTask({ id: 'c', parentId: 'p' })], {
-      comments: [{ id: 'm', taskId: 'c', body: '메모', createdAt: 1 }],
-    })
+    const state = stateWith(
+      [makeTask({ id: 'p', deletedAt: 1 }), makeTask({ id: 'c', parentId: 'p', deletedAt: 1 })],
+      { comments: [{ id: 'm', taskId: 'c', body: '메모', createdAt: 1 }] },
+    )
 
     const next = run(state, purgeTasks(state, ['p']))
 
     expect(next.tasks).toEqual({})
     expect(next.comments).toEqual({})
+  })
+
+  // 부모만 휴지통에 있고 하위 작업은 되살려 둔 경우. 그 하위 작업까지 지우면 되돌릴 방법이 없다.
+  test('purgeTasks 는 휴지통에 없는 하위 작업을 지우지 않고 최상위로 올린다', () => {
+    const state = stateWith([
+      makeTask({ id: 'p', deletedAt: 1 }),
+      makeTask({ id: 'alive', parentId: 'p' }),
+      makeTask({ id: 'gone', parentId: 'p', deletedAt: 1 }),
+      makeTask({ id: 'deep', parentId: 'alive' }),
+    ])
+
+    const next = run(state, purgeTasks(state, ['p'], 500))
+
+    expect(Object.keys(next.tasks).sort()).toEqual(['alive', 'deep'])
+    expect(next.tasks.alive.parentId).toBeNull()
+    expect(next.tasks.alive.updatedAt).toBe(500)
+    expect(next.tasks.deep.parentId).toBe('alive')
+  })
+
+  test('purgeTasks 는 살아 있는 하위 작업의 댓글도 지키지만 지운 작업의 댓글은 지운다', () => {
+    const state = stateWith([makeTask({ id: 'p', deletedAt: 1 }), makeTask({ id: 'alive', parentId: 'p' })], {
+      comments: [
+        { id: 'keep', taskId: 'alive', body: '남을 메모', createdAt: 1 },
+        { id: 'drop', taskId: 'p', body: '사라질 메모', createdAt: 1 },
+      ],
+    })
+
+    const next = run(state, purgeTasks(state, ['p']))
+
+    expect(Object.keys(next.comments)).toEqual(['keep'])
   })
 })
 
@@ -355,5 +386,21 @@ describe('indentTask and outdentTask', () => {
     const state = stateWith([makeTask({ id: 'a' })])
 
     expect(outdentTask(state, 'a', NOW).puts.tasks).toBeUndefined()
+  })
+})
+
+describe('patchTasks 선택 순서', () => {
+  // 부모를 옮기면 하위 작업까지 다시 쓰는데, 함께 고른 자식의 변경이 그 복사본에 덮이면 안 된다
+  test('부모와 자식을 함께 골라 프로젝트를 옮겨도 자식의 변경이 사라지지 않는다', () => {
+    const state = stateWith([makeTask({ id: 'p' }), makeTask({ id: 'c', parentId: 'p' })])
+
+    const childFirst = run(state, patchTasks(state, ['c', 'p'], { projectId: 'proj', priority: 1 }, 100))
+    const parentFirst = run(state, patchTasks(state, ['p', 'c'], { projectId: 'proj', priority: 1 }, 100))
+
+    for (const next of [childFirst, parentFirst]) {
+      expect(next.tasks.c.priority).toBe(1)
+      expect(next.tasks.c.projectId).toBe('proj')
+      expect(next.tasks.p.priority).toBe(1)
+    }
   })
 })

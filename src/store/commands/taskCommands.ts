@@ -65,10 +65,28 @@ export function patchTask(state: EntityState, id: ID, patch: Partial<Task>, nowM
   return patchWith(state, id, patch, nowMs, lazyChildrenIndex(state))
 }
 
-/** 여러 작업에 같은 변경을 적용한다. 하위 작업을 따라가야 할 때도 자식 색인은 한 번만 만든다. */
+/**
+ * 여러 작업에 같은 변경을 적용한다. 하위 작업을 따라가야 할 때도 자식 색인은 한 번만 만든다.
+ * 부모를 옮기면 하위 작업까지 함께 쓰는데, 나중 변경이 이기므로 얕은 쪽(조상)을 먼저 둔다.
+ * 그러지 않으면 부모가 만든 "하위 작업 복사본"이 함께 고른 자식의 변경을 덮어쓴다.
+ */
 export function patchTasks(state: EntityState, ids: readonly ID[], patch: Partial<Task>, nowMs: number): ChangeSet {
   const getIndex = lazyChildrenIndex(state)
-  return mergeChangeSets(...ids.map((id) => patchWith(state, id, patch, nowMs, getIndex)))
+  const ordered = [...ids].sort((a, b) => depthOf(state, a) - depthOf(state, b))
+  return mergeChangeSets(...ordered.map((id) => patchWith(state, id, patch, nowMs, getIndex)))
+}
+
+/** 부모를 따라 올라간 깊이. 끊긴 참조나 순환이 있어도 멈춘다. */
+function depthOf(state: EntityState, id: ID): number {
+  let depth = 0
+  let cursor = state.tasks[id]?.parentId ?? null
+  const seen = new Set<ID>([id])
+  while (cursor !== null && !seen.has(cursor)) {
+    seen.add(cursor)
+    depth += 1
+    cursor = state.tasks[cursor]?.parentId ?? null
+  }
+  return depth
 }
 
 /** 완료. 반복 작업은 다음 회차로 넘기고, 이번 회차는 완료 기록(복제본)으로 남겨 통계에 잡히게 한다. */
@@ -164,19 +182,40 @@ export function restoreTask(state: EntityState, id: ID, nowMs: number): ChangeSe
   return putTasks(restored, { puts: { activity: [log] }, deletes: {} })
 }
 
-/** 영구 삭제: 작업, 하위 작업, 댓글을 모두 지운다. */
-export function purgeTasks(state: EntityState, ids: readonly ID[]): ChangeSet {
+/**
+ * 영구 삭제: 작업, 휴지통에 있는 하위 작업, 댓글을 지운다.
+ * 휴지통에 없는(되살려 둔) 하위 작업은 지우지 않고 최상위로 올려 살려 둔다.
+ * 부모만 지웠다고 멀쩡한 하위 작업이 함께 사라지면 되돌릴 방법이 없다.
+ */
+export function purgeTasks(state: EntityState, ids: readonly ID[], nowMs?: number): ChangeSet {
   if (ids.length === 0) return EMPTY_CHANGES
   const doomed = new Set<ID>()
+  const rescued = new Map<ID, Task>()
   const index = childrenIndex(state.tasks)
+
+  const walk = (parentId: ID): void => {
+    for (const child of index.get(parentId) ?? []) {
+      if (doomed.has(child.id) || rescued.has(child.id)) continue
+      if (child.deletedAt === null) {
+        rescued.set(child.id, { ...child, parentId: null, updatedAt: nowMs ?? child.updatedAt })
+        continue // 살아 있는 하위 작업 아래는 그대로 둔다
+      }
+      doomed.add(child.id)
+      walk(child.id)
+    }
+  }
+
   for (const id of ids) {
-    if (!state.tasks[id]) continue
+    if (!state.tasks[id] || doomed.has(id)) continue
     doomed.add(id)
-    for (const t of descendantsFrom(index, id)) doomed.add(t.id)
+    rescued.delete(id)
+    walk(id)
   }
   if (doomed.size === 0) return EMPTY_CHANGES
+
   const comments = Object.values(state.comments).filter((c) => doomed.has(c.taskId)).map((c) => c.id)
-  return { puts: {}, deletes: { tasks: [...doomed], comments } }
+  const puts = rescued.size > 0 ? { tasks: [...rescued.values()] } : {}
+  return { puts, deletes: { tasks: [...doomed], comments } }
 }
 
 export function emptyTrash(state: EntityState): ChangeSet {
@@ -190,7 +229,7 @@ export function purgeExpiredTrash(state: EntityState, nowMs: number, keepDays = 
   const ids = Object.values(state.tasks)
     .filter((t) => t.deletedAt !== null && t.deletedAt < limit)
     .map((t) => t.id)
-  return purgeTasks(state, ids)
+  return purgeTasks(state, ids, nowMs)
 }
 
 export function duplicateTask(state: EntityState, id: ID, nowMs: number): { changes: ChangeSet; newId: ID | null } {

@@ -31,23 +31,61 @@ export function useCrossTabSync(): void {
   useEffect(() => {
     if (!syncChannel) return
     let timer: ReturnType<typeof setTimeout> | undefined
+    // 숨은 탭에서는 타이머가 느려지므로, 신호를 받아 둔 뒤 화면으로 돌아올 때 다시 읽는다.
+    let missed = false
+    let warnedUnsaved = false
+
     const tryReload = (attempt: number) => {
-      const { pendingWrites, ready } = useApp.getState()
+      const { pendingWrites, ready, persistError } = useApp.getState()
       if (!ready) return
+      // 저장하지 못한 변경이 메모리에만 있다. 다시 읽으면 그 변경이 사라지므로 읽지 않고 알린다.
+      if (persistError !== null) {
+        if (!warnedUnsaved) {
+          warnedUnsaved = true
+          useToasts
+            .getState()
+            .push('다른 탭에서 데이터가 바뀌었어요. 저장하지 못한 변경이 있어 이 탭은 그대로 두었어요. 설정 > 데이터에서 백업한 뒤 새로고침해 주세요.', {
+              ttlMs: 15000,
+              tone: 'error',
+            })
+        }
+        return
+      }
       if (pendingWrites > 0 && attempt < RELOAD_RETRY_LIMIT) {
         timer = setTimeout(() => tryReload(attempt + 1), RELOAD_RETRY_MS)
         return
       }
-      useApp.getState().reload().catch(() => undefined) // 실패는 loadError로 화면에 나온다
+      useApp
+        .getState()
+        .reload()
+        .catch(() => {
+          // 다시 읽기 실패는 화면을 가리지 않는다(이미 쓰던 데이터는 그대로다). 다만 조용히 두면 낡은 화면으로 계속 쓰게 된다.
+          useToasts.getState().push('다른 탭의 변경을 읽지 못했어요. 새로고침해 주세요.', { ttlMs: 12000, tone: 'error' })
+        })
     }
+
     const onMessage = () => {
+      if (typeof document !== 'undefined' && document.hidden) {
+        missed = true
+        return
+      }
       clearTimeout(timer)
       timer = setTimeout(() => tryReload(0), 100)
     }
+
+    const onVisible = () => {
+      if (typeof document !== 'undefined' && document.hidden) return
+      if (!missed) return
+      missed = false
+      tryReload(0)
+    }
+
     syncChannel.addEventListener('message', onMessage)
+    document.addEventListener('visibilitychange', onVisible)
     return () => {
       clearTimeout(timer)
       syncChannel?.removeEventListener('message', onMessage)
+      document.removeEventListener('visibilitychange', onVisible)
     }
   }, [])
 }

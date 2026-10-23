@@ -15,6 +15,8 @@ import './time-grid.css'
 const HOUR_PX = 56
 const STEP = 15
 const MIN_BLOCK = 15
+/** 이만큼은 움직여야 끌기로 본다. 누르는 순간의 손떨림을 '일정 이동'으로 기록하지 않기 위한 값이다. */
+const DRAG_THRESHOLD_PX = 4
 const HOURS = Array.from({ length: 24 }, (_, h) => h)
 
 interface TimeGridProps {
@@ -81,11 +83,15 @@ export function TimeGrid({ days, today, occurrences, defaults }: TimeGridProps) 
     const startMin = minutesOfDay(o.task.startTime as string)
     const dur = blockMinutes(o.task, settings.defaultDurationMin)
     const grabOffset = minutesAtPoint(e.clientY) - startMin
+    const origin = { x: e.clientX, y: e.clientY }
     setDrag({ taskId: o.task.id, mode, date: o.date, start: startMin, duration: dur, moved: false })
 
     const onMove = (ev: PointerEvent) => {
       const cur = dragRef.current
       if (!cur) return
+      // 임계값을 넘기 전에는 아직 누르기로 본다. 1px 움직임이 끌기로 기록되는 것을 막는다.
+      const far = Math.hypot(ev.clientX - origin.x, ev.clientY - origin.y) >= DRAG_THRESHOLD_PX
+      if (!cur.moved && !far) return
       if (mode === 'move') {
         const date = dateAtPoint(ev.clientX) ?? cur.date
         const start = clampMinutes(snapMinutes(minutesAtPoint(ev.clientY) - grabOffset, STEP))
@@ -103,7 +109,13 @@ export function TimeGrid({ days, today, occurrences, defaults }: TimeGridProps) 
       setDrag(null)
       if (!final) return
       if (!final.moved) return open(final.taskId)
-      actions.patch(final.taskId, { startDate: final.date, startTime: timeFromMinutes(final.start), durationMin: final.duration }, '일정 이동')
+      // 끌었다가 제자리로 돌아왔으면 아무것도 바꾸지 않는다. 안 바뀐 값을 쓰면 실행 취소 항목만 쌓인다.
+      const patch: Partial<Task> = {}
+      if (final.date !== o.date) patch.startDate = final.date
+      if (final.start !== startMin) patch.startTime = timeFromMinutes(final.start)
+      if (final.duration !== dur) patch.durationMin = final.duration
+      if (Object.keys(patch).length === 0) return
+      actions.patch(final.taskId, patch, '일정 이동')
     }
     target.addEventListener('pointermove', onMove)
     target.addEventListener('pointerup', onUp)

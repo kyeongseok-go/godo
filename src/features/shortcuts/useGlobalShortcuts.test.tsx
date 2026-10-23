@@ -158,6 +158,32 @@ describe('useGlobalShortcuts', () => {
     expect(where()).toBe('/today')
   })
 
+  test('ignores keys the keyboard is auto-repeating while held down', () => {
+    seed('첫째')
+    renderApp(<Screen />, '/today')
+    useUI.setState({ focusedId: 't0' })
+
+    press({ key: 'e' })
+    press({ key: 'e', repeat: true })
+    press({ key: 'e', repeat: true })
+
+    // 한 번만 실행되어야 한다. 반복까지 실행되면 완료 → 다시 열기 → 완료로 흔들린다.
+    expect(status('t0')).toBe('done')
+    expect(useApp.getState().undoStack).toHaveLength(1)
+  })
+
+  test('a held Ctrl+D does not pile up duplicates', () => {
+    seed('첫째')
+    renderApp(<Screen />, '/today')
+    useUI.setState({ focusedId: 't0' })
+
+    press({ key: 'd', ctrlKey: true })
+    press({ key: 'd', ctrlKey: true, repeat: true })
+    press({ key: 'd', ctrlKey: true, repeat: true })
+
+    expect(Object.keys(useApp.getState().entities.tasks)).toHaveLength(2)
+  })
+
   test('retries the last key on its own after a wrong sequence', async () => {
     const user = userEvent.setup()
     renderApp(<Screen />, '/today')

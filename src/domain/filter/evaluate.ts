@@ -79,6 +79,8 @@ function evalDate(node: NodeOf<'date'>, task: Task, rt: Runtime): boolean {
   const value = fieldDate(node.field, task)
   if (value === null) return false
   const target = rt.resolveDate(node.value)
+  // 지정한 날짜가 그 해에 없으면 어떤 작업도 맞지 않는다
+  if (target === null) return false
   const order = compareDate(value, target)
   if (node.op === 'on') return order === 0
   return node.op === 'before' ? order < 0 : order > 0

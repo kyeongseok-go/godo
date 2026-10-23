@@ -136,7 +136,7 @@ function ProjectForm({ target, onClose }: { target: EntityDialogTarget; onClose:
       >
         <label className="ed__field">
           <span>이름</span>
-          <input autoFocus value={name} onChange={(e) => setName(e.target.value)} placeholder="예) 사이드 프로젝트" />
+          <input autoFocus data-autofocus value={name} onChange={(e) => setName(e.target.value)} placeholder="예) 사이드 프로젝트" />
         </label>
         <div className="ed__field">
           <span>색</span>
@@ -214,7 +214,7 @@ function LabelForm({ target, onClose }: { target: EntityDialogTarget; onClose: (
       <form className="ed__form" onSubmit={(e) => { e.preventDefault(); save() }}>
         <label className="ed__field">
           <span>이름</span>
-          <input autoFocus value={name} onChange={(e) => setName(e.target.value)} placeholder="예) 집중필요" />
+          <input autoFocus data-autofocus value={name} onChange={(e) => setName(e.target.value)} placeholder="예) 집중필요" />
         </label>
         {duplicate ? <p className="ed__error">같은 이름의 라벨이 있어요</p> : null}
         <div className="ed__field">
@@ -275,7 +275,7 @@ function FilterForm({ target, onClose }: { target: EntityDialogTarget; onClose: 
       <form className="ed__form" onSubmit={(e) => { e.preventDefault(); save() }}>
         <label className="ed__field">
           <span>이름</span>
-          <input autoFocus value={name} onChange={(e) => setName(e.target.value)} placeholder="예) 이번 주 급한 일" />
+          <input autoFocus data-autofocus value={name} onChange={(e) => setName(e.target.value)} placeholder="예) 이번 주 급한 일" />
         </label>
         <label className="ed__field">
           <span>조건</span>

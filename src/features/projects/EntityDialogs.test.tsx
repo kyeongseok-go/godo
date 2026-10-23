@@ -6,18 +6,12 @@ import { useUI } from '../../store/ui'
 import type { EntityDialogTarget } from '../../store/ui'
 import { useToasts } from '../../ui/toast'
 import { makeLabel, makeProject, makeTask } from '../../test/factories'
+import { installModalDialogFocusShim } from '../../test/focusShim'
 import { renderApp, resetApp } from '../../test/render'
 import { EntityDialogs } from './EntityDialogs'
 
-// jsdom은 <dialog>의 showModal을 구현하지 않는다.
-beforeAll(() => {
-  HTMLDialogElement.prototype.showModal = function showModal() {
-    this.setAttribute('open', '')
-  }
-  HTMLDialogElement.prototype.close = function close() {
-    this.removeAttribute('open')
-  }
-})
+// jsdom은 <dialog>의 showModal을 구현하지 않는다. 브라우저의 포커스 규칙까지 흉내 내는 셔임을 쓴다.
+installModalDialogFocusShim()
 
 beforeEach(async () => {
   await resetApp()
@@ -46,6 +40,18 @@ function openDialog(target: EntityDialogTarget) {
 
 const nameField = () => screen.findByLabelText('이름')
 const submitButton = (name: '추가' | '저장') => screen.getByRole('button', { name })
+
+describe.each([
+  ['project', { kind: 'project' } as EntityDialogTarget],
+  ['label', { kind: 'label' } as EntityDialogTarget],
+  ['filter', { kind: 'filter' } as EntityDialogTarget],
+])('%s dialog focus', (_kind, target) => {
+  test('starts with the keyboard in the name field instead of the close button', async () => {
+    openDialog(target)
+
+    expect(await nameField()).toHaveFocus()
+  })
+})
 
 describe('project dialog', () => {
   test('cannot be submitted without a name', async () => {

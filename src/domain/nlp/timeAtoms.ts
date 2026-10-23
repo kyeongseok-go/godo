@@ -69,14 +69,20 @@ export function atomAt(text: string, pos: number): RawAtom | null {
 
 function hourWithMarker(h: number, marker: Marker): number | null {
   switch (marker) {
+    // 오전·새벽 12시는 관례대로 자정
     case '오전':
-    case '아침':
     case '새벽':
       return h >= 1 && h <= 12 ? h % 12 : h === 0 ? 0 : null
+    // 아침 12시는 자정이 아니라 정오로 읽는다
+    case '아침':
+      if (h === 12) return 12
+      return h >= 1 && h <= 11 ? h : h === 0 ? 0 : null
     case '오후':
       return h >= 1 && h <= 11 ? h + 12 : h === 12 ? 12 : null
+    // 저녁 12시는 정오가 아니라 자정으로 읽는다
     case '저녁':
-      return h >= 1 && h <= 11 ? h + 12 : h === 12 ? 12 : null
+      if (h === 12) return 0
+      return h >= 1 && h <= 11 ? h + 12 : null
     case '밤':
       if (h >= 1 && h <= 5) return h
       if (h >= 6 && h <= 11) return h + 12

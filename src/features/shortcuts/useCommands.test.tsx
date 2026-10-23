@@ -73,6 +73,30 @@ describe('useCommands through the keyboard', () => {
     expect(lastToast()).toBe('먼저 할 일을 선택해 주세요 (J/K로 이동)')
   })
 
+  test('falls back to the task open in the detail panel when no row has focus', async () => {
+    const user = userEvent.setup()
+    seed({}, {})
+    renderApp(<Screen />, '/inbox?task=t1')
+
+    await user.keyboard('e')
+
+    await waitFor(() => expect(task('t1').status).toBe('done'))
+    expect(task('t0').status).toBe('todo')
+    expect(lastToast()).not.toBe('먼저 할 일을 선택해 주세요 (J/K로 이동)')
+  })
+
+  test('the focused row still wins over the task open in the detail panel', async () => {
+    const user = userEvent.setup()
+    seed({}, {})
+    renderApp(<Screen />, '/inbox?task=t1')
+
+    row('할 일 0').focus()
+    await user.keyboard('e')
+
+    await waitFor(() => expect(task('t0').status).toBe('done'))
+    expect(task('t1').status).toBe('todo')
+  })
+
   test('S T, S M, S W and S X set today, tomorrow, next week and clear the date', async () => {
     const user = userEvent.setup()
     seed({ startDate: '2020-01-01', startTime: '09:30' })

@@ -14,9 +14,16 @@ function byLengthDesc<T extends Named>(items: readonly T[]): T[] {
   return [...items].sort((a, b) => b.name.length - a.name.length)
 }
 
+/** 이름이 끝난 자리가 경계인지. 글자·숫자가 이어지면 더 긴 단어이므로 이름이 아니다. */
+function endsAtBoundary(text: string, end: number): boolean {
+  const next = text[end]
+  return next === undefined || !/[\p{L}\p{N}_]/u.test(next)
+}
+
 /**
  * '#' 또는 '/' 바로 뒤의 이름을 읽는다. 따옴표면 닫는 따옴표까지 정확히 일치,
  * 아니면 이름이 입력 앞부분과 일치하는 것 중 가장 긴 것(공백 포함 이름 허용).
+ * 이름 뒤는 공백·문자열 끝·기호 같은 경계여야 한다('#Workshop'이 'Work'로 잘리지 않게).
  */
 function resolveNamed<T extends Named>(
   text: string,
@@ -33,7 +40,12 @@ function resolveNamed<T extends Named>(
     return item ? { item, end: closeAt + 1 } : null
   }
   const rest = text.slice(afterSymbol).toLowerCase()
-  const item = byLengthDesc(candidates).find((c) => c.name !== '' && rest.startsWith(c.name.toLowerCase()))
+  const item = byLengthDesc(candidates).find(
+    (c) =>
+      c.name !== '' &&
+      rest.startsWith(c.name.toLowerCase()) &&
+      endsAtBoundary(text, afterSymbol + c.name.length),
+  )
   return item ? { item, end: afterSymbol + item.name.length } : null
 }
 

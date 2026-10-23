@@ -9,6 +9,7 @@ import { useToasts } from '../../ui/toast'
 import { analyzeImportText, checkImportSize } from './analyzeImport'
 import type { ImportPlan } from './analyzeImport'
 import { csvProjectName } from './format'
+import { describeApplyFailure, syncAfterApply } from './applyResult'
 import { buildCsvImportData, importAppData } from './importer'
 
 const PROJECT_ORDER_STEP = 1000
@@ -56,7 +57,8 @@ async function runImport(plan: ImportPlan, mode: MergeMode, csvName: string): Pr
   const nowMs = Date.now()
   const effectiveMode: MergeMode = plan.kind === 'csv' ? 'merge' : mode
   const summary = await importAppData(db, buildImportData(plan, csvName, nowMs), effectiveMode, { nowMs, newId })
-  await useApp.getState().reload()
+  // 여기까지 오면 DB 는 이미 바뀌었다. 다른 탭에 알리고 이 탭도 다시 읽는다.
+  await syncAfterApply()
   if (plan.kind === 'csv') return `할 일 ${plan.parsed.tasks.length}개를 새 프로젝트로 가져왔어요`
   if (effectiveMode === 'replace') return '백업 내용으로 바꿨어요'
   return `새 항목 ${summary.added}개를 더하고 ${summary.updated}개를 갱신했어요`
@@ -120,7 +122,7 @@ export function useImportFlow(onApplied: () => void): ImportFlow {
       onApplied()
     } catch (e: unknown) {
       setConfirmingReplace(false)
-      setError(`가져오지 못했어요. 데이터는 그대로예요. (${describe(e)})`)
+      setError(describeApplyFailure(e, '가져오기'))
     } finally {
       setBusy(false)
     }

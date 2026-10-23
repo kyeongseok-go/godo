@@ -39,9 +39,16 @@ describe('applyImport replace', () => {
     expect(result.updated).toBe(1)
   })
 
-  it('replaces settings even when incoming has none', () => {
+  // 백업에 설정이 없다고 지금 설정까지 버리면, 테마·시간대·단축키가 조용히 기본값으로 돌아간다
+  it('설정이 없는 백업으로 덮어써도 지금 설정은 지킨다', () => {
     const current = data({ settings: settings('#111') })
-    expect(applyImport(current, data(), 'replace').data.settings).toBeNull()
+    expect(applyImport(current, data(), 'replace').data.settings).toEqual(settings('#111'))
+  })
+
+  it('백업에 설정이 있으면 그것으로 바꾼다', () => {
+    const current = data({ settings: settings('#111') })
+    const incoming = data({ settings: settings('#222') })
+    expect(applyImport(current, incoming, 'replace').data.settings).toEqual(settings('#222'))
   })
 
   it('keeps tasks that are in the trash', () => {
@@ -227,5 +234,45 @@ describe('applyImport reference integrity', () => {
     const current = data({ tasks: [makeTask({ id: 'p' })] })
     const incoming = data({ tasks: [makeTask({ id: 'c', parentId: 'p' })] })
     expect(applyImport(current, incoming, 'merge').data.tasks.find((t) => t.id === 'c')?.parentId).toBe('p')
+  })
+})
+
+describe('applyImport 참조 복구', () => {
+  it('자기 자신을 막는 작업은 막힘을 비운다', () => {
+    const incoming = data({ tasks: [makeTask({ id: 'a', blockedBy: ['a'] })] })
+    expect(applyImport(data(), incoming, 'replace').data.tasks[0].blockedBy).toEqual([])
+  })
+
+  it('사라진 작업을 가리키는 막힘은 걷어낸다', () => {
+    const incoming = data({ tasks: [makeTask({ id: 'a', blockedBy: ['gone', 'b'] }), makeTask({ id: 'b' })] })
+    expect(applyImport(data(), incoming, 'replace').data.tasks[0].blockedBy).toEqual(['b'])
+  })
+
+  it('서로 막는 순환은 한쪽만 남겨 둘 다 영원히 막히지 않게 한다', () => {
+    const incoming = data({
+      tasks: [makeTask({ id: 'b', blockedBy: ['c'] }), makeTask({ id: 'c', blockedBy: ['b'] })],
+    })
+    const tasks = applyImport(data(), incoming, 'replace').data.tasks
+    expect(tasks.find((t) => t.id === 'b')?.blockedBy).toEqual(['c'])
+    expect(tasks.find((t) => t.id === 'c')?.blockedBy).toEqual([])
+  })
+
+  it('정상적인 막힘은 그대로 둔다', () => {
+    const incoming = data({ tasks: [makeTask({ id: 'a', blockedBy: ['b'] }), makeTask({ id: 'b' })] })
+    expect(applyImport(data(), incoming, 'replace').data.tasks[0].blockedBy).toEqual(['b'])
+  })
+
+  it('프로젝트끼리의 순환을 끊어 사이드바에서 사라지지 않게 한다', () => {
+    const incoming = data({
+      projects: [makeProject({ id: 'p1', parentId: 'p2' }), makeProject({ id: 'p2', parentId: 'p1' })],
+    })
+    const projects = applyImport(data(), incoming, 'replace').data.projects
+    expect(projects.find((p) => p.id === 'p1')?.parentId).toBeNull()
+    expect(projects.find((p) => p.id === 'p2')?.parentId).toBe('p1')
+  })
+
+  it('사라진 상위 프로젝트를 가리키면 최상위로 올린다', () => {
+    const incoming = data({ projects: [makeProject({ id: 'p1', parentId: 'gone' })] })
+    expect(applyImport(data(), incoming, 'replace').data.projects[0].parentId).toBeNull()
   })
 })

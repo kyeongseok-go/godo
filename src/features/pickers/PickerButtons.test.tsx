@@ -4,8 +4,11 @@ import { useState } from 'react'
 import type { ID, Priority } from '../../domain/types'
 import { useApp } from '../../store/app'
 import { makeLabel, makeProject, makeSection } from '../../test/factories'
+import { installHiddenPanelFocusShim } from '../../test/focusShim'
 import { renderApp, resetApp } from '../../test/render'
 import { LabelButton, PriorityButton, ProjectButton } from './PickerButtons'
+
+installHiddenPanelFocusShim()
 
 beforeEach(async () => {
   await resetApp()
@@ -126,6 +129,15 @@ describe('LabelButton', () => {
         makeLabel({ id: 'l3', name: 'Work', order: 3 }),
       ],
     })
+  })
+
+  test('puts the keyboard in the search box as soon as the popover is up', async () => {
+    const user = userEvent.setup()
+    renderApp(<Harness />)
+
+    const search = await openPicker(user)
+
+    expect(search).toHaveFocus()
   })
 
   test('toggles labels with the checkboxes and names them on the button', async () => {

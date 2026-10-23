@@ -298,3 +298,37 @@ describe('summarizeProductivity: streaks', () => {
     expect(s.longestStreak).toBe(0)
   })
 })
+
+describe('하루 시작 시각(dayStartHour)', () => {
+  it('새벽에 끝낸 일을 전날 몫으로 센다', () => {
+    // 2026-10-24 02:00 에 완료. dayStartHour=4 면 아직 10-23 이다.
+    const completedAt = new Date(2026, 9, 24, 2, 0).getTime()
+    const tasks = [makeTask({ status: 'done', completedAt })]
+    const input = {
+      tasks,
+      weekStartsOn: 1 as const,
+      settings: { karmaEnabled: true, dailyGoal: 1, weeklyGoal: 5, daysOff: [], vacationMode: false },
+      seriesDays: 3,
+    }
+
+    const shifted = summarizeProductivity({ ...input, today: '2026-10-23', dayStartHour: 4 })
+    const plain = summarizeProductivity({ ...input, today: '2026-10-24', dayStartHour: 0 })
+
+    expect(shifted.todayDone).toBe(1)
+    expect(shifted.series.at(-1)).toEqual({ date: '2026-10-23', done: 1 })
+    expect(plain.todayDone).toBe(1)
+  })
+
+  it('설정을 주지 않으면 달력 날짜 그대로 센다', () => {
+    const completedAt = new Date(2026, 9, 24, 2, 0).getTime()
+    const summary = summarizeProductivity({
+      tasks: [makeTask({ status: 'done', completedAt })],
+      today: '2026-10-24',
+      weekStartsOn: 1,
+      settings: { karmaEnabled: true, dailyGoal: 1, weeklyGoal: 5, daysOff: [], vacationMode: false },
+      seriesDays: 3,
+    })
+
+    expect(summary.todayDone).toBe(1)
+  })
+})

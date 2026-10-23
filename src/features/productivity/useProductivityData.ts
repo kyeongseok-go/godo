@@ -19,12 +19,20 @@ export interface ProductivityData {
 export function useProductivityData(): ProductivityData {
   const tasks = useTable('tasks')
   const projects = useTable('projects')
-  const { weekStartsOn, productivity } = useSettings()
+  const { weekStartsOn, productivity, dayStartHour } = useSettings()
   const today = useToday()
 
   const summary = useMemo(
-    () => summarizeProductivity({ tasks, today, weekStartsOn, settings: productivity, seriesDays: WINDOW_DAYS }),
-    [tasks, today, weekStartsOn, productivity],
+    () =>
+      summarizeProductivity({
+        tasks,
+        today,
+        weekStartsOn,
+        settings: productivity,
+        seriesDays: WINDOW_DAYS,
+        dayStartHour,
+      }),
+    [tasks, today, weekStartsOn, productivity, dayStartHour],
   )
   const distribution = useMemo(
     () => projectDistribution({ tasks, projects, from: addDays(today, -(WINDOW_DAYS - 1)), to: today }),

@@ -72,6 +72,26 @@ export function snoozeReminder(state: ReminderState, key: string, until: number)
   return { ...state, snoozed: { ...state.snoozed, [baseKey(key)]: until } }
 }
 
+/**
+ * 두 처리 상태를 합친다. 같은 key 는 늦은 시각이 이긴다.
+ * 다른 탭이 먼저 울려 기록한 것을 덮어쓰지 않고, 저장이 막혔을 때 메모리 기록이 사라지지 않게 하려는 것이다.
+ */
+export function mergeStates(a: ReminderState, b: ReminderState): ReminderState {
+  const union = (
+    left: Readonly<Record<string, number>>,
+    right: Readonly<Record<string, number>>,
+  ): Record<string, number> => {
+    const out: Record<string, number> = { ...left }
+    for (const [key, at] of Object.entries(right)) out[key] = Math.max(out[key] ?? at, at)
+    return out
+  }
+  return {
+    lastCheck: Math.max(a.lastCheck, b.lastCheck),
+    fired: union(a.fired, b.fired),
+    snoozed: union(a.snoozed, b.snoozed),
+  }
+}
+
 export function pruneState(state: ReminderState, now: number): ReminderState {
   const cutoff = now - RETENTION_MS
   const keep = (record: Readonly<Record<string, number>>): Record<string, number> =>

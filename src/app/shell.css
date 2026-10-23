@@ -46,17 +46,21 @@
     grid-template-columns: minmax(0, 1fr);
   }
 
+  /* 화면 밖으로 밀어 둔 서랍은 visibility 로도 숨긴다. transform 만 쓰면 Tab 으로 잡힌다.
+     전환 대상에 visibility 를 넣어 닫히는 동안에는 보이게 남겨 둔다. */
   .shell__sidebar {
     position: fixed;
     inset: 0 auto 0 0;
     width: min(20rem, 86vw);
     transform: translateX(-100%);
-    transition: transform var(--duration-normal) var(--ease-out);
+    visibility: hidden;
+    transition: transform var(--duration-normal) var(--ease-out), visibility var(--duration-normal);
     box-shadow: var(--shadow-float);
   }
 
   .shell__sidebar[data-open='true'] {
     transform: none;
+    visibility: visible;
   }
 
   .shell__scrim {

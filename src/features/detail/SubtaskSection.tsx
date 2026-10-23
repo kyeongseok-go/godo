@@ -65,6 +65,11 @@ export function SubtaskSection({ parent, allTasks }: SubtaskSectionProps) {
               e.preventDefault()
               add()
             }
+            // 쓰던 하위 작업이 있으면 Esc 는 그 글만 버린다. 상세 패널까지 닫히면 쓴 내용이 통째로 사라진다.
+            if (e.key === 'Escape' && text !== '') {
+              e.stopPropagation()
+              setText('')
+            }
           }}
         />
       </div>

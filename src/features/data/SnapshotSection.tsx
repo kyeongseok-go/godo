@@ -6,6 +6,7 @@ import { useToasts } from '../../ui/toast'
 import { ConfirmDialog } from '../settings/ConfirmDialog'
 import { Group } from '../settings/fields'
 import { collectAppData } from './appData'
+import { describeApplyFailure, syncAfterApply } from './applyResult'
 import { formatBytes, formatSnapshotTime } from './format'
 import { restoreSnapshot } from './importer'
 import { createSnapshot, listSnapshots, pruneSnapshots } from './snapshots'
@@ -47,13 +48,13 @@ function useSnapshotActions(refresh: () => void) {
   const [error, setError] = useState<string | null>(null)
   const [restoring, setRestoring] = useState<SnapshotInfo | null>(null)
 
-  const run = async (task: () => Promise<void>, failure: string): Promise<void> => {
+  const run = async (task: () => Promise<void>, whatFailed: string): Promise<void> => {
     setBusy(true)
     setError(null)
     try {
       await task()
     } catch (e: unknown) {
-      setError(`${failure} (${describe(e)})`)
+      setError(describeApplyFailure(e, whatFailed))
     } finally {
       setBusy(false)
       refresh()
@@ -66,7 +67,7 @@ function useSnapshotActions(refresh: () => void) {
       await createSnapshot(db, collectAppData(useApp.getState()), nowMs, newId())
       await pruneSnapshots(db, nowMs)
       useToasts.getState().push('스냅샷을 만들었어요')
-    }, '스냅샷을 만들지 못했어요.')
+    }, '스냅샷 만들기')
 
   const restore = async (): Promise<void> => {
     if (!restoring) return
@@ -74,9 +75,11 @@ function useSnapshotActions(refresh: () => void) {
     await run(async () => {
       const result = await restoreSnapshot(db, target.id, { nowMs: Date.now(), newId })
       if (!result.ok) return setError(result.error)
-      await useApp.getState().reload()
-      useToasts.getState().push('스냅샷 시점으로 복원했어요')
-    }, '복원하지 못했어요. 데이터는 그대로예요.')
+      await syncAfterApply()
+      // 검증에서 걸러진 항목이 있으면 숨기지 않고 알려 준다(복원본에 그만큼이 빠져 있다)
+      const skipped = result.warnings.length > 0 ? ` (${result.warnings.join(' · ')})` : ''
+      useToasts.getState().push(`스냅샷 시점으로 복원했어요${skipped}`, result.warnings.length > 0 ? { ttlMs: 12000 } : undefined)
+    }, '복원')
     setRestoring(null)
   }
 

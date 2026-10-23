@@ -56,7 +56,8 @@ export function DependencySection({ task, allTasks, onChange }: DependencySectio
       </ul>
       <Popover open={open} anchorRef={ref} onClose={() => setOpen(false)} label="먼저 끝나야 할 일 선택">
         <div className="label-pop">
-          <input autoFocus placeholder="할 일 검색" value={query} onChange={(e) => setQuery(e.target.value)} />
+          {/* 팝오버가 보이게 된 뒤 포커스를 받는다(autoFocus 는 그 전에 불려 무시된다). */}
+          <input data-autofocus placeholder="할 일 검색" value={query} onChange={(e) => setQuery(e.target.value)} />
           <ul>
             {candidates.map((c) => (
               <li key={c.id}>

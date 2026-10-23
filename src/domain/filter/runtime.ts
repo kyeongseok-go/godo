@@ -14,7 +14,8 @@ export interface StatusWants {
 
 export interface Runtime {
   readonly today: ISODate
-  resolveDate(expr: DateExpr): ISODate
+  /** 그 해에 없는 날짜(평년 2월 29일)면 null */
+  resolveDate(expr: DateExpr): ISODate | null
   windowBounds(node: NodeOf<'dateWindow'>): readonly [ISODate, ISODate]
   projectIds(node: NodeOf<'project'>): ReadonlySet<ID>
   sectionIds(node: NodeOf<'section'>): ReadonlySet<ID>

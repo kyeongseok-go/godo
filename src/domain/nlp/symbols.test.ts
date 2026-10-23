@@ -35,6 +35,23 @@ describe('project symbol (#)', () => {
     expect(r.title).toBe('정리')
   })
 
+  test('이름이 더 긴 단어의 앞부분만 잘라 쓰지 않는다', () => {
+    const r = parse('#Workshop prep')
+    expect(r.projectId).toBeNull()
+    expect(r.title).toBe('#Workshop prep')
+    expect(r.tokens).toEqual([])
+    const ko = parse('#업무회의 준비')
+    expect(ko.projectId).toBeNull()
+    expect(ko.title).toBe('#업무회의 준비')
+  })
+
+  test('이름 뒤가 공백·끝·기호일 때는 그대로 일치한다', () => {
+    expect(parse('#업무 정리').projectId).toBe('p-work')
+    expect(parse('정리 #업무').projectId).toBe('p-work')
+    expect(parse('정리 #업무, 급함').projectId).toBe('p-work')
+    expect(parse('#업무/계획 정리').projectId).toBe('p-work')
+  })
+
   test('ignores an unknown project and keeps it in the title', () => {
     const r = parse('메모 #없는곳')
     expect(r.projectId).toBeNull()
@@ -78,6 +95,13 @@ describe('section symbol (/)', () => {
     const r = parse('#개인 /진행 일')
     expect(r.projectId).toBe('p-home')
     expect(r.sectionId).toBe('s-work-doing')
+  })
+
+  test('섹션 이름도 경계까지 맞아야 한다', () => {
+    const r = parse('/계획표 작성')
+    expect(r.sectionId).toBeNull()
+    expect(r.projectId).toBeNull()
+    expect(r.title).toBe('/계획표 작성')
   })
 
   test('ignores unknown sections and keeps them in the title', () => {

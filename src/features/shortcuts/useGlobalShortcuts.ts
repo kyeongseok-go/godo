@@ -24,6 +24,8 @@ export function useGlobalShortcuts(): void {
     }
 
     const onKeyDown = (e: KeyboardEvent) => {
+      // 키를 누르고 있으면 같은 keydown 이 계속 온다. 명령을 여러 번 실행하지 않도록 자동 반복은 버린다.
+      if (e.repeat) return
       const token = normalizeKey(e, IS_MAC)
       if (!token) return
 

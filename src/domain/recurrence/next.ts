@@ -1,6 +1,6 @@
 // 다음 회차 계산: 규칙 한 걸음(steps.ts) 위에 앵커·종료·건너뛰기·밀린 반복 처리를 얹는다.
 import type { ISODate, RecurrenceRule } from '../types'
-import { completionBase, stepDue } from './steps'
+import { completionBase, stepDue, withMonthDayAnchor } from './steps'
 
 /** 건너뛴 날짜·밀린 회차를 따라가는 최대 걸음 수(무한 루프 방지). */
 const MAX_STEPS = 1000
@@ -47,7 +47,9 @@ export function findNextAfter(
  * 'completion'은 completedOn에서 interval만큼 더한 날을 쓴다. 시리즈가 끝났으면 null.
  */
 export function nextOccurrence(rule: RecurrenceRule, from: ISODate, completedOn: ISODate): ISODate | null {
-  const counted: RecurrenceRule = { ...rule, doneCount: (rule.doneCount ?? 0) + 1 }
-  const first = rule.anchor === 'completion' ? completionBase(rule, completedOn) : stepDue(rule, from)
+  // 기준 일을 from 에서 박아 둔다. 그래야 짧은 달에 밀린 날짜가 다음 달에 원래 일로 돌아온다.
+  const anchored = withMonthDayAnchor(rule, from)
+  const counted: RecurrenceRule = { ...anchored, doneCount: (anchored.doneCount ?? 0) + 1 }
+  const first = anchored.anchor === 'completion' ? completionBase(anchored, completedOn) : stepDue(anchored, from)
   return findNextAfter(counted, first, completedOn)
 }

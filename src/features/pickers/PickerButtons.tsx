@@ -139,7 +139,8 @@ export function LabelButton({ labelIds, onChange, variant = 'chip' }: LabelButto
       <Popover open={open} anchorRef={ref} onClose={() => setOpen(false)} label="라벨 선택">
         <div className="label-pop">
           <input
-            autoFocus
+            // 팝오버가 보이게 된 뒤 포커스를 받는다(autoFocus 는 그 전에 불려 무시된다).
+            data-autofocus
             placeholder="라벨 검색 또는 새로 만들기"
             value={query}
             onChange={(e) => setQuery(e.target.value)}

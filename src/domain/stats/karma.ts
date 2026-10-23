@@ -60,12 +60,12 @@ export function karmaLevelFor(points: number): {
   return { level: KARMA_LEVELS[levelIndex].name, levelIndex, nextLevelAt: next ? next.min : null }
 }
 
-function pointsFor(tasks: readonly Task[], today: ISODate): number {
+function pointsFor(tasks: readonly Task[], today: ISODate, dayStartHour: number): number {
   let total = 0
   for (const task of tasks) {
     if (isCompletedTask(task)) {
       total += BASE_POINTS + PRIORITY_BONUS[task.priority]
-      if (task.dueDate !== null && localDateOf(task.completedAt) <= task.dueDate) total += ON_TIME_BONUS
+      if (task.dueDate !== null && localDateOf(task.completedAt, dayStartHour) <= task.dueDate) total += ON_TIME_BONUS
     } else if (
       isOpenTask(task) &&
       task.dueDate !== null &&
@@ -77,11 +77,11 @@ function pointsFor(tasks: readonly Task[], today: ISODate): number {
   return Math.max(0, total)
 }
 
-function countByDate(tasks: readonly Task[]): Map<ISODate, number> {
+function countByDate(tasks: readonly Task[], dayStartHour: number): Map<ISODate, number> {
   const counts = new Map<ISODate, number>()
   for (const task of tasks) {
     if (!isCompletedTask(task)) continue
-    const date = localDateOf(task.completedAt)
+    const date = localDateOf(task.completedAt, dayStartHour)
     counts.set(date, (counts.get(date) ?? 0) + 1)
   }
   return counts
@@ -120,9 +120,11 @@ export function summarizeProductivity(input: {
   weekStartsOn: 0 | 1
   settings: ProductivitySettings
   seriesDays: number
+  /** 하루 시작 시각(설정). 오늘 날짜(today)와 같은 기준으로 집계해야 한다 */
+  dayStartHour?: number
 }): KarmaSummary {
-  const { tasks, today, weekStartsOn, settings, seriesDays } = input
-  const counts = countByDate(tasks)
+  const { tasks, today, weekStartsOn, settings, seriesDays, dayStartHour = 0 } = input
+  const counts = countByDate(tasks, dayStartHour)
   const dailyGoal = Math.max(1, settings.dailyGoal)
   const weeklyGoal = Math.max(1, settings.weeklyGoal)
 
@@ -136,7 +138,7 @@ export function summarizeProductivity(input: {
     vacationMode: settings.vacationMode,
   })
 
-  const points = settings.karmaEnabled ? pointsFor(tasks, today) : 0
+  const points = settings.karmaEnabled ? pointsFor(tasks, today, dayStartHour) : 0
   const levelInfo = settings.karmaEnabled
     ? karmaLevelFor(points)
     : { level: '', levelIndex: 0, nextLevelAt: null }

@@ -14,6 +14,7 @@ const SEPARATOR = /\s*(?:부터|~|-|–|—|(?:to|until|till)(?![A-Za-z]))\s*/iu
 const SHARED_MERIDIEM = /(\d{1,2})(\s*[-–~]\s*)(\d{1,2})\s*(am|pm)(?![A-Za-z0-9])/iy
 const NOT_WORD_AFTER = /(?![\p{L}\p{N}])/uy
 const MINUTES_PER_DAY = 1440
+const HALF_DAY = MINUTES_PER_DAY / 2
 
 function sticky(re: RegExp, text: string, pos: number): RegExpExecArray | null {
   const copy = new RegExp(re.source, re.flags)
@@ -59,8 +60,8 @@ function sharedMeridiemRange(text: string, pos: number): TimeMatch | null {
   const a = resolveAtom({ end: 0, hour: Number(m[1]), minute: 0, marker: null, meridiem: mer, style: 'en' }, null)
   const b = resolveAtom({ end: 0, hour: Number(m[3]), minute: 0, marker: null, meridiem: mer, style: 'en' }, null)
   if (a === null || b === null) return null
-  // "11-1pm"처럼 시작이 끝보다 늦으면 시작은 12시간 앞이다
-  const startMin = b < a && a >= 720 && Number(m[1]) !== 12 ? a - 720 : a
+  // 끝이 시작보다 이르면 시작은 반대쪽 반나절이다: "11-1pm"은 오전 11시, "11-1am"은 밤 11시 시작
+  const startMin = b < a ? (a >= HALF_DAY ? a - HALF_DAY : a + HALF_DAY) : a
   const durationMin = (b - startMin + MINUTES_PER_DAY) % MINUTES_PER_DAY
   if (durationMin === 0) return null
   const timeEnd = pos + m[1].length

@@ -65,10 +65,11 @@ export async function restoreSnapshot(
   db: PaceDB,
   snapshotId: string,
   ctx: ImportContext,
-): Promise<{ ok: true; summary: ImportSummary } | { ok: false; error: string }> {
+): Promise<{ ok: true; summary: ImportSummary; warnings: string[] } | { ok: false; error: string }> {
   const parsed = await readSnapshotData(db, snapshotId)
   if (!parsed.ok) return parsed
-  return { ok: true, summary: await importAppData(db, parsed.value, 'replace', ctx) }
+  // 검증에서 걸러진 항목이 있으면 호출 측이 알려 줘야 한다. 복원본에 그만큼이 빠져 있다.
+  return { ok: true, summary: await importAppData(db, parsed.value, 'replace', ctx), warnings: parsed.warnings }
 }
 
 export interface CsvImportOptions {

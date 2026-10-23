@@ -122,9 +122,10 @@ describe('date semantics (startDate is the due date, dueDate is the deadline)', 
     expect(ids('마감이전: 2026-10-01', ctx)).toEqual([])
   })
 
-  it('clamps a feb 29 month-day to the last day of a non-leap february', () => {
+  it('평년의 2월 29일은 아무 작업과도 맞지 않는다', () => {
     const a = makeTask({ id: 'a', startDate: '2026-02-28' })
-    expect(ids('date: Feb 29', withTasks([a]))).toEqual(['a'])
+    expect(ids('date: Feb 29', withTasks([a]))).toEqual([])
+    expect(ids('date before: Feb 29', withTasks([a]))).toEqual([])
     const leap = makeCtx({ today: '2028-03-01', tasks: [makeTask({ id: 'l', startDate: '2028-02-29' })] })
     expect(ids('date: Feb 29', leap)).toEqual(['l'])
   })

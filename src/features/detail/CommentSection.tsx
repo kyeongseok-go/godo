@@ -60,6 +60,11 @@ export function CommentSection({ taskId }: { taskId: ID }) {
               e.preventDefault()
               add()
             }
+            // 쓰던 댓글이 있으면 Esc 는 그 글만 버린다. 상세 패널까지 닫히면 쓴 내용이 통째로 사라진다.
+            if (e.key === 'Escape' && text !== '') {
+              e.stopPropagation()
+              setText('')
+            }
           }}
         />
         <button type="button" className="icon-btn" aria-label="댓글 등록" disabled={!text.trim()} onClick={add}>

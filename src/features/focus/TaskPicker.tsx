@@ -66,7 +66,8 @@ export function TaskPicker({ taskId, onChange }: TaskPickerProps) {
       <Popover open={open} anchorRef={anchorRef} onClose={close} label="집중할 할 일 선택">
         <form className="focus-picker__pop" onSubmit={submit}>
           <input
-            autoFocus
+            // 팝오버가 보이게 된 뒤 포커스를 받는다(autoFocus 는 그 전에 불려 무시된다).
+            data-autofocus
             type="search"
             aria-label="할 일 검색"
             placeholder="할 일 검색"

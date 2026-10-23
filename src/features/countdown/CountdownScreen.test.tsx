@@ -2,16 +2,14 @@ import { act, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import type { Countdown } from '../../domain/types'
 import { useApp } from '../../store/app'
+import { installModalDialogFocusShim } from '../../test/focusShim'
 import { renderApp, resetApp } from '../../test/render'
 import { CountdownScreen } from './CountdownScreen'
 
+// jsdom은 <dialog>의 showModal을 구현하지 않는다. 브라우저의 포커스 규칙까지 흉내 내는 셔임을 쓴다.
+installModalDialogFocusShim()
+
 beforeAll(() => {
-  HTMLDialogElement.prototype.showModal = function showModal() {
-    this.setAttribute('open', '')
-  }
-  HTMLDialogElement.prototype.close = function close() {
-    this.removeAttribute('open')
-  }
   vi.useFakeTimers({ toFake: ['Date'], now: new Date(2026, 9, 23, 12, 0) })
 })
 
@@ -39,6 +37,15 @@ const seed = (...countdowns: Countdown[]) =>
 const stored = () => Object.values(useApp.getState().entities.countdowns)
 
 describe('CountdownScreen', () => {
+  test('the dialog starts with the keyboard in the name field instead of the close button', async () => {
+    const user = userEvent.setup()
+    renderApp(<CountdownScreen />, '/countdown')
+
+    await user.click(screen.getByRole('button', { name: /생일/ }))
+
+    expect(await screen.findByLabelText('이름')).toHaveFocus()
+  })
+
   test('offers birthday, anniversary and exam examples when empty and opens a prefilled dialog', async () => {
     const user = userEvent.setup()
     renderApp(<CountdownScreen />, '/countdown')

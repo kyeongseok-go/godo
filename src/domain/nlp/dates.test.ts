@@ -69,6 +69,17 @@ describe('Korean weekdays', () => {
     expect(start('다음 월요일')).toBe('2026-10-26')
   })
 
+  test('주를 생략한 지난·다다음 요일도 수식어까지 읽는다', () => {
+    const past = parseQuickAdd('지난 금요일 회의록', ctx)
+    expect(past.startDate).toBe('2026-10-16')
+    expect(past.title).toBe('회의록')
+    const afterNext = parseQuickAdd('다다음 월요일 회의', ctx)
+    expect(afterNext.startDate).toBe('2026-11-02')
+    expect(afterNext.title).toBe('회의')
+    expect(start('저번 금요일 회고')).toBe('2026-10-16')
+    expect(start('담 화요일 회의')).toBe('2026-10-27')
+  })
+
   test('weekend means the coming Saturday, or today during the weekend', () => {
     expect(start('주말 대청소')).toBe('2026-10-24')
     expect(start('이번 주말에 대청소')).toBe('2026-10-24')
@@ -144,6 +155,15 @@ describe('Korean offsets and month days', () => {
     expect(start('이번 달 말일 정산')).toBe('2026-10-31')
   })
 
+  test('0일은 날짜로 읽지 않는다', () => {
+    const r = parseQuickAdd('이번 달 0일 정산', ctx)
+    expect(r.startDate).toBeNull()
+    expect(r.title).toBe('이번 달 0일 정산')
+    expect(start('다음 달 0일 정산')).toBeNull()
+    expect(start('이번 달 32일 정산')).toBeNull()
+    expect(start('이번 달 31일 정산')).toBe('2026-10-31')
+  })
+
   test('month end works in February of a leap year', () => {
     const feb = makeCtx({ today: '2028-02-10', now: new Date(2028, 1, 10, 8, 0) })
     expect(start('월말 정산', feb)).toBe('2028-02-29')
@@ -180,6 +200,25 @@ describe('English dates', () => {
     }
   })
 
+  test('4자리 시각을 연도로 삼지 않는다', () => {
+    const r = parseQuickAdd('Dec 25 1530 meeting', ctx)
+    expect(r.startDate).toBe('2026-12-25')
+    expect(r.title).toBe('1530 meeting')
+    expect(start('call 5 jan 1530')).toBe('2027-01-05')
+  })
+
+  test('현실적인 범위의 연도만 읽는다', () => {
+    expect(start('call jan 5 2028')).toBe('2028-01-05')
+    expect(start('call jan 5 1999')).toBe('1999-01-05')
+    expect(start('call jan 5 2999')).toBe('2999-01-05')
+    expect(start('call jan 5 0930')).toBe('2027-01-05') // 연도가 아니라 시각 꼴이다
+  })
+
+  test('연도 0~99를 1900년대로 바꾸지 않는다', () => {
+    expect(start('0050년 1월 5일 회의')).not.toBe('1950-01-05')
+    expect(start('0050년 1월 5일 회의')).toBe('2027-01-05') // 연도로 못 읽어 월·일만 남는다
+  })
+
   test('reads English mixed into a Korean sentence', () => {
     const r = parseQuickAdd('tomorrow 팀 회의 오후 3시', ctx)
     expect(r.startDate).toBe('2026-10-24')
@@ -209,6 +248,23 @@ describe('deadline phrases', () => {
     expect(parseQuickAdd('보고서 마감일: 12월 1일', ctx).dueDate).toBe('2026-12-01')
     expect(parseQuickAdd('report due friday', ctx).dueDate).toBe('2026-10-30')
     expect(parseQuickAdd('report by tomorrow', ctx).dueDate).toBe('2026-10-24')
+  })
+
+  test('마감기한도 마감으로 읽는다', () => {
+    const r = parseQuickAdd('보고서 마감기한 금요일', ctx)
+    expect(r.dueDate).toBe('2026-10-30')
+    expect(r.startDate).toBeNull()
+    expect(r.title).toBe('보고서')
+    expect(parseQuickAdd('보고서 마감 기한 금요일', ctx).dueDate).toBe('2026-10-30')
+    expect(parseQuickAdd('보고서 기한 금요일', ctx).dueDate).toBe('2026-10-30')
+  })
+
+  test('영어 due·by 뒤의 콜론도 받는다', () => {
+    const r = parseQuickAdd('report due: friday', ctx)
+    expect(r.dueDate).toBe('2026-10-30')
+    expect(r.startDate).toBeNull()
+    expect(r.title).toBe('report')
+    expect(parseQuickAdd('report by: tomorrow', ctx).dueDate).toBe('2026-10-24')
   })
 
   test('keeps a start date and a deadline apart', () => {

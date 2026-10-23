@@ -1,6 +1,7 @@
 import { fireEvent, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { useApp } from '../../store/app'
+import { useOpenTask } from '../../hooks/openTask'
 import { useToasts } from '../../ui/toast'
 import { makeProject, makeTask } from '../../test/factories'
 import { renderApp, resetApp } from '../../test/render'
@@ -21,6 +22,19 @@ const panel = () => screen.getByLabelText('할 일 상세', { selector: 'aside' 
 function openPanel(task = taskA()) {
   seed(task)
   return renderApp(<DetailPanel />, `/inbox?task=${task.id}`)
+}
+
+/** 목록 행처럼 패널을 열어 주는 버튼. 닫은 뒤 포커스가 여기로 돌아와야 한다. */
+function Opener() {
+  const { open } = useOpenTask()
+  return (
+    <>
+      <button type="button" onClick={() => open('a')}>
+        보고서 쓰기 행
+      </button>
+      <DetailPanel />
+    </>
+  )
 }
 
 async function chooseFromMenu(user: ReturnType<typeof userEvent.setup>, name: string) {
@@ -130,6 +144,58 @@ describe('DetailPanel', () => {
       await user.keyboard('{Escape}')
 
       await waitFor(() => expect(panel()).toHaveAttribute('data-open', 'false'))
+    })
+
+    test('Escape in a comment being written throws the draft away and keeps the panel open', async () => {
+      const user = userEvent.setup()
+      openPanel()
+      const box = screen.getByLabelText('댓글 입력')
+
+      await user.type(box, '쓰던 글')
+      await user.keyboard('{Escape}')
+
+      expect(box).toHaveValue('')
+      expect(panel()).toHaveAttribute('data-open', 'true')
+      expect(box).toHaveFocus()
+    })
+
+    test('Escape in a subtask being written throws the draft away and keeps the panel open', async () => {
+      const user = userEvent.setup()
+      openPanel()
+      const field = screen.getByLabelText('하위 작업 추가')
+
+      await user.type(field, '자료 모으기')
+      await user.keyboard('{Escape}')
+
+      expect(field).toHaveValue('')
+      expect(panel()).toHaveAttribute('data-open', 'true')
+      expect(useApp.getState().entities.tasks).not.toHaveProperty('자료 모으기')
+    })
+
+    test('Escape in an empty comment box still closes the panel', async () => {
+      const user = userEvent.setup()
+      openPanel()
+
+      await user.click(screen.getByLabelText('댓글 입력'))
+      await user.keyboard('{Escape}')
+
+      await waitFor(() => expect(panel()).toHaveAttribute('data-open', 'false'))
+    })
+
+    test('gives focus back to the row that opened the panel', async () => {
+      const user = userEvent.setup()
+      seed(taskA())
+      renderApp(<Opener />, '/inbox')
+      const trigger = screen.getByRole('button', { name: '보고서 쓰기 행' })
+
+      await user.click(trigger)
+      await screen.findByLabelText('제목')
+      expect(trigger).not.toHaveFocus()
+
+      await user.keyboard('{Escape}')
+
+      await waitFor(() => expect(panel()).toHaveAttribute('data-open', 'false'))
+      expect(trigger).toHaveFocus()
     })
 
     test('Escape only closes an open menu first and keeps the panel', async () => {

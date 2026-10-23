@@ -334,3 +334,28 @@ describe('isRecurrenceFinished', () => {
     expect(isRecurrenceFinished(r, '2026-10-24')).toBe(false)
   })
 })
+
+// 짧은 달에 밀린 날짜가 다시 원래 일로 돌아오는지(기준 일 고정)
+describe('nextOccurrence - 말일·2월 29일 밀림 방지', () => {
+  test('날짜를 안 정한 매월 반복도 1월 31일 기준을 기억한다', () => {
+    const monthly = rule({ freq: 'monthly' })
+    const feb = nextOccurrence(monthly, '2026-01-31', '2026-01-31')
+    expect(feb).toBe('2026-02-28')
+    // 2월 28일에서 이어서 계산해도 3월에는 31일로 돌아온다(기준 일이 규칙에 박혀 있어야 가능)
+    const anchored = { ...monthly, byMonthDay: 31 as const }
+    expect(nextOccurrence(anchored, '2026-02-28', '2026-02-28')).toBe('2026-03-31')
+  })
+
+  test('매년 반복은 2월 29일을 잊지 않는다', () => {
+    const yearly = rule({ freq: 'yearly' })
+    expect(nextOccurrence(yearly, '2024-02-29', '2024-02-29')).toBe('2025-02-28')
+    const anchored = { ...yearly, byMonthDay: 29 as const }
+    expect(nextOccurrence(anchored, '2025-02-28', '2025-02-28')).toBe('2026-02-28')
+    expect(nextOccurrence(anchored, '2027-02-28', '2027-02-28')).toBe('2028-02-29')
+  })
+
+  test('n번째 요일 규칙은 기준 일을 끼워 넣지 않는다', () => {
+    const nth = rule({ freq: 'monthly', nth: { n: 2, weekday: 1 } })
+    expect(nextOccurrence(nth, '2026-10-12', '2026-10-12')).toBe('2026-11-09')
+  })
+})

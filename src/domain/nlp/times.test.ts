@@ -12,7 +12,8 @@ describe('Korean clock times', () => {
     ['내일 오전 12시', '00:00'],
     ['내일 아침 7시', '07:00'],
     ['내일 저녁 7시', '19:00'],
-    ['내일 저녁 12시', '12:00'],
+    ['내일 저녁 12시', '00:00'],
+    ['내일 아침 12시', '12:00'],
     ['내일 밤 11시', '23:00'],
     ['내일 밤 12시', '00:00'],
     ['내일 밤 2시', '02:00'],
@@ -45,6 +46,16 @@ describe('Korean clock times', () => {
     expect(r.startTime).toBe('19:00')
     expect(r.title).toBe('저녁 약속')
     expect(r.dayPart).toBeNull()
+  })
+
+  test('저녁·밤 12시는 자정, 아침 12시는 정오로 읽는다', () => {
+    expect(time('내일 저녁 12시')).toBe('00:00')
+    expect(time('내일 밤 12시')).toBe('00:00')
+    expect(time('내일 아침 12시')).toBe('12:00')
+    expect(time('내일 오후 12시')).toBe('12:00')
+    expect(time('내일 오전 12시')).toBe('00:00') // 오전 12시는 관례대로 자정
+    expect(time('내일 저녁 7시')).toBe('19:00')
+    expect(time('내일 아침 7시')).toBe('07:00')
   })
 
   test('rejects impossible clock values', () => {
@@ -166,6 +177,18 @@ describe('time ranges', () => {
     const r = parseQuickAdd('오후 3시부터 99시 회의', ctx)
     expect(r.startTime).toBe('15:00')
     expect(r.durationMin).toBeNull()
+  })
+
+  test('오전/오후를 공유하는 범위가 자정을 넘기면 시작은 밤이다', () => {
+    const r = parseQuickAdd('11-1am 야근', ctx)
+    expect(r.startTime).toBe('23:00')
+    expect(r.durationMin).toBe(120)
+    expect(r.title).toBe('야근')
+    // 기존 해석은 그대로
+    expect(parseQuickAdd('11-1pm 점심', ctx).startTime).toBe('11:00')
+    expect(parseQuickAdd('11-1pm 점심', ctx).durationMin).toBe(120)
+    expect(parseQuickAdd('9pm-1am 야근', ctx).startTime).toBe('21:00')
+    expect(parseQuickAdd('9pm-1am 야근', ctx).durationMin).toBe(240)
   })
 
   test('refuses a zero-length range', () => {

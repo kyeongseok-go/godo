@@ -5,6 +5,7 @@ import { addDays, todayOf } from '../../domain/date'
 import { nextWeekStart } from '../../domain/calendarGrid'
 import type { ID, Priority } from '../../domain/types'
 import { useTaskActions } from '../../hooks/actions'
+import { useOpenTask } from '../../hooks/openTask'
 import { useApp } from '../../store/app'
 import { useUI } from '../../store/ui'
 import { useToasts } from '../../ui/toast'
@@ -20,11 +21,14 @@ export interface Command {
   run: () => void
 }
 
-/** 지금 키보드가 가리키는 할 일: 포커스된 행 > 열린 상세 패널 */
-export function currentTaskId(): ID | null {
+/**
+ * 지금 키보드가 가리키는 할 일: 포커스된 행 > 마지막으로 포커스했던 행 > 열린 상세 패널.
+ * 상세 패널로 포커스가 들어가면 `focusedId` 가 비므로, 열린 할 일을 마지막 기준으로 쓴다.
+ */
+export function currentTaskId(openTaskId: ID | null = null): ID | null {
   const row = document.activeElement?.closest?.('[data-task-id]') as HTMLElement | null
   if (row?.dataset.taskId) return row.dataset.taskId
-  return useUI.getState().focusedId
+  return useUI.getState().focusedId ?? openTaskId
 }
 
 function moveFocus(delta: 1 | -1): void {
@@ -41,6 +45,7 @@ export function useCommands(): Command[] {
   const location = useLocation()
   const [, setParams] = useSearchParams()
   const actions = useTaskActions()
+  const { openId } = useOpenTask()
 
   return useMemo(() => {
     const go = (to: string) => () => navigate(to)
@@ -48,7 +53,7 @@ export function useCommands(): Command[] {
     const state = () => useApp.getState()
     const today = () => todayOf(new Date(), state().settings.dayStartHour)
     const withTask = (fn: (id: ID) => void) => () => {
-      const id = currentTaskId()
+      const id = currentTaskId(openId)
       if (id) fn(id)
       else useToasts.getState().push('먼저 할 일을 선택해 주세요 (J/K로 이동)')
     }
@@ -151,7 +156,7 @@ export function useCommands(): Command[] {
       },
     ]
     return list
-  }, [navigate, location.pathname, setParams, actions])
+  }, [navigate, location.pathname, setParams, actions, openId])
 }
 
 /** 사용자 지정 단축키를 반영한 최종 키. 빈 문자열이면 단축키를 끈 것이다. */

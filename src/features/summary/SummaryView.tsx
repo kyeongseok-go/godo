@@ -15,11 +15,14 @@ export function SummaryView() {
   const [search, setSearch] = useSearchParams()
   const [tab, setTab] = useState<OutputTab>('preview')
   const ctx = useEngineContext()
-  const { weekStartsOn } = useSettings()
+  const { weekStartsOn, dayStartHour } = useSettings()
   const projects = useTable('projects')
 
   const params = useMemo(() => parseSummaryParams(search), [search])
-  const options = useMemo(() => resolveSummaryOptions(params, ctx.today, weekStartsOn), [params, ctx.today, weekStartsOn])
+  const options = useMemo(
+    () => resolveSummaryOptions(params, ctx.today, weekStartsOn, dayStartHour),
+    [params, ctx.today, weekStartsOn, dayStartHour],
+  )
   const markdown = useMemo(() => buildSummaryMarkdown(ctx, options), [ctx, options])
   const choosable = useMemo(
     () => projects.filter((p) => !p.isFolder && p.deletedAt === null).sort((a, b) => a.order - b.order),

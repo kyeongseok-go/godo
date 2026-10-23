@@ -3,9 +3,12 @@ import userEvent from '@testing-library/user-event'
 import { useState } from 'react'
 import { presetRule } from '../../domain/recurrence'
 import type { RecurrenceRule } from '../../domain/types'
+import { installHiddenPanelFocusShim } from '../../test/focusShim'
 import { renderApp, resetApp } from '../../test/render'
 import { DateButton } from './PickerButtons'
 import type { SchedulePatch } from './DatePopover'
+
+installHiddenPanelFocusShim()
 
 // 오늘은 2026-10-23(금), 한 주는 월요일에 시작한다.
 beforeEach(async () => {
@@ -62,6 +65,28 @@ describe('DateButton summary', () => {
 
 // 빠른 선택 칩은 달력의 '다음 달' 이동 버튼보다 앞에 나온다.
 const quickChip = (pop: HTMLElement, label: string) => within(pop).getAllByRole('button', { name: label })[0]
+
+describe('keyboard', () => {
+  test('moves focus into the popover so it can be reached without tabbing the page', async () => {
+    const user = userEvent.setup()
+    renderApp(<Harness />)
+    const pop = await openPopover(user)
+
+    expect(pop.contains(document.activeElement)).toBe(true)
+    expect(quickChip(pop, '오늘')).toHaveFocus()
+  })
+
+  test('Escape closes the popover and gives focus back to the button', async () => {
+    const user = userEvent.setup()
+    renderApp(<Harness />)
+    await openPopover(user)
+
+    await user.keyboard('{Escape}')
+
+    expect(screen.queryByRole('dialog', { name: '날짜 선택' })).not.toBeInTheDocument()
+    expect(screen.getByRole('button', { name: '날짜' })).toHaveFocus()
+  })
+})
 
 describe('quick dates', () => {
   test.each([
@@ -214,6 +239,19 @@ describe('repeat presets', () => {
 
     expect(onPatch).toHaveBeenLastCalledWith({ recurrence: expect.objectContaining({ freq: 'weekly', interval: 3 }) })
     expect(within(pop).getByLabelText('반복')).toHaveValue('custom')
+  })
+
+  test('clearing the date also leaves “사용자 지정…” instead of keeping an editor-less custom state', async () => {
+    const user = userEvent.setup()
+    renderApp(<Harness initial={{ startDate: '2026-10-23' }} />)
+    const pop = await openPopover(user, '오늘')
+    await user.selectOptions(within(pop).getByLabelText('반복'), '사용자 지정…')
+    expect(within(pop).getByLabelText('반복 단위')).toBeInTheDocument()
+
+    await user.click(within(pop).getByRole('button', { name: '날짜 없음' }))
+
+    expect(within(pop).getByLabelText('반복')).toHaveValue('none')
+    expect(within(pop).queryByLabelText('반복 단위')).not.toBeInTheDocument()
   })
 
   test('a rule that matches no preset opens straight into the editor so it can be changed', async () => {

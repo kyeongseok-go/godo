@@ -29,6 +29,8 @@ const en = (source: string): RegExp => new RegExp(`${BEFORE_WORD}(?:${source})${
 const num = (m: RegExpExecArray, i: number): number => Number(group(m, i))
 const KO_WD = '[일월화수목금토]'
 const NOT_COUNTER = '(?![차째간])'
+/** 일(日)은 1~31만 날짜다. 0일·32일은 날짜로 읽지 않는다. */
+const DAY_1_31 = '(0?[1-9]|[12]\\d|3[01])'
 
 const RELATIVE_WORDS: Readonly<Record<string, number>> = {
   오늘: 0, 내일: 1, 모레: 2, 내일모레: 2, 글피: 3, 그글피: 4, 어제: -1, 그저께: -2, 그제: -2,
@@ -79,7 +81,11 @@ function resolveEnglishMonthDay(monthWord: string, day: number, year: string | u
 }
 
 const NOT_TIME_AFTER = '(?![\\d:])(?!\\s?[ap]m(?![A-Za-z]))'
-const EN_YEAR = '(?:,?\\s+(\\d{4})(?!\\d))?'
+/**
+ * "Dec 25 2028"의 연도. 1900~2999만 연도로 보고, 그 밖의 네 자리(1530처럼 HHMM 시각으로 읽히는 값)는
+ * 연도로 삼지 않아 "Dec 25 1530"이 1530년이 되지 않게 한다.
+ */
+const EN_YEAR = '(?:,?\\s+((?:19|2\\d)\\d{2})(?!\\d))?'
 
 const PATTERNS: readonly DatePattern[] = [
   // 오늘·내일·모레 …
@@ -97,9 +103,9 @@ const PATTERNS: readonly DatePattern[] = [
         : weekBased(ctx.today, RELATIVE_OFFSET[group(m, 1) ?? ''] ?? 0, weekday, ctx.weekStartsOn)
     },
   },
-  // 이번 토요일 / 다음 월요일 (주 생략)
+  // 이번 토요일 / 다음 월요일 / 지난 금요일 / 다다음 월요일 (주 생략)
   {
-    re: ko(`(이번|다음)\\s*(${KO_WD})요일`),
+    re: ko(`(다다음|다음|이번|담|지난|저번)\\s*(${KO_WD})요일`),
     resolve: (m, ctx) => {
       const weekday = weekdayKo(group(m, 2))
       return weekday === null
@@ -167,7 +173,7 @@ const PATTERNS: readonly DatePattern[] = [
   },
   // 이번 달 5일 / 다음 달 말일 / 월말
   {
-    re: ko(`(이번|다음|다다음)\\s*달\\s*(\\d{1,2})\\s*일${NOT_COUNTER}`),
+    re: ko(`(이번|다음|다다음)\\s*달\\s*${DAY_1_31}\\s*일${NOT_COUNTER}`),
     resolve: (m, ctx) => dayOfMonth(ctx.today, RELATIVE_OFFSET[group(m, 1) ?? ''] ?? 0, num(m, 2)),
   },
   {

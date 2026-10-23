@@ -112,11 +112,15 @@ describe('resolveDateExpr', () => {
     expect(resolveDateExpr({ kind: 'nextWeek' }, '2026-10-26', 1)).toBe('2026-11-02')
   })
 
-  it('uses the current year for month-day and clamps impossible days', () => {
+  it('uses the current year for month-day', () => {
     expect(resolveDateExpr({ kind: 'monthDay', month: 10, day: 30 }, FRIDAY, 1)).toBe('2026-10-30')
-    expect(resolveDateExpr({ kind: 'monthDay', month: 2, day: 29 }, FRIDAY, 1)).toBe('2026-02-28')
     expect(resolveDateExpr({ kind: 'monthDay', month: 2, day: 29 }, '2028-06-01', 1)).toBe('2028-02-29')
     expect(resolveDateExpr({ kind: 'monthDay', month: 1, day: 5 }, '2027-12-31', 1)).toBe('2027-01-05')
+  })
+
+  it('그 해에 없는 월·일은 어떤 날짜도 아니다', () => {
+    expect(resolveDateExpr({ kind: 'monthDay', month: 2, day: 29 }, FRIDAY, 1)).toBeNull()
+    expect(resolveDateExpr({ kind: 'monthDay', month: 2, day: 30 }, '2028-06-01', 1)).toBeNull()
   })
 
   it('returns iso dates unchanged', () => {

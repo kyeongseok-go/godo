@@ -9,6 +9,8 @@ export interface SummaryOptions {
   /** null 이면 모든 프로젝트, 빈 배열이면 아무 프로젝트도 아님 */
   projectIds: ID[] | null
   status: 'completed' | 'pending' | 'all'
+  /** 하루 시작 시각(설정). 완료 날짜를 오늘 목록과 같은 기준으로 센다 */
+  dayStartHour?: number
 }
 
 interface Entry {
@@ -30,7 +32,7 @@ function classify(task: Task, opts: SummaryOptions, from: ISODate, to: ISODate):
   if (opts.projectIds !== null && !opts.projectIds.includes(task.projectId)) return null
 
   if (isCompletedTask(task) && opts.status !== 'pending') {
-    const date = localDateOf(task.completedAt)
+    const date = localDateOf(task.completedAt, opts.dayStartHour ?? 0)
     return inRange(date) ? { kind: 'done', date } : null
   }
   if (isOpenTask(task) && opts.status !== 'completed') {

@@ -108,6 +108,44 @@ export function mergeChangeSets(...sets: ChangeSet[]): ChangeSet {
   return out as unknown as ChangeSet
 }
 
+/** 두 행에서 값이 달라진 필드 이름. 배열·객체는 같은 내용이어도 다른 것으로 본다(되돌려도 값은 같다). */
+function changedKeys(forward: object, before: object): string[] {
+  const after = forward as unknown as Record<string, unknown>
+  const prev = before as unknown as Record<string, unknown>
+  const keys = new Set([...Object.keys(after), ...Object.keys(prev)])
+  return [...keys].filter((key) => !Object.is(after[key], prev[key]))
+}
+
+/**
+ * 되돌릴 때 그 변경이 실제로 건드린 필드만 돌려놓도록 역변경을 좁힌다.
+ * 역변경은 "그 시점의 행 전체"라서, 그 뒤에 실행 취소에 남기지 않는 쓰기(집중 시간 기록,
+ * 순서 재조정 등)가 바꾼 필드까지 함께 되돌려 버린다. 그 필드는 지금 값을 지킨다.
+ */
+export function narrowInverse(forward: ChangeSet, inverse: ChangeSet, state: EntityState): ChangeSet {
+  const puts: Record<string, unknown[]> = {}
+  for (const t of TABLE_NAMES) {
+    const olds = inverse.puts[t] as ReadonlyArray<TableMap[typeof t]> | undefined
+    if (!olds?.length) continue
+    const forwardRows = new Map(
+      ((forward.puts[t] ?? []) as ReadonlyArray<TableMap[typeof t]>).map((e) => [keyOf(t, e), e]),
+    )
+    const table = state[t] as Record<string, TableMap[typeof t]>
+    puts[t] = olds.map((old) => {
+      const key = keyOf(t, old)
+      const applied = forwardRows.get(key)
+      const current = table[key]
+      // 그 변경이 만든 행이 아니거나(지우기의 역) 지금 없는 행이면 통째로 돌려놓는다
+      if (applied === undefined || current === undefined) return old
+      const touched = changedKeys(applied, old)
+      const restored: Record<string, unknown> = { ...current }
+      const before = old as unknown as Record<string, unknown>
+      for (const field of touched) restored[field] = before[field]
+      return restored
+    })
+  }
+  return { puts, deletes: inverse.deletes } as ChangeSet
+}
+
 /** 상태에 변경을 적용한다. 원본은 건드리지 않고 바뀐 테이블만 새 객체로 교체한다. */
 export function applyChangeSet(
   state: EntityState,

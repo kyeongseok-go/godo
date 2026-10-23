@@ -6,6 +6,8 @@ import { parseYMD } from './calendar'
 export type ValidationResult = { ok: true } | { ok: false; message: string }
 
 const FREQS: readonly string[] = ['daily', 'weekly', 'monthly', 'yearly']
+/** 반복 간격 상한. 1000년·1000개월까지면 실제 쓰임에는 충분하다. */
+export const MAX_INTERVAL = 1000
 const NTH_VALUES: readonly number[] = [1, 2, 3, 4, -1]
 
 const fail = (message: string): ValidationResult => ({ ok: false, message })
@@ -37,6 +39,8 @@ function checkEnd(rule: RecurrenceRule): ValidationResult | null {
 export function validateRule(rule: RecurrenceRule): ValidationResult {
   if (!FREQS.includes(rule.freq)) return fail('반복 주기가 올바르지 않아요.')
   if (!Number.isInteger(rule.interval) || rule.interval < 1) return fail('반복 간격은 1 이상의 정수여야 해요.')
+  // 상한이 없으면 가져온 백업의 터무니없는 값이 'NaN-NaN-NaN' 같은 날짜를 만든다
+  if (rule.interval > MAX_INTERVAL) return fail(`반복 간격은 ${MAX_INTERVAL} 이하여야 해요.`)
   if (rule.byWeekday && !rule.byWeekday.every(isWeekdayNumber)) {
     return fail('요일은 일요일부터 토요일 사이여야 해요.')
   }

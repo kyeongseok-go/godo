@@ -6,8 +6,9 @@ import { token, type Hit, type Recognizer } from './state'
 import type { ParseContext } from './types'
 
 const BRACES = /(?<!\S)\{([^{}]*)\}/g
-const KEYWORD_KO = /(?<![^\s([{"'“‘,;])(?:마감일?|마감\s*기한|기한)\s*[:：]?\s*/gu
-const KEYWORD_EN = /(?<![^\s([{"'“‘,;])(?:due|by)\s+/giu
+// 교대는 긴 대안을 먼저 적는다. '마감일?'이 앞에 오면 '마감기한'의 '마감'만 집어먹는다.
+const KEYWORD_KO = /(?<![^\s([{"'“‘,;])(?:마감\s*기한|마감일|마감|기한)\s*[:：]?\s*/gu
+const KEYWORD_EN = /(?<![^\s([{"'“‘,;])(?:due|by)(?:\s*[:：]\s*|\s+)/giu
 const UNTIL = /^\s*까지(?![\p{L}\p{N}])/u
 
 function deadlineHit(text: string, start: number, end: number, date: string, ctx: ParseContext): Hit {

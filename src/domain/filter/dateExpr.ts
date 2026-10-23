@@ -124,8 +124,8 @@ function calendar(text: string, year: number | undefined, month: number, day: nu
   return ok({ kind: 'iso', date: `${String(year).padStart(4, '0')}-${pad(month)}-${pad(day)}` })
 }
 
-/** 표현식을 실제 날짜로 푼다. 순수 함수이며 today는 호출자가 준다. */
-export function resolveDateExpr(expr: DateExpr, today: ISODate, weekStartsOn: 0 | 1): ISODate {
+/** 표현식을 실제 날짜로 푼다. 순수 함수이며 today는 호출자가 준다. 그 해에 없는 날짜면 null. */
+export function resolveDateExpr(expr: DateExpr, today: ISODate, weekStartsOn: 0 | 1): ISODate | null {
   switch (expr.kind) {
     case 'iso':
       return expr.date
@@ -136,9 +136,10 @@ export function resolveDateExpr(expr: DateExpr, today: ISODate, weekStartsOn: 0 
     case 'nextWeek':
       return addDays(startOfWeek(today, weekStartsOn), 7)
     case 'monthDay': {
+      // 평년의 2월 29일처럼 그 해에 없는 날은 말일로 당기지 않는다. 맞는 날이 아예 없는 것이다.
       const year = Number(today.slice(0, 4))
-      const day = Math.min(expr.day, lastDayOfMonth(year, expr.month))
-      return toISODate(new Date(year, expr.month - 1, day))
+      if (expr.day > lastDayOfMonth(year, expr.month)) return null
+      return toISODate(new Date(year, expr.month - 1, expr.day))
     }
   }
 }

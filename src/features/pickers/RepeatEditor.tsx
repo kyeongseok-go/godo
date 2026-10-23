@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { describeRule, presetRule, validateRule } from '../../domain/recurrence'
 import { WEEKDAY_KO } from '../../domain/date'
 import type { ISODate, RecurrenceFreq, RecurrenceRule, Weekday } from '../../domain/types'
@@ -11,11 +12,49 @@ interface RepeatEditorProps {
 
 const FREQ_LABEL: Record<RecurrenceFreq, string> = { daily: '일', weekly: '주', monthly: '개월', yearly: '년' }
 const WEEKDAY_ORDER: Weekday[] = [1, 2, 3, 4, 5, 6, 0]
+const MIN_COUNT = 1
+
+/** 숫자 칸에 쓴 글이 바로 쓸 수 있는 값인지. 비운 상태·0 같은 값은 칸에만 남겨 두고 커밋하지 않는다. */
+function readCount(raw: string): number | null {
+  if (raw.trim() === '') return null
+  const n = Number(raw)
+  if (!Number.isFinite(n) || n < MIN_COUNT) return null
+  return Math.floor(n)
+}
 
 /** 사용자 지정 반복 편집기. 바꿀 때마다 검증하고, 규칙 요약을 바로 보여준다. */
 export function RepeatEditor({ rule, startDate, onChange }: RepeatEditorProps) {
   const check = validateRule(rule)
   const patch = (next: Partial<RecurrenceRule>) => onChange({ ...rule, ...next })
+  // 아직 쓸 수 없는 값(빈 칸, 0)은 여기에만 담아 둔다. 바로 1 로 고쳐 버리면 "13" 같은 값이 만들어진다.
+  const [intervalDraft, setIntervalDraft] = useState<string | null>(null)
+  const [countDraft, setCountDraft] = useState<string | null>(null)
+
+  const typeInterval = (raw: string) => {
+    const next = readCount(raw)
+    if (next === null) return setIntervalDraft(raw)
+    setIntervalDraft(null)
+    patch({ interval: next })
+  }
+  const commitInterval = () => {
+    if (intervalDraft === null) return
+    const next = readCount(intervalDraft) ?? MIN_COUNT
+    setIntervalDraft(null)
+    if (next !== rule.interval) patch({ interval: next })
+  }
+
+  const typeCount = (raw: string) => {
+    const next = readCount(raw)
+    if (next === null) return setCountDraft(raw)
+    setCountDraft(null)
+    patch({ end: { type: 'count', count: next } })
+  }
+  const commitCount = () => {
+    if (countDraft === null) return
+    const next = readCount(countDraft) ?? MIN_COUNT
+    setCountDraft(null)
+    if (rule.end.type === 'count' && next !== rule.end.count) patch({ end: { type: 'count', count: next } })
+  }
 
   const setFreq = (freq: RecurrenceFreq) => {
     const base = presetRule(freq === 'daily' ? 'daily' : freq === 'weekly' ? 'weekly' : freq === 'monthly' ? 'monthly' : 'yearly', startDate)
@@ -47,8 +86,9 @@ export function RepeatEditor({ rule, startDate, onChange }: RepeatEditorProps) {
           type="number"
           min={1}
           max={365}
-          value={rule.interval}
-          onChange={(e) => patch({ interval: Math.max(1, Number(e.target.value) || 1) })}
+          value={intervalDraft ?? rule.interval}
+          onChange={(e) => typeInterval(e.target.value)}
+          onBlur={commitInterval}
         />
         <select aria-label="반복 단위" value={rule.freq} onChange={(e) => setFreq(e.target.value as RecurrenceFreq)}>
           {(Object.keys(FREQ_LABEL) as RecurrenceFreq[]).map((f) => (
@@ -121,8 +161,9 @@ export function RepeatEditor({ rule, startDate, onChange }: RepeatEditorProps) {
             type="number"
             min={1}
             aria-label="반복 횟수"
-            value={rule.end.count}
-            onChange={(e) => patch({ end: { type: 'count', count: Math.max(1, Number(e.target.value) || 1) } })}
+            value={countDraft ?? rule.end.count}
+            onChange={(e) => typeCount(e.target.value)}
+            onBlur={commitCount}
           />
         ) : null}
       </div>

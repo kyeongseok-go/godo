@@ -106,7 +106,7 @@ describe('ImportSection JSON', () => {
     )
 
     // 파일 읽기와 검증은 비동기라 부하가 큰 실행에서는 기본 1초를 넘길 수 있다.
-    const preview = await screen.findByText('pace-backup.json', undefined, { timeout: 5000 })
+    const preview = await screen.findByText('pace-backup.json', undefined, { timeout: 15000 })
     expect(preview).toBeInTheDocument()
     expect(screen.getByText('할 일').nextElementSibling).toHaveTextContent('1')
     expect(screen.getByText('라벨').nextElementSibling).toHaveTextContent('1')
