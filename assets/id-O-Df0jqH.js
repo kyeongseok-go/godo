@@ -1,0 +1,1 @@
+function e(){if(typeof crypto<`u`&&typeof crypto.randomUUID==`function`)return crypto.randomUUID();let e=()=>Math.random().toString(36).slice(2,10);return`${Date.now().toString(36)}-${e()}-${e()}`}export{e as t};
