@@ -19,3 +19,23 @@ export function nextMembership(
   }
   return next
 }
+
+/**
+ * 그룹 키 → 제목 기록. 입력은 바꾸지 않는다.
+ *
+ * 그룹에 남은 마지막 하나를 끝내면 그룹이 통째로 사라진다. 남겨 두기로 한 행을 원래 자리에
+ * 다시 세우려면 그 그룹의 이름이 있어야 하므로, 아직 누군가 가리키고 있는 키의 제목은 들고 있는다.
+ */
+export function nextGroupTitles(
+  prev: ReadonlyMap<string, string>,
+  groups: readonly TaskGroup[],
+  membership: ReadonlyMap<ID, string>,
+): Map<string, string> {
+  const next = new Map<string, string>()
+  for (const g of groups) next.set(g.key, g.title)
+  const stillNeeded = new Set(membership.values())
+  for (const [key, title] of prev) {
+    if (!next.has(key) && stillNeeded.has(key)) next.set(key, title)
+  }
+  return next
+}

@@ -16,7 +16,7 @@ import { useUI } from '../../store/ui'
 import type { QuickAddDefaults } from '../../store/ui'
 import { rebalanceOrders } from '../../domain/views'
 import { useApp } from '../../store/app'
-import { nextMembership } from './membership'
+import { nextGroupTitles, nextMembership } from './membership'
 import { computeReorder } from './reorder'
 import { TaskRow } from './TaskRow'
 import type { TaskRowProps } from './TaskRow'
@@ -86,16 +86,35 @@ export function TaskList({ groups, showProject = false, empty, addDefaults, nest
   // 같은 입력으로 다시 렌더될 때는 계산을 건너뛴다.
   const lingering = useUI((s) => s.lingering)
   const allTasks = useApp((s) => s.entities.tasks)
-  const [tracked, setTracked] = useState(() => ({ groups, lingering, membership: nextMembership(new Map(), groups, lingering) }))
+  const [tracked, setTracked] = useState(() => {
+    const membership = nextMembership(new Map(), groups, lingering)
+    return { groups, lingering, membership, titles: nextGroupTitles(new Map(), groups, membership) }
+  })
   let membership = tracked.membership
+  let titles = tracked.titles
   if (tracked.groups !== groups || tracked.lingering !== lingering) {
     membership = nextMembership(tracked.membership, groups, lingering)
-    setTracked({ groups, lingering, membership })
+    titles = nextGroupTitles(tracked.titles, groups, membership)
+    setTracked({ groups, lingering, membership, titles })
   }
+
+  // 마지막 하나를 끝내면 그룹까지 사라져서, 남겨 두기로 한 행이 설 자리가 없어진다.
+  // 그러면 되돌릴 틈도 함께 사라지므로, 빈 껍데기 그룹을 잠깐 세워 둔다.
+  const shownGroups = useMemo(() => {
+    const present = new Set(groups.map((g) => g.key))
+    const ghosts: TaskGroup[] = []
+    for (const id of Object.keys(lingering)) {
+      const key = membership.get(id)
+      if (!key || present.has(key)) continue
+      if (ghosts.some((g) => g.key === key)) continue
+      ghosts.push({ key, title: titles.get(key) ?? '', tasks: [] })
+    }
+    return ghosts.length > 0 ? [...groups, ...ghosts] : groups
+  }, [groups, lingering, membership, titles])
 
   const rendered = useMemo(
     () =>
-      groups.map((g) => {
+      shownGroups.map((g) => {
         const present = new Set(g.tasks.map((t) => t.id))
         const extra = Object.keys(lingering)
           .filter((id) => membership.get(id) === g.key && !present.has(id) && allTasks[id])
@@ -108,7 +127,7 @@ export function TaskList({ groups, showProject = false, empty, addDefaults, nest
             : tasks.map((task): TaskNode => ({ task, children: [], depth: 0 })),
         }
       }),
-    [groups, collapsed, nested, lingering, allTasks, membership],
+    [shownGroups, collapsed, nested, lingering, allTasks, membership],
   )
 
   // 방금 목록에 들어온 행만 올라오며 나타나게 한다.

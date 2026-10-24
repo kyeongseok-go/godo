@@ -108,6 +108,28 @@ describe('TaskList', () => {
       expect(screen.getByText('남은 일')).toBeInTheDocument()
     })
 
+    // 그룹에 남은 마지막 하나를 끝내면 그룹까지 통째로 사라진다. 그래도 되돌릴 틈은 남아야 한다.
+    test('keeps the last row of a group visible even though the group itself is gone', async () => {
+      const user = userEvent.setup()
+      // 끝내면 그룹이 비어서 사라지는 목록(빈 그룹은 걸러진다)
+      function OpenOnlyDropsEmpty() {
+        const tasks = useApp((s) => s.entities.tasks)
+        const open = Object.values(tasks).filter((t) => t.status !== 'done')
+        return <TaskList groups={open.length > 0 ? [{ key: '오늘', title: '오늘', tasks: open }] : []} />
+      }
+      useApp.getState().commit({ puts: { tasks: [makeTask({ id: 'a', title: '하나뿐인 일' })] }, deletes: {} }, 'seed', { history: false })
+      renderApp(<OpenOnlyDropsEmpty />)
+
+      await user.click(screen.getByRole('checkbox', { name: '"하나뿐인 일" 완료' }))
+
+      await waitFor(() => expect(useApp.getState().entities.tasks.a.status).toBe('done'))
+      expect(screen.getByText('하나뿐인 일')).toBeInTheDocument()
+
+      useUI.setState({ lingering: {} })
+
+      await waitFor(() => expect(screen.queryByText('하나뿐인 일')).not.toBeInTheDocument())
+    })
+
     test('does not show a completed row that was never marked as lingering', () => {
       useApp.getState().commit({ puts: { tasks: [makeTask({ id: 'x', title: '이미 끝난 일' })] }, deletes: {} }, 'seed', { history: false })
       renderApp(<OpenOnly />)
