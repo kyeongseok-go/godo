@@ -72,6 +72,11 @@
   --ease-spring: cubic-bezier(0.34, 1.4, 0.64, 1);
   --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
 
+  /* 떠 있는 독이 바닥에서 차지하는 높이: 바 + 안쪽 여백(--space-1 위아래) + 띄운 만큼 + 홈 인디케이터.
+     그 위에 떠 있는 추가 버튼까지 피해야 하는 것(토스트·본문 아래 여백)은 --dock-clear 를 쓴다. */
+  --dock-space: calc(var(--tabbar-h) + var(--space-2) + var(--space-3) + var(--safe-b));
+  --dock-clear: calc(var(--dock-space) + var(--space-3) + 3.5rem + var(--space-3));
+
   --sidebar-width: 16.5rem;
   --detail-width: 28rem;
   --row-height: 2.75rem;
