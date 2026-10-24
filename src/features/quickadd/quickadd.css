@@ -75,6 +75,15 @@
   outline: none;
 }
 
+/* 폰에서는 안내문("무엇을 할까요? 예) …")이 두 줄로 접힌다.
+   입력 줄 수는 쓴 글의 줄바꿈만 세기 때문에, 비어 있을 때 한 줄짜리 칸이 안내문을 잘라먹었다.
+   본문 두 줄(1.0625rem × 1.5 × 2)에 위아래 여백을 더한 높이를 바닥으로 깐다. */
+@media (max-width: 40rem) {
+  .qa__input {
+    min-height: calc(1.0625rem * 1.5 * 2 + var(--space-3) * 2);
+  }
+}
+
 .qa__input::placeholder {
   color: var(--muted);
 }

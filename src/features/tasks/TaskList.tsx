@@ -35,6 +35,9 @@ interface TaskListProps {
   sortable?: boolean
 }
 
+/** 새로 들어온 행이 없을 때 쓰는 빈 집합. 매번 새로 만들면 렌더가 쓸데없이 돈다. */
+const EMPTY_IDS: ReadonlySet<string> = new Set()
+
 function SortableRow(props: TaskRowProps & { sortable: boolean }) {
   const { sortable, ...rowProps } = props
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
@@ -108,6 +111,20 @@ export function TaskList({ groups, showProject = false, empty, addDefaults, nest
     [groups, collapsed, nested, lingering, allTasks, membership],
   )
 
+  // 방금 목록에 들어온 행만 올라오며 나타나게 한다.
+  // 화면을 여는 순간 전부가 들썩이면 "뭔가 생겼다"는 신호가 묻히므로,
+  // 처음 그릴 때는 지금 있는 것을 모두 "이미 본 것"으로 두고 시작한다.
+  // 결과를 state 에 담아 두는 것은 렌더 중 setState 가 이 렌더를 버리고 다시 그리기 때문이다.
+  const visibleIds = useMemo(() => rendered.flatMap(({ rows }) => rows.map((r) => r.task.id)), [rendered])
+  const [arrivals, setArrivals] = useState(() => ({ ids: visibleIds, seen: new Set(visibleIds), fresh: EMPTY_IDS }))
+  let fresh = arrivals.fresh
+  if (arrivals.ids !== visibleIds) {
+    // 저장소에서 데이터가 늦게 들어오면 빈 목록이 한꺼번에 채워진다. 그건 "새로 더해진 것"이 아니라
+    // 그냥 불러온 것이므로, 비어 있다가 처음 차는 경우는 통째로 건너뛴다.
+    fresh = arrivals.seen.size === 0 ? EMPTY_IDS : new Set(visibleIds.filter((id) => !arrivals.seen.has(id)))
+    setArrivals({ ids: visibleIds, seen: new Set(visibleIds), fresh })
+  }
+
   const onToggleDone = useCallback(
     (task: Task, done: boolean) => (done ? actions.complete(task.id) : actions.reopen(task.id)),
     [actions],
@@ -176,6 +193,7 @@ export function TaskList({ groups, showProject = false, empty, addDefaults, nest
                   collapsed={!!collapsed[node.task.id]}
                   selected={selected.has(node.task.id)}
                   focused={focusedId === node.task.id}
+                  fresh={fresh.has(node.task.id)}
                   onToggleDone={onToggleDone}
                   onOpen={onOpen}
                   onToggleCollapse={onToggleCollapse}

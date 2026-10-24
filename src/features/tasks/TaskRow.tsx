@@ -1,6 +1,7 @@
 import { ChevronRight, Pin } from 'lucide-react'
 import { memo } from 'react'
 import type { KeyboardEvent, ReactNode } from 'react'
+import { useJustChanged } from '../../hooks/flash'
 import { useLookups } from '../../hooks/lookups'
 import type { Lookups } from '../../hooks/lookups'
 import type { ISODate, Settings, Task } from '../../domain/types'
@@ -23,6 +24,8 @@ export interface TaskRowProps {
   onOpen: (task: Task) => void
   onToggleCollapse: (task: Task) => void
   onToggleSelect: (task: Task) => void
+  /** 방금 목록에 들어온 행인지. 참이면 한 번 올라오며 나타난다. */
+  fresh?: boolean
   /** 드래그 핸들 등 호출 측이 끼워 넣는 요소 */
   handle?: ReactNode
   lookups?: Lookups
@@ -37,6 +40,8 @@ function TaskRowBase(props: TaskRowProps) {
   const progress = hasChildren ? countDescendants(node) : undefined
   const done = task.status === 'done'
   const canceled = task.status === 'canceled'
+  // 방금 상태가 바뀐 줄만 한 번 밝아졌다 가라앉는다. 어느 줄을 눌렀는지가 손가락을 떼도 남는다.
+  const flash = useJustChanged(task.status)
 
   const labels = task.labelIds.flatMap((id) => {
     const l = lookups.labels.get(id)
@@ -60,6 +65,8 @@ function TaskRowBase(props: TaskRowProps) {
       tabIndex={0}
       data-task-id={task.id}
       data-done={done}
+      data-fresh={props.fresh || undefined}
+      data-flash={flash || undefined}
       data-canceled={canceled}
       data-selected={selected}
       data-focused={focused}

@@ -57,6 +57,7 @@ function Bars({ bars, activeIndex }: { bars: readonly TrendBar[]; activeIndex: n
               style={{ ['--i' as string]: bar.index }}
               x={bar.x}
               y={bar.y}
+              rx={Math.min(3, bar.width / 2)}
               width={bar.width}
               height={bar.height}
             />

@@ -86,17 +86,19 @@
 
 .prod-pbars__track {
   display: block;
-  height: 0.875rem;
+  height: 0.625rem;
+  border-radius: var(--radius-pill);
   overflow: hidden;
-  background: color-mix(in oklab, var(--ink) 8%, transparent);
+  background: var(--fill-1);
 }
 
 .prod-pbars__fill {
   display: block;
   height: 100%;
+  border-radius: var(--radius-pill);
   transform-origin: left;
   transform: scaleX(var(--ratio, 0));
-  transition: transform var(--duration-slow) var(--ease-out);
+  transition: transform var(--duration-slow) var(--ease-soft);
 }
 
 .prod-pbars__count {
@@ -201,33 +203,36 @@
 /* 쉬는 요일 */
 .prod-daypick {
   display: inline-flex;
-  border: 1px solid var(--rule-strong);
+  gap: 2px;
+  padding: 3px;
+  border-radius: var(--radius-pill);
+  background: var(--fill-1);
 }
 
 .prod-daypick__btn {
-  width: 2.5rem;
+  min-width: 2.5rem;
   height: 2.5rem;
+  border-radius: var(--radius-pill);
+  color: var(--ink-soft);
   font-weight: 600;
   transition:
-    background-color var(--duration-fast) var(--ease-out),
-    color var(--duration-fast) var(--ease-out);
-}
-
-.prod-daypick__btn + .prod-daypick__btn {
-  border-left: 1px solid var(--rule);
+    background-color var(--duration-fast) var(--ease-ui),
+    color var(--duration-fast) var(--ease-ui),
+    transform var(--duration-fast) var(--ease-spring);
 }
 
 .prod-daypick__btn:hover {
-  background: var(--surface-sunk);
+  color: var(--ink);
 }
 
+/* 고른 요일은 검정으로 채우지 않는다. 강조색을 옅게 깐다. */
 .prod-daypick__btn[aria-pressed='true'] {
-  background: var(--ink);
-  color: var(--paper);
+  background: var(--accent-tint);
+  color: var(--accent);
 }
 
 .prod-daypick__btn:active {
-  transform: translateY(1px);
+  transform: scale(0.9);
 }
 
 @media (max-width: 64rem) {
@@ -245,9 +250,11 @@
     display: flex;
   }
 
+  /* 일곱 칸을 한 줄에 넣어야 해서 폭은 화면이 정한다(320px 에서는 44px 을 넣을 자리가 없다).
+     대신 높이로 44px 을 지킨다. */
   .prod-daypick__btn {
     flex: 1;
-    width: auto;
+    min-width: 0;
   }
 
   .prod-pbars__row {

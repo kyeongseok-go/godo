@@ -11,7 +11,6 @@
   display: grid;
   gap: var(--space-2);
   padding: var(--space-3);
-  border: 1px solid var(--rule);
   background: var(--surface);
 }
 
@@ -42,16 +41,16 @@
 .frame__days button {
   min-width: 2.2rem;
   padding: 0.25rem 0;
-  border: 1px solid var(--rule-strong);
-  background: transparent;
-  color: var(--ink);
+  border-radius: var(--radius-pill);
+  background: var(--fill-2);
+  color: var(--ink-soft);
   font-size: var(--text-xs);
   cursor: pointer;
 }
 
 .frame__days button[aria-pressed='true'],
 .frame__chips .chip-btn[aria-pressed='true'] {
-  border-color: var(--accent);
+  background: var(--accent-tint);
   background: color-mix(in oklab, var(--accent) 12%, var(--surface));
   color: var(--accent-ink);
   font-weight: 700;

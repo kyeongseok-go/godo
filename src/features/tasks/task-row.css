@@ -95,11 +95,10 @@
   color: var(--accent);
 }
 
+/* 취소선 자체는 motion.css 가 긋는다(켜지는 대신 번지게 하려고 항상 그어 두고 색만 바꾼다). */
 .task-row[data-done='true'] .task-row__title,
 .task-row[data-canceled='true'] .task-row__title {
   color: var(--muted);
-  text-decoration: line-through;
-  text-decoration-color: var(--rule-strong);
 }
 
 .task-row[data-canceled='true'] .task-row__title {

@@ -1,6 +1,10 @@
 /* 앱 전체가 쓰는 컨트롤. 화면 하나에 묶이지 않는 것만 여기 둔다.
    원칙: 테두리 대신 채움색, 각진 모서리 대신 둥근 면, 누르면 줄어드는 반응.
-   손가락이 닿는 것은 어떤 경우에도 44px 아래로 내려가지 않는다. */
+   손가락이 닿는 것은 어떤 경우에도 44px 아래로 내려가지 않는다.
+
+   누르는 것은 전부 알약이다. gif.garajedeideas.com 이 버튼 반경을 예외 없이
+   `--roundness--full` 하나로 묶어 쓰는데, 각져 보이지 않게 하는 가장 큰 한 수가 이것이다.
+   네모를 남겨 두면 그 하나가 화면 전체를 딱딱하게 만든다. */
 
 /* ── 공통 ───────────────────────────────────────────── */
 
@@ -26,6 +30,13 @@
   transform: scale(0.96);
 }
 
+/* 알약 안에서 글자가 접히면 더 이상 알약으로 보이지 않는다. 좁으면 줄이지 말고 넘긴다. */
+.btn-accent,
+.btn-tint,
+.btn-ghost {
+  white-space: nowrap;
+}
+
 .btn-accent:disabled,
 .btn-tint:disabled,
 .btn-ghost:disabled,
@@ -44,8 +55,8 @@
   justify-content: center;
   gap: var(--space-2);
   min-height: var(--control-h);
-  padding: 0 var(--space-4);
-  border-radius: var(--radius-md);
+  padding: 0 var(--space-5);
+  border-radius: var(--radius-pill);
   background: var(--accent);
   color: var(--accent-ink);
   font-weight: var(--weight-semibold);
@@ -73,8 +84,8 @@
   justify-content: center;
   gap: var(--space-2);
   min-height: var(--control-h);
-  padding: 0 var(--space-4);
-  border-radius: var(--radius-md);
+  padding: 0 var(--space-5);
+  border-radius: var(--radius-pill);
   background: var(--accent-tint);
   color: var(--accent);
   font-weight: var(--weight-semibold);
@@ -95,8 +106,8 @@
   justify-content: center;
   gap: var(--space-2);
   min-height: var(--control-h);
-  padding: 0 var(--space-4);
-  border-radius: var(--radius-md);
+  padding: 0 var(--space-5);
+  border-radius: var(--radius-pill);
   background: var(--fill-1);
   color: var(--ink);
   font-weight: var(--weight-medium);
@@ -143,8 +154,8 @@
 .segmented {
   display: inline-flex;
   gap: 2px;
-  padding: 2px;
-  border-radius: var(--radius-sm);
+  padding: 3px;
+  border-radius: var(--radius-pill);
   background: var(--fill-1);
 }
 
@@ -154,8 +165,8 @@
   justify-content: center;
   gap: var(--space-1);
   min-height: 2rem;
-  padding: 0 var(--space-3);
-  border-radius: calc(var(--radius-sm) - 2px);
+  padding: 0 var(--space-4);
+  border-radius: var(--radius-pill);
   color: var(--ink-soft);
   font-size: var(--text-sm);
   font-weight: var(--weight-medium);
@@ -183,7 +194,7 @@
 /* 손가락으로 쓰는 화면에서는 세그먼트도 44px 을 지킨다. */
 @media (max-width: 40rem) {
   .segmented__option {
-    min-height: 2.5rem;
+    min-height: var(--control-h);
     padding: 0 var(--space-4);
   }
 }
@@ -210,8 +221,8 @@ kbd {
     min-height: var(--control-h);
   }
 
-  .prod-stepper__btn,
-  .prod-daypick__btn {
+  /* 요일 선택은 일곱 칸이 한 줄에 들어가야 해서 폭을 강제하지 않는다(달력 칸과 같은 예외). */
+  .prod-stepper__btn {
     min-width: var(--control-h);
   }
 

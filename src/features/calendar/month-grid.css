@@ -187,7 +187,17 @@
     font-size: var(--text-sm);
     transition:
       background-color var(--duration-fast) var(--ease-ui),
-      color var(--duration-fast) var(--ease-ui);
+      color var(--duration-fast) var(--ease-ui),
+      transform var(--duration-normal) var(--ease-spring);
+  }
+
+  /* 고른 날은 동그라미가 한 번 커졌다 자리를 잡는다. 어디를 눌렀는지가 손가락 아래에서 보인다. */
+  .mcell[data-selected='true'] .mcell__num {
+    transform: scale(1.08);
+  }
+
+  .mcell:active .mcell__num {
+    transform: scale(0.9);
   }
 
   /* 오늘은 옅게 깐 동그라미, 지금 고른 날은 꽉 채운 동그라미. */

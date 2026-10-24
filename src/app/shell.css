@@ -88,24 +88,28 @@
   /* 탭바와 그 위에 뜬 추가 버튼에 가리지 않을 만큼 아래를 비우고, 위는 노치를 피한다. */
   .shell__main {
     padding-top: var(--safe-t);
-    padding-bottom: calc(var(--tabbar-h) + var(--safe-b) + 5rem);
+    padding-bottom: calc(var(--tabbar-h) + var(--safe-b) + 6rem);
   }
 
-  /* 바 뒤로 내용이 비쳐 보인다. 스크롤 중에도 바가 화면에서 분리돼 보이게 하는 장치다. */
+  /* 가장자리에 붙은 바가 아니라 화면 위에 떠 있는 독이다.
+     바닥에 붙은 바는 화면을 잘라 끝을 만들지만, 띄우면 내용이 그 아래로 계속 이어져 보인다.
+     gif.garajedeideas.com 의 하단 독이 쓰는 방식이고, 각져 보이지 않게 하는 두 번째 한 수다. */
   .tabbar {
     position: fixed;
-    inset: auto 0 0 0;
+    inset: auto var(--space-3) calc(var(--safe-b) + var(--space-3)) var(--space-3);
+    margin-inline-start: var(--safe-l);
+    margin-inline-end: var(--safe-r);
     z-index: 30;
     display: grid;
     grid-template-columns: repeat(4, 1fr);
     align-items: stretch;
-    padding: 0 var(--space-2) var(--safe-b);
-    padding-inline-start: calc(var(--space-2) + var(--safe-l));
-    padding-inline-end: calc(var(--space-2) + var(--safe-r));
-    background: color-mix(in srgb, var(--surface) 80%, transparent);
+    gap: 2px;
+    padding: var(--space-1);
+    border-radius: var(--radius-frame);
+    background: color-mix(in srgb, var(--surface) 72%, transparent);
     -webkit-backdrop-filter: var(--blur-bar);
     backdrop-filter: var(--blur-bar);
-    border-top: 1px solid var(--rule);
+    box-shadow: var(--shadow-float);
   }
 
   /* 뒤를 흐릴 수 없는 브라우저에서는 그냥 불투명하게 둔다(글자가 겹쳐 읽히는 것보다 낫다). */
@@ -115,6 +119,7 @@
     }
   }
 
+  /* 안쪽 반경 = 바깥 반경 − 안쪽 여백(동심 규칙). 어긋나면 모서리가 두 겹으로 보인다. */
   .tabbar__item {
     display: grid;
     justify-items: center;
@@ -122,10 +127,12 @@
     gap: 3px;
     min-height: var(--tabbar-h);
     padding: var(--space-1);
+    border-radius: calc(var(--radius-frame) - var(--space-1));
     font-size: var(--text-2xs);
     color: var(--muted);
     transition:
-      color var(--duration-fast) var(--ease-out),
+      color var(--duration-fast) var(--ease-ui),
+      background-color var(--duration-fast) var(--ease-ui),
       transform var(--duration-fast) var(--ease-spring);
   }
 
@@ -133,7 +140,9 @@
     transform: scale(0.9);
   }
 
+  /* 지금 있는 자리는 글자색만이 아니라 면으로 짚는다. 작은 글씨의 색 차이는 멀리서 안 보인다. */
   .tabbar__item.active {
+    background: var(--accent-tint);
     color: var(--accent);
     font-weight: var(--weight-semibold);
   }
@@ -141,7 +150,7 @@
   /* 추가 버튼은 탭 사이에 끼우지 않고 바 위에 띄운다. 엄지가 닿는 자리이면서 탭의 리듬을 깨지 않는다. */
   .tabbar__add {
     position: absolute;
-    right: calc(var(--space-4) + var(--safe-r));
+    right: var(--space-2);
     bottom: calc(100% + var(--space-3));
     display: grid;
     place-items: center;

@@ -230,9 +230,8 @@
   gap: var(--space-2);
   min-height: 2.75rem;
   padding: 0 var(--space-4);
-  border: 1px solid var(--rule-strong);
-  border-radius: var(--radius-sm);
-  background: var(--surface);
+  border-radius: var(--radius-pill);
+  background: var(--fill-1);
   font-weight: 600;
   align-items: center;
   transition:
@@ -240,10 +239,12 @@
     transform var(--duration-fast) var(--ease-out);
 }
 
+/* 칩 바탕을 흰 면에서 채움색으로 바꾸면서 바탕이 한 단 어두워졌다.
+   --muted 는 흰 바탕 기준(5.2:1)이라 여기서는 4.0:1 로 떨어진다. 한 단 진한 색을 쓴다. */
 .cdchip small {
   font-size: var(--text-xs);
   font-weight: 400;
-  color: var(--muted);
+  color: var(--ink-soft);
 }
 
 .cdchip:hover {

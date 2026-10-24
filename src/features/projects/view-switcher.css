@@ -1,8 +1,8 @@
 .vswitch {
   display: inline-flex;
   gap: 2px;
-  padding: 2px;
-  border-radius: var(--radius-sm);
+  padding: 3px;
+  border-radius: var(--radius-pill);
   background: var(--fill-1);
 }
 
@@ -12,8 +12,8 @@
   justify-content: center;
   gap: var(--space-1);
   min-height: 2rem;
-  padding: 0 var(--space-3);
-  border-radius: calc(var(--radius-sm) - 2px);
+  padding: 0 var(--space-4);
+  border-radius: var(--radius-pill);
   font-size: var(--text-sm);
   font-weight: var(--weight-medium);
   color: var(--ink-soft);
@@ -42,7 +42,7 @@
 
 @media (max-width: 40rem) {
   .vswitch button {
-    min-height: 2.5rem;
+    min-height: var(--control-h);
     padding: 0 var(--space-4);
   }
 

@@ -22,7 +22,7 @@
   -webkit-backdrop-filter: var(--blur-bar);
   backdrop-filter: var(--blur-bar);
   color: var(--toast-ink);
-  border-radius: var(--radius-lg);
+  border-radius: var(--radius-xl);
   font-size: var(--text-base);
   box-shadow: var(--shadow-float);
   animation: toast-in var(--duration-normal) var(--ease-spring);
@@ -69,13 +69,14 @@
   color: #fff;
 }
 
-/* 좁은 화면에서는 하단 탭바 위로 올린다. 탭바를 가리면 이동이 막힌다. */
+/* 좁은 화면에서는 떠 있는 독 위로 올린다. 독을 가리면 이동이 막힌다.
+   독은 바닥에서 --space-3 만큼 떠 있고 안쪽 여백이 --space-1 씩 있으므로 그만큼을 더 비운다. */
 @media (max-width: 56rem) {
   .toast-host {
     right: auto;
     left: 50%;
     translate: -50% 0;
-    bottom: calc(var(--tabbar-h) + var(--safe-b) + var(--space-3));
+    bottom: calc(var(--tabbar-h) + var(--safe-b) + var(--space-3) + var(--space-2) + var(--space-3));
     justify-items: stretch;
   }
 }

@@ -11,9 +11,8 @@
   flex: none;
   width: 18.5rem;
   scroll-snap-align: start;
-  border: 1px solid var(--rule);
-  border-radius: var(--radius-md);
-  background: color-mix(in oklab, var(--surface-sunk) 45%, var(--paper));
+  border-radius: var(--radius-lg);
+  background: color-mix(in oklab, var(--surface-sunk) 60%, var(--paper));
   transition: box-shadow var(--duration-fast) var(--ease-out);
 }
 

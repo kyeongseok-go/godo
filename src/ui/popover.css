@@ -6,8 +6,7 @@
   max-height: min(28rem, calc(100dvh - 1rem));
   overflow: auto;
   background: var(--surface);
-  border: 1px solid var(--rule);
-  border-radius: var(--radius-lg);
+  border-radius: var(--radius-xl);
   box-shadow: var(--shadow-float);
   /* 눌린 자리에서 피어나듯 열린다. 위에서 떨어지는 것보다 어디서 왔는지가 분명하다. */
   transform-origin: top center;

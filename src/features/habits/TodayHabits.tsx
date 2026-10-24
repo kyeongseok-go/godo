@@ -9,6 +9,7 @@ import { planHabitBlocks, scheduledOn } from '../../domain/planning'
 import { habitValue, isHabitDone } from '../../domain/stats'
 import type { Habit, ISODate } from '../../domain/types'
 import { busyFromTimedTasks } from '../plan/logic'
+import { useJustChanged } from '../../hooks/flash'
 import { useNow, useSettings, useTable, useToday } from '../../hooks/data'
 import { todayHabits } from './habitView'
 import { useHabitActions } from './useHabitActions'
@@ -45,13 +46,15 @@ function CountChip({ habit, today, actions }: ChipProps) {
   const value = habitValue(habit, today)
   const done = isHabitDone(habit, today)
   const ratio = Math.min(1, value / habit.goal.target)
+  // 눌러서 숫자가 바뀐 그 순간에만 한 번 솟았다 내려온다.
+  const bumped = useJustChanged(value)
   return (
     <div className="thabit thabit--count" role="group" aria-label={habit.name} data-done={done} style={{ '--habit': habit.color, '--ratio': ratio } as CSSProperties}>
       <button type="button" className="thabit__step" aria-label={`${habit.name} 1 줄이기`} disabled={value <= 0} onClick={() => actions.step(habit.id, today, -1)}>
         <Minus size={14} aria-hidden="true" />
       </button>
       <span className="thabit__name">{habit.name}</span>
-      <output className="thabit__value" aria-label={`${habit.name} 오늘 ${value}, 목표 ${habit.goal.target}${habit.goal.unit ?? ''}`}>
+      <output className="thabit__value" data-bump={bumped || undefined} aria-label={`${habit.name} 오늘 ${value}, 목표 ${habit.goal.target}${habit.goal.unit ?? ''}`}>
         {done ? <Check size={13} strokeWidth={3} aria-hidden="true" /> : null}
         {value}/{habit.goal.target}
         {habit.goal.unit ?? ''}

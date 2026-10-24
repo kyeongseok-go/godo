@@ -142,21 +142,28 @@ button.thabit[data-done='true']:hover {
   padding-left: var(--space-2);
 }
 
+/* 횟수 습관은 칩 자체가 왼쪽부터 차오른다.
+   바닥에 깔린 2px 선은 알약 모서리에 잘려 한쪽 끝이 뾰족해 보였고, 무엇보다 작아서
+   "얼마나 채웠나"가 읽히지 않았다. 면으로 차오르면 숫자를 보지 않아도 알 수 있다. */
 .thabit--count::after {
   content: '';
   position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  height: 2px;
-  background: var(--habit);
+  inset: 0;
+  z-index: 0;
+  background: color-mix(in oklab, var(--habit) 26%, transparent);
   transform: scaleX(var(--ratio, 0));
   transform-origin: left;
-  transition: transform var(--duration-normal) var(--ease-out);
+  transition: transform var(--duration-slow) var(--ease-soft);
+  pointer-events: none;
 }
 
-.thabit--count[data-done='true']::after {
-  background: var(--habit-fg);
+/* 차오르는 면 위에 글자와 버튼이 올라앉게 한다. */
+.thabit__mark,
+.thabit__name,
+.thabit__value,
+.thabit__step {
+  position: relative;
+  z-index: 1;
 }
 
 .thabit__value {
@@ -173,7 +180,12 @@ button.thabit[data-done='true']:hover {
   place-items: center;
   width: 2rem;
   height: 2rem;
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-pill);
+  transition: transform var(--duration-fast) var(--ease-spring);
+}
+
+.thabit__step:active:not(:disabled) {
+  transform: scale(0.86);
 }
 
 .thabit__step:hover:not(:disabled) {

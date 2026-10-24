@@ -94,7 +94,13 @@
 
 /* 폰에서는 눌리는 것이 44px 밑으로 내려가지 않게 한다(Apple HIG 최소 터치 영역). */
 @media (max-width: 40rem) {
-  .focus-field__input {
+  .focus-field__input,
+  .focus-field__input input {
+    min-height: var(--control-h);
+  }
+
+  /* 네모 칸 자체는 작아도 된다 — label 이 감싸고 있어 줄 전체가 눌린다. 그 줄을 44px 로 만든다. */
+  .focus-prefs__switch {
     min-height: var(--control-h);
   }
 }

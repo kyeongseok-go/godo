@@ -3,9 +3,10 @@
 /* ── 탭 ── */
 .plan-tabs {
   display: inline-flex;
-  border: 1px solid var(--rule-strong);
-  border-radius: var(--radius-sm);
-  overflow: hidden;
+  gap: 2px;
+  padding: 3px;
+  border-radius: var(--radius-pill);
+  background: var(--fill-1);
 }
 
 .plan-tabs__tab {
@@ -15,20 +16,22 @@
   gap: var(--space-2);
   min-height: 2.5rem;
   padding: 0 var(--space-4);
+  border-radius: var(--radius-pill);
   font-size: var(--text-sm);
   font-weight: 600;
   color: var(--ink-soft);
   transition:
-    background-color var(--duration-fast) var(--ease-out),
-    color var(--duration-fast) var(--ease-out);
+    background-color var(--duration-fast) var(--ease-ui),
+    color var(--duration-fast) var(--ease-ui),
+    transform var(--duration-fast) var(--ease-spring);
 }
 
-.plan-tabs__tab + .plan-tabs__tab {
-  border-left: 1px solid var(--rule-strong);
+.plan-tabs__tab:active {
+  transform: scale(0.95);
 }
 
 .plan-tabs__tab:hover {
-  background: var(--surface-sunk);
+  color: var(--ink);
 }
 
 .plan-tabs__tab[aria-selected='true'] {
@@ -411,9 +414,9 @@
   max-width: var(--measure);
   margin: 0 var(--space-gutter) var(--space-4);
   padding: var(--space-3) var(--space-4) var(--space-2);
-  border: 1px solid var(--rule);
   border-radius: var(--radius-lg);
   background: var(--surface);
+  box-shadow: var(--shadow-1);
 }
 
 .capmeter__head {
@@ -464,10 +467,12 @@
 }
 
 /* 리본: 창 전체가 트랙, 시각이 정해진 일이 면으로 앉는다 */
+/* 트랙도 일도 알약이다. 네모난 조각이 가로로 늘어서면 간트 차트처럼 읽혀서
+   "오늘 하루"가 아니라 "일정표"가 된다. */
 .capmeter__ribbon {
   position: relative;
-  height: 1.5rem;
-  border-radius: var(--radius-sm);
+  height: 1.75rem;
+  border-radius: var(--radius-pill);
   background: var(--surface-sunk);
   overflow: hidden;
 }
@@ -493,8 +498,8 @@
   position: absolute;
   top: 0.25rem;
   bottom: 0.25rem;
-  min-width: 2px;
-  border-radius: 2px;
+  min-width: 0.5rem;
+  border-radius: var(--radius-pill);
   background: color-mix(in oklab, var(--seg-color, var(--p4)) 58%, var(--surface));
   box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--seg-color, var(--p4)) 70%, transparent);
   --seg-color: var(--p4);
@@ -517,7 +522,8 @@
   position: absolute;
   top: 0;
   bottom: 0;
-  width: 2px;
+  width: 3px;
+  border-radius: var(--radius-pill);
   background: var(--now);
 }
 
@@ -527,8 +533,8 @@
   left: 5px;
   /* 오른쪽 끝에 가까우면 글자를 왼쪽으로 넘긴다(잘리지 않게) */
   translate: 0 -50%;
-  padding: 0 0.3rem;
-  border-radius: var(--radius-sm);
+  padding: 0 0.4rem;
+  border-radius: var(--radius-pill);
   background: var(--now);
   color: var(--now-ink);
   font-size: var(--text-2xs);

@@ -35,15 +35,15 @@
 .focus-mode {
   display: inline-flex;
   gap: 2px;
-  padding: 2px;
-  border-radius: var(--radius-sm);
+  padding: 3px;
+  border-radius: var(--radius-pill);
   background: var(--fill-1);
 }
 
 .focus-mode__button {
   min-height: 2.25rem;
   padding: 0 var(--space-5);
-  border-radius: calc(var(--radius-sm) - 2px);
+  border-radius: var(--radius-pill);
   font-size: var(--text-base);
   font-weight: var(--weight-medium);
   color: var(--ink-soft);
@@ -81,6 +81,33 @@
   width: min(80vw, 22rem);
   aspect-ratio: 1;
   container-type: inline-size;
+}
+
+/* 안쪽을 비워 두지 않고 면을 깐다. 가는 선 하나만 떠 있으면 원이 그려진 게 아니라
+   화면에 구멍이 뚫린 것처럼 보이고, 가운데 숫자도 어디에 얹힌 건지 알 수 없다. */
+.focus-dial::before {
+  content: '';
+  position: absolute;
+  inset: 9%;
+  border-radius: 50%;
+  background: var(--surface);
+  box-shadow: var(--shadow-1);
+}
+
+/* 돌아가는 동안만 아주 얕게 숨을 쉰다. 초침 없이도 "지금 흐르는 중"이 보인다.
+   폭이 1.5% 뿐이라 곁눈으로만 걸리고, 글자를 읽는 데는 방해가 되지 않는다. */
+@keyframes godo-breathe {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.015);
+  }
+}
+
+.focus-dial[data-phase='running'] {
+  animation: godo-breathe 4s var(--ease-in-out) infinite;
 }
 
 .focus-dial__ring {

@@ -1,0 +1,113 @@
+/* 일정이 바뀔 때 보이는 반응.
+   목적은 장식이 아니라 전달이다 — 무엇이 어떻게 바뀌었는지를 글을 읽지 않고도 알게 한다.
+   그래서 셋만 지킨다.
+
+   1. 내가 한 동작에만 반응한다. 화면을 열었을 때 이미 그 상태였던 것은 가만히 있는다.
+   2. 범위를 벗어나면 안 되는 값(색·투명도)에는 스프링을 쓰지 않는다. transform 에만 쓴다.
+   3. 모션 줄이기 설정은 base.css 의 전역 블록이 전부 끈다. 여기에서 따로 챙기지 않는다. */
+
+/* ── 완료 ──────────────────────────────────────────────
+   가장 자주 하는 동작이다. 체크가 차오르고, 줄이 그어지고, 행이 한 번 밝아졌다 가라앉는다. */
+
+@keyframes godo-check-pop {
+  0% {
+    transform: scale(1);
+  }
+  36% {
+    transform: scale(1.22);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.check[data-pop='true'] {
+  animation: godo-check-pop var(--duration-normal) var(--ease-spring);
+}
+
+/* 체크 표시 자체는 한 박자 늦게 들어와 "찍혔다"는 느낌을 만든다. */
+@keyframes godo-check-mark {
+  0% {
+    transform: scale(0.2) rotate(-18deg);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1) rotate(0);
+    opacity: 1;
+  }
+}
+
+.check[data-pop='true'][data-checked='true'] svg {
+  animation: godo-check-mark var(--duration-normal) var(--ease-spring) 60ms backwards;
+}
+
+/* 행은 강조색이 한 번 스쳤다가 사라진다. 어느 줄을 눌렀는지가 손가락을 떼도 남는다. */
+@keyframes godo-row-flash {
+  0% {
+    background-color: var(--accent-tint);
+  }
+  100% {
+    background-color: transparent;
+  }
+}
+
+.task-row[data-flash='true'] {
+  animation: godo-row-flash var(--duration-slow) var(--ease-ui);
+}
+
+/* 취소선은 켜지는 것이 아니라 번진다. 줄 자체는 항상 긋되 평소에는 투명하게 둔다 —
+   줄바꿈된 제목에서도 각 줄을 제대로 따라가는 방법은 text-decoration 뿐이다. */
+.task-row__title {
+  text-decoration-line: line-through;
+  text-decoration-color: transparent;
+  text-decoration-thickness: 1.5px;
+  transition:
+    color var(--duration-normal) var(--ease-ui),
+    text-decoration-color var(--duration-normal) var(--ease-ui);
+}
+
+.task-row[data-done='true'] .task-row__title,
+.task-row[data-canceled='true'] .task-row__title {
+  text-decoration-color: var(--rule-strong);
+}
+
+/* ── 목록에 새로 들어온 행 ───────────────────────────────
+   방금 더해진 것만 아래에서 올라온다. 화면을 여는 순간 전체가 들썩이면
+   "뭔가 생겼다"는 신호가 묻히므로, 어느 것이 새것인지는 TaskList 가 가려서 알려준다. */
+
+@keyframes godo-row-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.task-row[data-fresh='true'] {
+  animation: godo-row-in var(--duration-normal) var(--ease-soft);
+}
+
+/* ── 숫자가 바뀔 때 ────────────────────────────────────
+   습관 횟수처럼 한 자리씩 오르는 값은, 바뀐 순간에만 살짝 솟았다 내려온다. */
+
+@keyframes godo-bump {
+  0% {
+    transform: translateY(0);
+  }
+  40% {
+    transform: translateY(-3px);
+  }
+  100% {
+    transform: translateY(0);
+  }
+}
+
+[data-bump='true'] {
+  animation: godo-bump var(--duration-fast) var(--ease-spring);
+}
+
+/* 토스트가 아래에서 스프링으로 올라오는 것은 ui/toast.css 의 `toast-in` 이 맡는다.
+   같은 움직임을 두 군데 정의하지 않는다. */
